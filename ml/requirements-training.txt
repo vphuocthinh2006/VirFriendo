@@ -1,0 +1,14 @@
+# Machine learning & Data Processing
+pandas
+numpy
+scikit-learn
+tqdm
+PyYAML
+
+# NLP
+transformers
+torch
+
+# Others
+mlflow
+optuna

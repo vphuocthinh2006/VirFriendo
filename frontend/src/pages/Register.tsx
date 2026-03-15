@@ -1,0 +1,86 @@
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
+
+export default function Register() {
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const { register } = useAuth()
+  const navigate = useNavigate()
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      await register({ username, email, password })
+      navigate('/chat', { replace: true })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Đăng ký thất bại')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4 bg-cream-100">
+      <div className="w-full max-w-sm rounded-2xl border border-chat-border bg-cream-50 p-8 shadow-sm">
+        <h1 className="text-xl font-semibold text-stone-800 mb-6 text-center">Đăng ký</h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="text-sm text-red-600 bg-red-50/80 rounded-lg px-3 py-2">{error}</div>
+          )}
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Tên đăng nhập</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full rounded-xl border border-chat-border px-3 py-2.5 text-stone-800 bg-cream-50 focus:ring-2 focus:ring-accent/40 focus:border-accent/50 outline-none"
+              required
+              autoComplete="username"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-xl border border-chat-border px-3 py-2.5 text-stone-800 bg-cream-50 focus:ring-2 focus:ring-accent/40 focus:border-accent/50 outline-none"
+              required
+              autoComplete="email"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Mật khẩu</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-xl border border-chat-border px-3 py-2.5 text-stone-800 bg-cream-50 focus:ring-2 focus:ring-accent/40 focus:border-accent/50 outline-none"
+              required
+              autoComplete="new-password"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2.5 rounded-xl bg-accent text-cream-50 text-sm font-medium hover:bg-accent-hover disabled:opacity-50 transition"
+          >
+            {loading ? 'Đang đăng ký...' : 'Đăng ký'}
+          </button>
+        </form>
+        <p className="mt-6 text-center text-sm text-stone-500">
+          Đã có tài khoản?{' '}
+          <Link to="/login" className="text-accent-dark font-medium hover:underline">
+            Đăng nhập
+          </Link>
+        </p>
+      </div>
+    </div>
+  )
+}
