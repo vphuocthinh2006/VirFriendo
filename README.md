@@ -1,7 +1,4 @@
 # VirFriendo
-
-> AI Anime Companion — người bạn ảo kiểu Visual Novel: trò chuyện theo từng đoạn (streaming + karaoke), nhận diện cảm xúc, intent classification và nhiều agent chuyên biệt.
-
 ---
 
 ## Tổng quan
