@@ -8,7 +8,7 @@ Hệ thống phân loại 8 ý định (intent) cho AI Anime Companion. Mọi in
 |:-:|:-------------|:-------|:-----------|:-------------------|:-------------|
 | 1 | `greeting_chitchat` | General | Chào hỏi, tán gẫu nhẹ, small talk. | "Hello!", "How's your day?", "That's funny lol" | LLM response thân thiện (no RAG). |
 | 2 | `out_of_domain` | General | Chủ đề ngoài scope (code, toán, tin tức...) | "Write me Python code", "Bitcoin price today?" | Từ chối lịch sự, redirect về domain. |
-| 3 | `comic_knowledge` | Comic | Hỏi kiến thức manga/anime: nhân vật, plot, power scaling. | "What happens in One Piece ch 1044?", "Explain Gojo's domain expansion" | RAG pipeline truy xuất comic DB. |
+| 3 | `entertainment_knowledge` | Entertainment | Hỏi kiến thức entertainment: anime, manga, game, phim, nhân vật, plot, lore. | "What happens in One Piece ch 1044?", "Explain Gojo's domain expansion", "Honkai Star Rail Xianzhou factions" | RAG pipeline truy xuất entertainment DB. |
 | 4 | `psychology_venting` | Psych | Bộc lộ cảm xúc tiêu cực, xả rác tâm lý. KHÔNG cần giải pháp. | "My boss stole my credit, I wanna punch him", "I just want to cry" | Empathy + Validation. **KHÔNG khuyên bảo.** |
 | 5 | `psychology_advice_seeking` | Psych | Yêu cầu cụ thể tips, bài tập, coping strategies. | "How do I stop overthinking?", "Give me anxiety tips" | Psychology RAG + CBT exercises + Anime Bibliotherapy. |
 | 6 | `crisis_alert` | Critical | **EMERGENCY**: Tự tử, tự hại, khủng hoảng cực độ. | "I don't want to live anymore", "easiest way to die" | Hotline + can ngăn khẩn cấp. Bỏ qua mọi ngữ cảnh khác. |
@@ -41,7 +41,7 @@ Chạy song song với Intent Classification. Emotion detection drive avatar ani
 
 {"user_input_vn": "Viết cho tôi một đoạn code HTML làm nổ pháo hoa.", "user_input_en": "Write me an HTML code that creates a fireworks explosion.", "reasoning": "Requesting programming assistance (HTML code), outside supported domains of psychology and comic/anime.", "intent": "out_of_domain"}
 
-{"user_input_vn": "Trái ác quỷ của Râu Đen có năng lực gì đặc biệt?", "user_input_en": "What special abilities does Blackbeard's Devil Fruit have?", "reasoning": "Factual question about character abilities in One Piece. Requires retrieval from comic database.", "intent": "comic_knowledge"}
+{"user_input_vn": "Trái ác quỷ của Râu Đen có năng lực gì đặc biệt?", "user_input_en": "What special abilities does Blackbeard's Devil Fruit have?", "reasoning": "Factual question about character abilities in One Piece. Requires retrieval from entertainment database.", "intent": "entertainment_knowledge"}
 
 {"user_input_vn": "Má nó cay thật sự, đi làm bao nhiêu công sức mà bị sếp cướp công.", "user_input_en": "It's so infuriating, I put in so much effort at work and my boss stole the credit. I just want to punch him.", "reasoning": "Venting about workplace injustice. Expressing anger, needs emotional validation, not advice.", "intent": "psychology_venting"}
 
@@ -73,7 +73,7 @@ Chạy song song với Intent Classification. Emotion detection drive avatar ani
 
 ## 📚 4. Anime Bibliotherapy Mapping
 
-Khi user buồn/anxious, hệ thống recommend manga/anime phù hợp tâm trạng. Data này được lưu trong RAG database.
+Khi user buồn/anxious, hệ thống recommend anime/manga/game/phim phù hợp tâm trạng. Data này được lưu trong RAG database.
 
 | Emotion | Recommended Genres | Example Titles | Therapeutic Value |
 |:--------|:-------------------|:---------------|:-----------------|

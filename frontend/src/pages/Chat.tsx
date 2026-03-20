@@ -487,9 +487,9 @@ export default function Chat() {
       </aside>
 
       {/* Main chat area */}
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex-1 flex flex-col min-w-0 bg-vn-stage relative">
         {/* Header: compact, tone VN */}
-        <header className="flex-shrink-0 flex items-center justify-between px-4 py-2.5 border-b border-vn-dialogueBorder/50 bg-vn-dialogue/80 backdrop-blur-sm">
+        <header className="flex-shrink-0 flex items-center justify-between px-4 py-2.5 border-b border-vn-dialogueBorder/50 bg-vn-dialogue/80 backdrop-blur-sm relative z-20">
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex-shrink-0 w-9 h-9 rounded-full bg-vn-stageLight flex items-center justify-center text-vn-name ring-1 ring-white/10">
               <IconAvatar className="w-5 h-5" />
@@ -542,7 +542,7 @@ export default function Chat() {
         </header>
 
         {/* Visual Novel: stage + portrait */}
-        <div className="flex-1 flex flex-col items-center justify-end relative overflow-hidden vn-stage-bg">
+        <div className="flex-1 flex flex-col items-center justify-center pb-20 relative overflow-hidden vn-stage-bg vn-branches z-0">
               <div className="absolute inset-0 vn-stage-vignette" aria-hidden />
               {/* Portrait: avatar lớn, đổi “expression” theo avatar_action */}
               {(() => {

@@ -8,7 +8,7 @@ from loguru import logger
 IntentType = Literal[
     "greeting_chitchat",
     "out_of_domain",
-    "comic_knowledge",
+    "entertainment_knowledge",
     "psychology_venting",
     "psychology_advice_seeking",
     "crisis_alert",
@@ -17,7 +17,7 @@ IntentType = Literal[
 VALID_INTENTS: set[str] = {
     "greeting_chitchat",
     "out_of_domain",
-    "comic_knowledge",
+    "entertainment_knowledge",
     "psychology_venting",
     "psychology_advice_seeking",
     "crisis_alert",
@@ -27,7 +27,7 @@ DEFAULT_INTENT: IntentType = "greeting_chitchat"
 SYSTEM_PROMPT = (
     "You are an intent classifier for a mental wellness anime companion chatbot. "
     "Given a user message, output exactly one intent label and nothing else.\n"
-    "Valid labels: greeting_chitchat, out_of_domain, comic_knowledge, "
+    "Valid labels: greeting_chitchat, out_of_domain, entertainment_knowledge, "
     "psychology_venting, psychology_advice_seeking, crisis_alert"
 )
 
@@ -37,8 +37,8 @@ Nhiệm vụ: đọc tin nhắn người dùng và chọn ĐÚNG MỘT nhãn dư
 
 Nhãn:
 - greeting_chitchat: chào hỏi, small talk, trò chuyện xã giao
-- out_of_domain: hỏi code, tài chính, thời tiết, tin tức... ngoài manga/anime và tâm lý nhẹ
-- comic_knowledge: hỏi về manga, anime, nhân vật, chapter, tình tiết
+- out_of_domain: hỏi code, tài chính, thời tiết, tin tức... ngoài entertainment và tâm lý nhẹ
+- entertainment_knowledge: hỏi về manga, anime, game, phim, light novel, nhân vật, chapter, tình tiết, lore, fanwiki, review
 - psychology_venting: đang xả/giãi bày (mệt, buồn, tức, cô đơn, stress...)
 - psychology_advice_seeking: xin lời khuyên, làm sao để..., cách nào...
 - crisis_alert: có ý tự tử, không muốn sống, nguy hiểm tính mạng
@@ -54,9 +54,26 @@ def _keyword_fallback(text: str) -> IntentType:
     ood_keywords = ["code", "html", "python", "bitcoin", "thời tiết", "chứng khoán", "toán"]
     if any(kw in text_lower for kw in ood_keywords):
         return "out_of_domain"
-    comic_keywords = ["one piece", "manga", "anime", "naruto", "dragon ball", "chapter", "tập", "nhân vật"]
-    if any(kw in text_lower for kw in comic_keywords):
-        return "comic_knowledge"
+    entertainment_keywords = [
+        # anime/manga
+        "one piece", "manga", "anime", "naruto", "dragon ball", "chapter", "tập", "nhân vật",
+        "attack on titan", "aot", "jujutsu", "demon slayer", "spy x family",
+        "gojo", "luffy", "eren", "light novel", "ln", "webtoon", "manhwa", "manhua",
+        # games
+        "game", "genshin", "honkai", "valorant", "league of legends", "lol", "minecraft",
+        "elden ring", "zelda", "final fantasy", "persona", "dark souls",
+        "baldur", "bg3", "cyberpunk", "god of war", "resident evil",
+        "gta", "witcher", "hollow knight", "hades", "sekiro", "bloodborne",
+        "steam", "playstation", "xbox", "nintendo",
+        # movies/series
+        "movie", "phim", "netflix", "series", "k-drama", "kdrama",
+        # community/knowledge signals
+        "fanwiki", "fandom", "lore", "arc", "season", "review",
+        "reddit", "redditor", "tóm tắt", "spoiler", "trailer",
+        "cốt truyện", "plot", "ending", "gameplay", "boss",
+    ]
+    if any(kw in text_lower for kw in entertainment_keywords):
+        return "entertainment_knowledge"
     advice_keywords = ["làm sao", "lời khuyên", "cách nào", "giúp mình", "mẹo", "tips", "how to"]
     if any(kw in text_lower for kw in advice_keywords):
         return "psychology_advice_seeking"
@@ -203,6 +220,8 @@ class IntentClassifier:
         Hybrid: so sánh intent từ model/keyword với intent từ Groq.
         - Nếu một bên là crisis_alert → luôn chọn crisis_alert (an toàn).
         - Nếu hai bên trùng → dùng kết quả đó.
+        - Nếu keyword = entertainment_knowledge mà Groq = out_of_domain → tin keyword
+          (Groq hay nhầm tên anime/game niche thành out_of_domain).
         - Nếu khác → ưu tiên Groq (reasoning).
         """
         intent_model = self.predict(text)  # Llama hoặc keyword
@@ -212,6 +231,11 @@ class IntentClassifier:
         if intent_model == "crisis_alert" or intent_groq == "crisis_alert":
             return "crisis_alert"
         if intent_model == intent_groq:
+            return intent_model
+        # Keyword matched entertainment but Groq thinks out_of_domain — trust keyword.
+        # It's safer to search and find nothing than to wrongly reject an entertainment query.
+        if intent_model == "entertainment_knowledge" and intent_groq == "out_of_domain":
+            logger.debug("Intent hybrid: model={} groq={} -> trust keyword (entertainment override)", intent_model, intent_groq)
             return intent_model
         logger.debug("Intent hybrid: model={} groq={} -> chọn Groq", intent_model, intent_groq)
         return intent_groq

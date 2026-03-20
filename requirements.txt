@@ -24,3 +24,9 @@ loguru==0.7.2
 email-validator
 passlib[bcrypt]
 python-jose[cryptography]
+
+# Testing
+pytest
+pytest-asyncio
+pytest-cov
+aiosqlite

@@ -42,7 +42,7 @@ Hệ thống gồm 3 service chính chạy trên Docker, giao tiếp qua REST/gR
 │        ┌─────────────────┼─────────────────────────┐                │
 │        ▼                 ▼                          ▼                │
 │  ┌───────────┐  ┌──────────────┐  ┌──────────────────────────────┐ │
-│  │chit_chat  │  │comfort_agent │  │ comic_expert (RAG Pipeline)  │ │
+│  │chit_chat  │  │comfort_agent │  │ entertainment_expert (RAG Pipeline) │ │
 │  │guardrail  │  │advice_agent  │  │ embed → retrieve → rerank    │ │
 │  │           │  │crisis_agent  │  │          → LLM generate      │ │
 │  │           │  │              │  │                               │ │
@@ -88,7 +88,7 @@ graph LR
     end
 
     subgraph "📥 Thu thập dữ liệu"
-        SC["🕷️ Scrapy<br/>─────────────<br/>Crawl dữ liệu<br/>manga/anime<br/>(MyAnimeList,<br/>AniList, Wiki)"]
+        SC["🕷️ Scrapy<br/>─────────────<br/>Crawl dữ liệu<br/>entertainment<br/>(AniList, Wiki,<br/>IGDB, TMDB)"]
         NEWS["📰 Web Sources<br/>─────────────<br/>Tâm lý học,<br/>bài viết sức khỏe<br/>tinh thần"]
         SYNTH["🤖 GPT-4o-mini<br/>─────────────<br/>Synthetic data<br/>generation cho<br/>intent & emotion"]
     end
@@ -161,7 +161,7 @@ graph TB
     subgraph "🤖 Specialized Agents (6)"
         A1["💬 chit_chat_agent<br/>Small talk, greeting"]
         A2["🛡️ guardrail_agent<br/>Out-of-domain reject"]
-        A3["📖 comic_expert_agent<br/>RAG → manga/anime"]
+        A3["📖 entertainment_expert_agent<br/>RAG → entertainment"]
         A4["🫂 comfort_agent<br/>Empathy, validation"]
         A5["🧠 advice_agent<br/>CBT + bibliotherapy"]
         A6["🚨 crisis_agent<br/>Emergency hotline"]

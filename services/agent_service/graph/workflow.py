@@ -6,7 +6,7 @@ from typing import Literal
 from services.agent_service.graph.state import AgentState
 from services.agent_service.graph.agents import (
     chit_chat_node, guardrail_node,
-    comic_expert_node, comfort_node,
+    entertainment_expert_node, comfort_node,
     advice_node, crisis_node
 )
 from services.agent_service.graph.emotion import emotion_node
@@ -23,7 +23,7 @@ async def classification_node(state: AgentState) -> dict:
 
 
 def route_intent(state: AgentState) -> Literal[
-    "chit_chat", "guardrail", "comic_expert", "comfort", "advice", "crisis"
+    "chit_chat", "guardrail", "entertainment_expert", "comfort", "advice", "crisis"
 ]:
     """
     Hàm định tuyến (Conditional Edge) dựa vào intent trong state.
@@ -33,10 +33,10 @@ def route_intent(state: AgentState) -> Literal[
     mapping = {
         "greeting_chitchat": "chit_chat",
         "out_of_domain": "guardrail",
-        "comic_knowledge": "comic_expert",
+        "entertainment_knowledge": "entertainment_expert",
         "psychology_venting": "comfort",
         "psychology_advice_seeking": "advice",
-        "crisis_alert": "crisis"
+        "crisis_alert": "crisis",
     }
     
     return mapping.get(intent, "chit_chat")
@@ -52,7 +52,7 @@ def build_graph() -> StateGraph:
     workflow.add_node("emotion", emotion_node)
     workflow.add_node("chit_chat", chit_chat_node)
     workflow.add_node("guardrail", guardrail_node)
-    workflow.add_node("comic_expert", comic_expert_node)
+    workflow.add_node("entertainment_expert", entertainment_expert_node)
     workflow.add_node("comfort", comfort_node)
     workflow.add_node("advice", advice_node)
     workflow.add_node("crisis", crisis_node)
@@ -64,7 +64,7 @@ def build_graph() -> StateGraph:
     # Từ các Agent -> Kết nối tới END (hoặc gửi response ra output)
     workflow.add_edge("chit_chat", END)
     workflow.add_edge("guardrail", END)
-    workflow.add_edge("comic_expert", END)
+    workflow.add_edge("entertainment_expert", END)
     workflow.add_edge("comfort", END)
     workflow.add_edge("advice", END)
     workflow.add_edge("crisis", END)

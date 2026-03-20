@@ -4,14 +4,15 @@ from sqlalchemy import select, delete, func
 from uuid import UUID
 
 from services.core.database import get_db
-from services.core.models import Conversation, Message
+from services.core.models import Conversation, Message, UserMemory
 from services.core.security import get_current_user_id
 from pydantic import BaseModel
 from pydantic import ConfigDict
 
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from services.agent_service.graph.workflow import graph_app
 from services.core.context import get_conversation_context, MAX_CONTEXT_MESSAGES
+from services.agent_service.llm.memory import extract_user_memories
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
@@ -74,6 +75,22 @@ async def chat(
     if not lc_messages:
         lc_messages = [HumanMessage(content=request.message)]
 
+    # BƯỚC 3.1: Nạp user memories (không UI) để bot "nhớ" lâu dài
+    mem_result = await db.execute(
+        select(UserMemory)
+        .where(UserMemory.user_id == user_uuid, UserMemory.is_active == True)  # noqa: E712
+        .order_by(UserMemory.updated_at.desc(), UserMemory.created_at.desc())
+        .limit(20)
+    )
+    memories = mem_result.scalars().all()
+    if memories:
+        bullets = "\n".join([f"- ({m.type}) {m.content}" for m in memories if m.content])
+        memory_block = (
+            "Thông tin đã biết về bạn (dùng để trả lời tự nhiên hơn, không cần nhắc lại y nguyên):\n"
+            + bullets
+        )
+        lc_messages = [SystemMessage(content=memory_block)] + lc_messages
+
     initial_state = {
         "messages": lc_messages,
     }
@@ -101,6 +118,40 @@ async def chat(
     db.add(bot_msg)
     await db.commit()
     await db.refresh(bot_msg)
+
+    # BƯỚC 4.1: Trích xuất & lưu user memory tự động sau mỗi lượt chat
+    try:
+        # Dùng một cửa sổ nhỏ gần nhất để extract (đã gồm memory SystemMessage ở đầu, nên bỏ nó)
+        extract_window = [m for m in lc_messages if not isinstance(m, SystemMessage)][-12:]
+        extracted = await extract_user_memories(extract_window)
+        for mem in extracted:
+            mtype = (mem.get("type") or "fact").strip()[:32]
+            mcontent = (mem.get("content") or "").strip()
+            if not mcontent:
+                continue
+            # tránh duplicate y nguyên
+            dup_q = await db.execute(
+                select(UserMemory.id).where(
+                    UserMemory.user_id == user_uuid,
+                    UserMemory.is_active == True,  # noqa: E712
+                    UserMemory.type == mtype,
+                    UserMemory.content == mcontent,
+                ).limit(1)
+            )
+            if dup_q.scalar() is not None:
+                continue
+            db.add(
+                UserMemory(
+                    user_id=user_uuid,
+                    type=mtype,
+                    content=mcontent,
+                    source_message_id=bot_msg.id,
+                )
+            )
+        await db.commit()
+    except Exception:
+        # memory fail should not break chat
+        await db.rollback()
 
     # Cập nhật tiêu đề mỗi 21 tin (theo tin user vừa gửi)
     count_result = await db.execute(select(func.count(Message.id)).where(Message.conversation_id == conversation.id))

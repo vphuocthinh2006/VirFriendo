@@ -6,8 +6,8 @@
 **VirFriendo** là ứng dụng chat với AI companion dạng nhân vật anime, giao diện theo phong cách Visual Novel:
 
 - **Chat kiểu VN:** Hội thoại hiển thị từng đoạn (chunks), hiệu ứng karaoke (từng chữ đổi màu), cooldown 5s trước đoạn đầu, click dialogue để skip/advance.
-- **Backend:** FastAPI (auth, chat API), LangGraph (intent classification, 6 agent: chit_chat, guardrail, comic_expert, comfort, advice, crisis), PostgreSQL + Redis + ChromaDB.
-- **Mở rộng:** Emotion-driven avatar, RAG manga/anime, mini-game (Chess, Quiz), mood tracking (theo kế hoạch).
+- **Backend:** FastAPI (auth, chat API), LangGraph (intent classification, 6 agent: chit_chat, guardrail, entertainment_expert, comfort, advice, crisis), PostgreSQL + Redis + ChromaDB.
+- **Mở rộng:** Emotion-driven avatar, RAG entertainment (anime, manga, game, phim), mini-game (Chess, Quiz), mood tracking (theo kế hoạch).
 
 ---
 
