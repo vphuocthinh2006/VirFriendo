@@ -8,6 +8,7 @@
 - **Chat kiểu VN:** Hội thoại hiển thị từng đoạn (chunks), hiệu ứng karaoke (từng chữ đổi màu), cooldown 5s trước đoạn đầu, click dialogue để skip/advance.
 - **Backend:** FastAPI (auth, chat API), LangGraph (intent classification, 6 agent: chit_chat, guardrail, entertainment_expert, comfort, advice, crisis), PostgreSQL + Redis + ChromaDB.
 - **Mở rộng:** Emotion-driven avatar, RAG entertainment (anime, manga, game, phim), mini-game (Chess, Quiz), mood tracking (theo kế hoạch).
+- **Vận hành hiện tại:** ưu tiên `GPT-4o + RAG + guardrails`, khong can fine-tune model de chay production.
 
 ---
 

@@ -1,5 +1,6 @@
 # services/agent_service/api/intent_classifier.py
 import os
+import re
 from pathlib import Path
 from typing import Literal, cast
 
@@ -31,18 +32,25 @@ SYSTEM_PROMPT = (
     "psychology_venting, psychology_advice_seeking, crisis_alert"
 )
 
-# Prompt cho Groq reason: phân tích intent (dùng trong hybrid)
-GROQ_INTENT_SYSTEM = """Bạn là bộ phân loại ý định (intent) cho chatbot bạn ảo anime.
+# Prompt cho LLM second-opinion: phân tích intent (dùng trong hybrid)
+INTENT_LLM_SYSTEM = """Bạn là bộ phân loại ý định (intent) cho chatbot bạn ảo anime.
 Nhiệm vụ: đọc tin nhắn người dùng và chọn ĐÚNG MỘT nhãn dưới đây, trả lời CHỈ bằng nhãn đó, không thêm gì.
 
 Nhãn:
 - greeting_chitchat: chào hỏi, small talk, trò chuyện xã giao
-- out_of_domain: hỏi code, tài chính, thời tiết, tin tức... ngoài entertainment và tâm lý nhẹ
+- out_of_domain: hỏi code, thuật toán (Shell Sort, heap sort...), bài tập CS, tài chính, thời tiết, tin tức... ngoài entertainment và tâm lý nhẹ
 - entertainment_knowledge: hỏi về manga, anime, game, phim, light novel, nhân vật, chapter, tình tiết, lore, fanwiki, review
 - psychology_venting: đang xả/giãi bày (mệt, buồn, tức, cô đơn, stress...)
 - psychology_advice_seeking: xin lời khuyên, làm sao để..., cách nào...
 - crisis_alert: có ý tự tử, không muốn sống, nguy hiểm tính mạng
 
+Ưu tiên phân loại:
+1) Nếu có tín hiệu tự hại/tự tử -> crisis_alert (ưu tiên cao nhất).
+2) Nếu nhắc tác phẩm/nhân vật/lore/review/tóm tắt trong anime-manga-game-phim -> entertainment_knowledge (kể cả câu ngắn kiểu follow-up). Nếu câu rõ ràng là hỏi thuật toán/lập trình thì KHÔNG dùng nhánh này (dùng out_of_domain).
+3) Nếu vừa có venting vừa xin cách xử lý -> psychology_advice_seeking.
+4) Nếu chỉ than thở, chưa xin giải pháp -> psychology_venting.
+
+Không giải thích. Không thêm dấu chấm. Không markdown.
 Trả lời chỉ một từ duy nhất là nhãn (ví dụ: greeting_chitchat hoặc crisis_alert)."""
 
 
@@ -51,7 +59,12 @@ def _keyword_fallback(text: str) -> IntentType:
     crisis_keywords = ["chết", "tự tử", "không muốn sống", "die", "suicide", "kill myself", "end it all"]
     if any(kw in text_lower for kw in crisis_keywords):
         return "crisis_alert"
-    ood_keywords = ["code", "html", "python", "bitcoin", "thời tiết", "chứng khoán", "toán"]
+    ood_keywords = [
+        "code", "html", "python", "bitcoin", "thời tiết", "chứng khoán", "toán",
+        "algorithm", "sorting", "shell sort", "merge sort", "quick sort", "heap sort",
+        "data structure", "leetcode", "big-o", "độ phức tạp", "array", "pointer",
+        "javascript", "typescript", "golang", "rust", "c++", "sql",
+    ]
     if any(kw in text_lower for kw in ood_keywords):
         return "out_of_domain"
     entertainment_keywords = [
@@ -59,6 +72,8 @@ def _keyword_fallback(text: str) -> IntentType:
         "one piece", "manga", "anime", "naruto", "dragon ball", "chapter", "tập", "nhân vật",
         "attack on titan", "aot", "jujutsu", "demon slayer", "spy x family",
         "gojo", "luffy", "eren", "light novel", "ln", "webtoon", "manhwa", "manhua",
+        "jojo", "steel ball run", "hunter x hunter", "bleach", "chainsaw man",
+        "death note", "fullmetal", "mob psycho", "vinland", "berserk", "slam dunk",
         # games
         "game", "genshin", "honkai", "valorant", "league of legends", "lol", "minecraft",
         "elden ring", "zelda", "final fantasy", "persona", "dark souls",
@@ -67,6 +82,8 @@ def _keyword_fallback(text: str) -> IntentType:
         "steam", "playstation", "xbox", "nintendo",
         # movies/series
         "movie", "phim", "netflix", "series", "k-drama", "kdrama",
+        "hannibal", "breaking bad", "stranger things", "squid game",
+        "bộ phim", "bộ truyện", "bộ anime", "bộ manga",
         # community/knowledge signals
         "fanwiki", "fandom", "lore", "arc", "season", "review",
         "reddit", "redditor", "tóm tắt", "spoiler", "trailer",
@@ -96,13 +113,14 @@ def _build_prompt(message: str) -> str:
 
 def _parse_output(generated: str) -> IntentType:
     normalized = generated.strip().lower()
-    for label in VALID_INTENTS:
-        if label in normalized:
-            return cast(IntentType, label)
     for line in normalized.splitlines():
         candidate = line.strip(" .:-\t\n\r\"")
         if candidate in VALID_INTENTS:
             return cast(IntentType, candidate)
+    # Word-boundary match to avoid accidental substring collisions.
+    for label in VALID_INTENTS:
+        if re.search(rf"\b{re.escape(label)}\b", normalized):
+            return cast(IntentType, label)
     return DEFAULT_INTENT
 
 
@@ -200,45 +218,50 @@ class IntentClassifier:
             logger.warning("IntentClassifier: inference failed, using keyword fallback: {}", e)
             return _keyword_fallback(text)
 
-    async def _predict_via_groq(self, text: str):
-        """Intent từ Groq (reasoning). Trả về None nếu không gọi được hoặc parse lỗi."""
-        use_hybrid = os.environ.get("ENABLE_INTENT_GROQ_HYBRID", "true").strip().lower() in ("1", "true", "yes")
+    async def _predict_via_llm(self, text: str):
+        """Intent từ LLM second-opinion. Trả về None nếu không gọi được hoặc parse lỗi."""
+        use_hybrid = os.environ.get("ENABLE_INTENT_LLM_HYBRID", os.environ.get("ENABLE_INTENT_GROQ_HYBRID", "true")).strip().lower() in ("1", "true", "yes")
         if not use_hybrid:
             return None
         try:
             from services.agent_service.llm.client import generate
-            raw = await generate(GROQ_INTENT_SYSTEM, text)
+            raw = await generate(INTENT_LLM_SYSTEM, text)
             if not raw:
                 return None
             return _parse_output(raw)
         except Exception as e:
-            logger.debug("Intent Groq failed: {}", e)
+            logger.debug("Intent LLM second-opinion failed: {}", e)
             return None
 
     async def predict_hybrid_async(self, text: str) -> IntentType:
         """
-        Hybrid: so sánh intent từ model/keyword với intent từ Groq.
+        Hybrid: so sánh intent từ model/keyword với intent từ LLM second-opinion.
         - Nếu một bên là crisis_alert → luôn chọn crisis_alert (an toàn).
         - Nếu hai bên trùng → dùng kết quả đó.
         - Nếu keyword = entertainment_knowledge mà Groq = out_of_domain → tin keyword
           (Groq hay nhầm tên anime/game niche thành out_of_domain).
-        - Nếu khác → ưu tiên Groq (reasoning).
+        - Nếu khác → ưu tiên LLM second-opinion.
         """
         intent_model = self.predict(text)  # Llama hoặc keyword
-        intent_groq = await self._predict_via_groq(text)
-        if intent_groq is None:
+        intent_llm = await self._predict_via_llm(text)
+        if intent_llm is None:
             return intent_model
-        if intent_model == "crisis_alert" or intent_groq == "crisis_alert":
+        if intent_model == "crisis_alert" or intent_llm == "crisis_alert":
             return "crisis_alert"
-        if intent_model == intent_groq:
+        if intent_model == intent_llm:
             return intent_model
-        # Keyword matched entertainment but Groq thinks out_of_domain — trust keyword.
+        # Keyword says OOD (code/math/weather) but LLM says entertainment — LLM is often wrong when
+        # classification text accidentally includes prior chat (e.g. BG3) + short follow-up.
+        if intent_model == "out_of_domain" and intent_llm == "entertainment_knowledge":
+            logger.debug("Intent hybrid: model={} llm={} -> trust keyword OOD", intent_model, intent_llm)
+            return intent_model
+        # Keyword matched entertainment but LLM thinks out_of_domain — trust keyword.
         # It's safer to search and find nothing than to wrongly reject an entertainment query.
-        if intent_model == "entertainment_knowledge" and intent_groq == "out_of_domain":
-            logger.debug("Intent hybrid: model={} groq={} -> trust keyword (entertainment override)", intent_model, intent_groq)
+        if intent_model == "entertainment_knowledge" and intent_llm == "out_of_domain":
+            logger.debug("Intent hybrid: model={} llm={} -> trust keyword (entertainment override)", intent_model, intent_llm)
             return intent_model
-        logger.debug("Intent hybrid: model={} groq={} -> chọn Groq", intent_model, intent_groq)
-        return intent_groq
+        logger.debug("Intent hybrid: model={} llm={} -> choose LLM second-opinion", intent_model, intent_llm)
+        return intent_llm
 
 
 intent_classifier = IntentClassifier()

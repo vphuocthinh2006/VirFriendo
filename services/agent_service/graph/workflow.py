@@ -13,12 +13,36 @@ from services.agent_service.graph.emotion import emotion_node
 from services.agent_service.api.intent_classifier import intent_classifier
 
 
+def _technical_followup_suppresses_context(last_message: str) -> bool:
+    """Short follow-ups are merged with prior user text for anime/game continuity — but CS/math/code must stay OOD."""
+    low = (last_message or "").strip().lower()
+    markers = (
+        " code", "code ", "algorithm", "shell sort", "merge sort", "quick sort", "heap sort",
+        "sorting", "data structure", "leetcode", "big-o", "độ phức", "pointer", "array",
+        "python", "javascript", "typescript", "html", "css", "sql", "golang", "rust", "c++",
+        "toán ", " toán", "bitcoin", "chứng khoán",
+    )
+    return any(m in low for m in markers)
+
+
 async def classification_node(state: AgentState) -> dict:
     """
     Phân loại intent: hybrid (model/keyword + Groq reason), lấy kết quả ổn hơn.
     """
     last_message = state["messages"][-1].content
-    detected_intent = await intent_classifier.predict_hybrid_async(last_message)
+    user_msgs = [m.content for m in state.get("messages", []) if isinstance(m, HumanMessage)]
+    prev_user = user_msgs[-2] if len(user_msgs) >= 2 else ""
+    low = (last_message or "").strip().lower()
+    use_prev = (
+        bool(prev_user)
+        and not _technical_followup_suppresses_context(last_message)
+        and (
+            any(k in low for k in ["nếu so sánh", "ý là", "thế còn", "còn nếu", "vậy còn", "so với", "so sánh"])
+            or len(low.split()) <= 8
+        )
+    )
+    classify_text = f"{prev_user}\nFollow-up: {last_message}" if use_prev else last_message
+    detected_intent = await intent_classifier.predict_hybrid_async(classify_text)
     return {"intent": detected_intent}
 
 
@@ -29,6 +53,9 @@ def route_intent(state: AgentState) -> Literal[
     Hàm định tuyến (Conditional Edge) dựa vào intent trong state.
     """
     intent = state.get("intent", "greeting_chitchat")
+    # Safety-first: emotion detector can catch crisis even if intent classifier misses.
+    if state.get("emotion") == "crisis":
+        return "crisis"
     
     mapping = {
         "greeting_chitchat": "chit_chat",

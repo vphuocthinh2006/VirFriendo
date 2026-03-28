@@ -1,4 +1,4 @@
-from typing import TypedDict, Annotated, Sequence
+from typing import TypedDict, Annotated, Sequence, NotRequired
 import operator
 from langchain_core.messages import BaseMessage
 
@@ -19,3 +19,6 @@ class AgentState(TypedDict):
     # Optional metadata such as avatar action or bibliotherapy suggestions
     avatar_action: str
     bibliotherapy_suggestion: str | None
+
+    # Deployed agent id (e.g. tuq27) — drives persona name lock + output sanitization
+    agent_id: NotRequired[str]

@@ -9,6 +9,11 @@ export function useAuth() {
   useEffect(() => {
     setIsAuth(api.isAuthenticated())
     setLoading(false)
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'access_token') setIsAuth(!!e.newValue)
+    }
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
   }, [])
 
   const login = useCallback(async (username: string, password: string) => {

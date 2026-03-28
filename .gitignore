@@ -46,8 +46,8 @@ data/models/*
 !data/models/.gitkeep
 # Large model files (host elsewhere or LFS)
 my_trained_model.zip
-services/agent-service/models/intent/*.safetensors
-services/agent-service/models/intent/adapter_model.safetensors
+services/agent_service/models/intent/*.safetensors
+services/agent_service/models/intent/adapter_model.safetensors
 
 # Frontend & deps
 node_modules/
@@ -60,6 +60,16 @@ frontend/node_modules/
 *.swo
 *~
 .DS_Store
+
+# Local game clones / Godot integration — use branch `archive/sourceofmana-integration` for addon only
+integrations/
+
+# Cursor IDE
+.cursor/
+
+# Large local exports (Blender, etc.)
+/Untitled.fbx
+/exports/
 
 # Local temp / debug files
 .tempmediaStorage/

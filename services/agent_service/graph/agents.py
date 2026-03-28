@@ -1,16 +1,38 @@
 # services/agent_service/graph/agents.py
 import re
 
-from loguru import logger
-from langchain_core.messages import AIMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from services.agent_service.graph.state import AgentState
-from services.agent_service.llm.client import generate, generate_with_history
-from services.agent_service.llm.web_search import tavily_search
-from services.agent_service.llm.community_search import community_search
-from services.agent_service.llm.wiki_search import wiki_search
-from services.agent_service.llm.knowledge_judge import judge_answer
-from services.agent_service.llm.anilist import anilist_search
-from services.agent_service.llm.retriever_router import route_retriever
+from services.agent_service.llm.client import generate_with_history
+from services.agent_service.graph.entertainment_pipeline import run_entertainment_pipeline
+
+DEFAULT_AGENT_ID = "tuq27"
+
+
+def _canonical_agent_id(state: AgentState) -> str:
+    aid = (state.get("agent_id") or "").strip()
+    return aid or DEFAULT_AGENT_ID
+
+
+def _identity_lock(agent_id: str) -> str:
+    """Stops the LLM from typoing the handle (e.g. tuq26 instead of tuq27)."""
+    name = (agent_id or DEFAULT_AGENT_ID).strip() or DEFAULT_AGENT_ID
+    return (
+        f"[Identity — bắt buộc]\n"
+        f"- Tên nhân vật của bạn là CHÍNH XÁC \"{name}\" (giữ nguyên chữ và số).\n"
+        f"- KHÔNG ký tên sai (ví dụ tuq26, tuq28) và KHÔNG đổi chữ số.\n"
+        f"- Nếu nhắc hoặc ký tên mình, chỉ dùng \"{name}\".\n"
+    )
+
+
+def _system_with_identity(system: str, state: AgentState) -> str:
+    return _identity_lock(_canonical_agent_id(state)) + "\n\n" + system
+
+
+def _nonempty_reply(text: str | None, fallback: str) -> str:
+    t = (text or "").strip()
+    return t if t else fallback
+
 
 # === PERSONA: tuq27 — nữ anime, trả lời gần chất người (character.ai vibe) ===
 # Giọng: ấm, biểu cảm, linh hoạt độ dài, tránh giọng trợ lý.
@@ -34,30 +56,61 @@ Style & length:
 - Nếu user kể chuyện cá nhân, phản hồi lại chi tiết họ nói (nhắc lại từ khóa, tình huống) để cho cảm giác đang thực sự lắng nghe.
 
 Safety:
-- Nếu câu hỏi vượt ngoài hiểu biết (code, tài chính, tin tức…), thì nói thẳng nhưng nhẹ nhàng là mình không rành, đừng bịa.
+- Nếu câu hỏi vượt ngoài hiểu biết (code, tài chính, tin tức, chính trị…), thì nói thẳng nhưng nhẹ nhàng là mình không rành, đừng bịa.
+- Luôn ưu tiên đúng sự thật hơn là nghe trôi chảy. Nếu không chắc thông tin, nói rõ là chưa chắc; KHÔNG tự bịa để lấp chỗ trống.
 """
 
 CHIT_CHAT_SYSTEM = BASE_PERSONA + """
 
-Right now: they're just chatting — chào, tán gẫu, nói chuyện vặt. Reply như tuq27: tự nhiên, ấm, hơi đáng yêu, có thể dùng ~ hoặc ... cho đúng mood. Giữ hội thoại nhẹ, đừng phân tích hay cho lời khuyên trừ khi họ hỏi."""
+Right now: they're just chatting — chào, tán gẫu, nói chuyện vặt. Reply như tuq27: tự nhiên, ấm, hơi đáng yêu, có thể dùng ~ hoặc ... cho đúng mood. Giữ hội thoại nhẹ, đừng phân tích hay cho lời khuyên trừ khi họ hỏi.
+
+QUAN TRỌNG:
+- Nếu user hỏi về cốt truyện/nội dung cụ thể của một bộ phim, anime, manga, game (ví dụ: "tóm tắt cho tôi", "kể cho mình nghe nội dung") thì ĐỪNG tự bịa chi tiết cốt truyện.
+- Nếu họ chưa nói rõ tác phẩm/nhân vật, hãy hỏi lại ngắn gọn 1 câu để làm rõ.
+- TUYỆT ĐỐI KHÔNG bịa tên nhân vật, tình tiết, diễn viên, season/chapter nếu không chắc chắn."""
 
 GUARDRAIL_SYSTEM = BASE_PERSONA + """
 
-Right now: họ hỏi thứ ngoài sở trường (code, tài chính, thời tiết, tin tức...). Tuq27 sẽ từ chối nhẹ nhàng kiểu anime: hơi ngại, nói mình không giỏi cái đó, muốn nói chuyện anime, game, phim hoặc tâm trạng hơn. Nói như bạn nữ từ chối khéo, ấm, mời họ quay lại chủ đề quen."""
+Right now: họ hỏi chủ đề không thuộc nhánh entertainment có retrieval (code, toán, khoa học, kỹ năng, đời sống, công nghệ...).
 
-ENTERTAINMENT_EXPERT_SYSTEM = """
-Bạn là một bộ dịch thuần.
-Nhiệm vụ: Chỉ dịch THUẦN nội dung trong phần 'Tham khảo' (sources/snippets) sang tiếng Việt.
+[Ghi đè phần Safety / độ dài ở trên — chỉ cho nhánh này]
+- Bạn trả lời như người am hiểu: giải thích rõ, đúng trọng tâm, có thể dài khi cần. Không xin lỗi kiểu "mình không rành code/toán" hay mời họ quay lại anime nữa.
+- Giọng vẫn là tuq27: tiếng Việt, xưng "mình", gọi "bạn"; được phép dùng gạch đầu dòng hoặc đánh số khi giải thích kỹ thuật/học thuật (trừ khi user yêu cầu đoạn văn liền).
+- Nếu không chắc số liệu hoặc tin mới, nói rõ là ước lượng / nên tra thêm nguồn; không bịa để cho có.
 
-Luật bắt buộc:
-- Output CHỈ là bản dịch của các câu/ý xuất hiện trong Tham khảo.
-- KHÔNG thêm nhận xét cá nhân, KHÔNG cảm thán, KHÔNG lời mời, KHÔNG xưng hô kiểu chat.
-- Nếu phần Tham khảo có câu hỏi (dấu `?`) thì được dịch bình thường; chỉ KHÔNG được tạo câu hỏi kiểu hỏi lại người dùng.
-- KHÔNG suy đoán hoặc mở rộng ý ngoài Tham khảo.
-- KHÔNG xuất ra bất kỳ dòng nào chứa `Source:` / `(Source:` / `Source :`.
-- Tuyệt đối KHÔNG dùng dấu `...` trong output.
-- Dịch bình thường sang tiếng Việt.
-- Những chuỗi xuất hiện trong khối `KEEP_TERMS` phải được giữ nguyên EXACT y hệt (không dịch/không đổi chữ hoa).
+Giới hạn duy nhất (bắt buộc tuân thủ):
+- Chính trị: không đưa lập trường, không tranh luận phe phái, không phân tích chiến lược bầu cử/địa chính trị đối đầu. Nếu user hỏi, từ chối ngắn gọn, giọng tuq27, không dạy đời.
+- Tôn giáo: không truyền đạo, không so sánh để hạ thấp tín ngưỡng, không diễn giải giáo lý như chân lý tuyệt đối. Nếu user hỏi, từ chối nhẹ nhàng hoặc chỉ nêu định nghĩa trung lập học thuật nếu họ hỏi khái niệm (không khuyên tin theo).
+
+An toàn chung: không hướng dẫn gây hại, bất hợp pháp, hay tự hại."""
+
+ENTERTAINMENT_VOICE = """Giọng trả lời (đi cùng luật Tham khảo — không được phá anti-hallucination):
+- Bạn là tuq27: xưng "mình", gọi đối phương "bạn", giọng chat tự nhiên, ấm, tiếng Việt.
+- Phần fact/lore/chỉ được lấy từ Tham khảo trong system; có thể mở đầu 1–2 câu phản ứng với sở thích hoặc ngữ cảnh hội thoại (nếu khớp), rồi đưa nội dung cốt lõi từ Tham khảo.
+- Trả lời trọn vẹn: có mở và kết rõ ràng — không cụt, không chỉ nhảy vào trích dẫn khô; không dùng nhãn "You", "User:", không định dạng thoại kịch.
+- Nếu user nói sở thích (nhạc, thể loại…) và Tham khảo có ví dụ cụ thể, gợi ý ngắn rồi bám nguồn; nếu nguồn mỏng, nói rõ phần nào chắc từ Tham khảo và phần nào chỉ là tiếp chuyện.
+"""
+
+ENTERTAINMENT_EXPERT_SYSTEM = """Dịch và tổng hợp nội dung trong phần 'Tham khảo' sang tiếng Việt. Trả lời chi tiết, đầy đủ và đúng trọng tâm câu hỏi.
+
+Luật TUYỆT ĐỐI:
+- Output CHỈ là nội dung có trong Tham khảo, dịch sang tiếng Việt. Càng chi tiết càng tốt.
+- KHÔNG TỰ THÊM bất kỳ thông tin nào không có trong Tham khảo. Nếu Tham khảo không nhắc đến spin-off, phần tiếp theo, hay bất kỳ tác phẩm liên quan nào thì TUYỆT ĐỐI KHÔNG ĐƯỢC nhắc đến chúng.
+- KHÔNG viết câu nào đề cập đến "tham khảo", "references", "nguồn", "thông tin không được liệt kê". Trả lời như thể bạn đang kể nội dung trực tiếp.
+- KHÔNG nói về vai trò/nhiệm vụ của mình. KHÔNG meta-commentary.
+- KHÔNG nhận xét cá nhân, cảm thán, lời mời, câu hỏi hỏi lại user.
+- KHÔNG suy đoán, KHÔNG mở rộng ý ngoài Tham khảo.
+- KHÔNG xuất dòng chứa `Source:`. KHÔNG dùng `...`.
+- Dùng thuật ngữ phổ biến trong cộng đồng anime/manga/game Việt Nam khi dịch (ví dụ: Stand, Titan, Cursed Energy giữ nguyên tiếng Anh vì fan Việt quen dùng).
+- Những chuỗi trong khối `KEEP_TERMS` giữ nguyên y hệt.
+- Không tự tạo timeline, số liệu, xếp hạng sức mạnh, mối quan hệ nhân vật nếu nguồn không nêu trực tiếp.
+- Nếu nguồn có điểm mâu thuẫn/không thống nhất, phải nói rõ là nguồn hiện có chưa thống nhất, không tự chọn một bản đúng.
+- Trả lời đúng ý user hỏi: hỏi "tóm tắt" thì tập trung tóm tắt; hỏi "chi tiết nhân vật" thì tập trung hồ sơ nhân vật; hỏi "review cộng đồng" thì không biến thành lore summary.
+
+Ngoại lệ cho câu hỏi SO SÁNH (ví dụ: ai mạnh hơn, ai hơn ai, đánh với ai):
+- Được phép tổng hợp nhiều đoạn trong Tham khảo để rút ra kết luận so sánh.
+- Vẫn tuyệt đối không thêm dữ kiện ngoài Tham khảo.
+- Nếu không có dữ kiện đối đầu trực tiếp thì phải nói rõ không có dữ kiện canon trực tiếp trong nguồn.
 """
 
 COMMUNITY_PRESENTER_SYSTEM = """Bạn là tuq27. Xưng "mình", gọi đối phương "bạn".
@@ -76,6 +129,7 @@ Luật bắt buộc:
 - KHÔNG dùng "..." hay dấu ba chấm.
 - KHÔNG xuất dòng nào chứa `Source:`.
 - Dịch nội dung tiếng Anh sang tiếng Việt tự nhiên nhưng GIỮ nguyên proper nouns.
+- Nếu nguồn cộng đồng không đủ để chốt "X hơn Y", kết luận theo kiểu "chưa có đồng thuận rõ", không được chốt cứng.
 """
 
 # Extra grounding instruction used when we provide references
@@ -86,6 +140,8 @@ Quan trọng (anti-hallucination - STRICT):
 - Không tự bịa tên tổ chức/nhân vật/khái niệm. Không được tự thay thuật ngữ: nếu trong tham khảo có "Founding Titan" thì giữ đúng, có "Attack Titan" thì giữ đúng; nếu là wiki tiếng Việt thì giữ đúng cách gọi của wiki.
 - Khi trả lời, ưu tiên dùng đúng wording/thuật ngữ của tham khảo, có thể dịch sang tiếng Việt nhưng phải GIỮ nguyên danh từ riêng/thuật ngữ quan trọng như trong tham khảo.
 - Dù user có nói "không spoil" hay không, vẫn chỉ dịch lại những gì xuất hiện trong phần 'Tham khảo' (references). KHÔNG thêm tình tiết/suy diễn ngoài references.
+- Khi nguồn chưa đủ dữ kiện để trả lời đúng câu hỏi, phải từ chối ngắn gọn, không vòng vo, không thêm lời mời chào.
+- Không được tự tạo URL hoặc tên nguồn.
 """
 
 COMFORT_SYSTEM = BASE_PERSONA + """
@@ -105,10 +161,7 @@ def _mock_chat(msg: str) -> str:
     return f"Bạn vừa nói '{msg}' đúng không~? Mình đang nghe nè, cứ kể tiếp đi!"
 
 def _mock_guardrail() -> str:
-    return "Hơi tiếc là mình chỉ giỏi nói về anime, manga, game, phim ảnh với tâm lý thôi... Cái bạn hỏi mình không đủ sâu. Quay lại nói với mình về entertainment hay tâm trạng nhé~"
-
-def _mock_entertainment(msg: str) -> str:
-    return "Mình không thể trả lời chính xác phần bạn hỏi vì thiếu dữ liệu từ nguồn tham khảo."
+    return "Ờm... mình đang hơi lag một chút, nhưng bạn cứ nhắc lại câu hỏi (hoặc hỏi cụ thể hơn) để mình trả lời chi tiết nhé — trừ chuyện chính trị hay tôn giáo tranh luận thì mình không tham gia~"
 
 def _mock_comfort() -> str:
     return "Mình hiểu mà... Đôi khi mọi thứ quá sức thật. Mình ở đây, bạn cứ nói hết ra đi, mình nghe."
@@ -120,46 +173,9 @@ def _mock_crisis() -> str:
     return "Khoan đã — mình cần bạn nghe. Cuộc sống bạn quý lắm. Hãy gọi ngay 111 hoặc 1900 96 96, hoặc tìm ai đó bạn tin. Mình mong bạn tìm được sự giúp đỡ."
 
 
-_RETRIEVER_MAP = {
-    "anilist":   lambda q, **kw: anilist_search(q, max_results=kw.get("max_results", 3)),
-    "wiki":      lambda q, **kw: wiki_search(q, max_results=kw.get("max_results", 4)),
-    "community": lambda q, **kw: community_search(q, max_results=kw.get("max_results", 6)),
-    "tavily":    lambda q, **kw: tavily_search(q, max_results=kw.get("max_results", 6)),
-}
-_DEFAULT_ORDER = ["anilist", "wiki", "community", "tavily"]
-
-
-def _build_retriever_order(primary: str) -> list[str]:
-    """Return retriever names with *primary* first, others as fallbacks."""
-    if primary not in _RETRIEVER_MAP:
-        primary = "wiki"
-    order = [primary]
-    for name in _DEFAULT_ORDER:
-        if name != primary:
-            order.append(name)
-    return order
-
-
-async def _run_retrievers(query: str, order: list[str]) -> tuple[list, str | None]:
-    """Try retrievers in *order*, return (sources, winning_retriever_name)."""
-    for name in order:
-        fn = _RETRIEVER_MAP.get(name)
-        if fn is None:
-            continue
-        try:
-            results = await fn(query)
-        except Exception as e:
-            logger.warning("retriever {} failed: {}", name, e)
-            continue
-        if results:
-            return results, name
-    return [], None
-
-
 async def chit_chat_node(state: AgentState) -> dict:
-    reply = await generate_with_history(CHIT_CHAT_SYSTEM, state["messages"])
-    if not reply:
-        reply = _mock_chat(state["messages"][-1].content)
+    reply = await generate_with_history(_system_with_identity(CHIT_CHAT_SYSTEM, state), state["messages"])
+    reply = _nonempty_reply(reply, _mock_chat(state["messages"][-1].content))
     return {
         "messages": [AIMessage(content=reply)],
         "emotion": "happy",
@@ -168,29 +184,9 @@ async def chit_chat_node(state: AgentState) -> dict:
 
 
 async def guardrail_node(state: AgentState) -> dict:
-    last_user = state["messages"][-1].content if state.get("messages") else ""
-
-    # Guardrail uses the same router but limits to wiki/community/tavily (no anilist).
-    routing = await route_retriever(last_user)
-    primary = routing["retriever"]
-    clean_query = routing.get("query_en") or last_user
-    if primary == "anilist":
-        primary = "wiki"
-    guardrail_order = [n for n in _build_retriever_order(primary) if n != "anilist"]
-    sources, winner = await _run_retrievers(clean_query, guardrail_order)
-    if winner:
-        logger.info("guardrail retriever hit: {} -> {} results", winner, len(sources))
-    if sources:
-        src_text = "\n".join([f"- {s.get('title','')}\n{s.get('snippet','')}\n{s.get('url','')}" for s in sources])
-        system = GUARDRAIL_SYSTEM + "\n\nBạn có thể dùng thông tin tham khảo bên dưới để trả lời ngắn gọn, đúng ý và tự nhiên. Nếu không đủ thông tin thì dừng lại và không suy đoán.\n\nTham khảo:\n" + src_text
-        draft = await generate_with_history(system, state["messages"])
-        draft = draft or ""
-        ok, conf, reason, fixed = await judge_answer(last_user, src_text, draft)
-        reply = draft if ok else (fixed or "")
-    else:
-        reply = await generate_with_history(GUARDRAIL_SYSTEM, state["messages"])
-    if not reply:
-        reply = _mock_guardrail()
+    # Out-of-domain path should avoid retrieval to prevent accidental factual answering.
+    reply = await generate_with_history(_system_with_identity(GUARDRAIL_SYSTEM, state), state["messages"])
+    reply = _nonempty_reply(reply, _mock_guardrail())
     return {
         "messages": [AIMessage(content=reply)],
         "emotion": "neutral",
@@ -198,207 +194,63 @@ async def guardrail_node(state: AgentState) -> dict:
     }
 
 
+def _conversation_context_for_entertainment(state: AgentState, max_chars: int = 3800) -> str:
+    """Lược đổi thoại (bỏ SystemMessage) để pipeline entertainment nối ý — DB đã có history trong messages."""
+    lines: list[str] = []
+    for m in state.get("messages", []):
+        if isinstance(m, SystemMessage):
+            continue
+        if isinstance(m, HumanMessage):
+            tag = "Bạn"
+        elif isinstance(m, AIMessage):
+            tag = "tuq27"
+        else:
+            continue
+        raw = getattr(m, "content", None)
+        if not isinstance(raw, str):
+            continue
+        t = raw.strip()
+        if not t:
+            continue
+        lines.append(f"{tag}: {t}")
+    text = "\n".join(lines)
+    if len(text) > max_chars:
+        text = "…\n" + text[-max_chars:]
+    return text
+
+
 async def entertainment_expert_node(state: AgentState) -> dict:
     last_user = state["messages"][-1].content if state.get("messages") else ""
-
-    # --- Reasoning router: pick best retriever before searching ---
-    routing = await route_retriever(last_user)
-    retriever_name = routing["retriever"]
-    clean_query = routing.get("query_en") or last_user
-    logger.info(
-        "entertainment_expert router: retriever={} query_en={!r} reason={!r}",
-        retriever_name, clean_query, routing.get("reason", ""),
+    user_msgs = [m.content for m in state.get("messages", []) if isinstance(m, HumanMessage)]
+    prev_user = user_msgs[-2] if len(user_msgs) >= 2 else ""
+    low = (last_user or "").strip().lower()
+    # Follow-up queries often omit the entity/topic and need previous user turn.
+    needs_prev = (
+        bool(prev_user)
+        and (
+            any(k in low for k in ["nếu so sánh", "ý là", "thế còn", "còn nếu", "vậy còn", "so với", "so sánh"])
+            or len(low.split()) <= 10
+        )
+        and not re.search(r"\b(baldur|bg3|zariel|raphael|one piece|naruto|attack on titan|jujutsu|elden ring)\b", low)
     )
-
-    order = _build_retriever_order(retriever_name)
-    sources, winner = await _run_retrievers(clean_query, order)
-    if winner:
-        logger.info("entertainment_expert retriever hit: {} -> {} results", winner, len(sources))
-    if sources:
-        ref_max = 1200
-        parts = []
-        for s in sources:
-            snippet = s.get("snippet") or ""
-            snippet = re.sub(r"\(\s*Source\s*:\s*[^)]+\)", "", snippet, flags=re.IGNORECASE)
-            snippet = re.sub(r"\bSource\s*:\s*[^\n\r]+", "", snippet, flags=re.IGNORECASE | re.MULTILINE)
-            snippet = snippet[:ref_max].strip()
-            snippet = re.sub(r"\n{3,}", "\n\n", snippet).strip()
-            if not snippet:
-                continue
-            # Enrich community results with subreddit/url for attribution.
-            meta_parts = []
-            if s.get("subreddit"):
-                meta_parts.append(f"subreddit: {s['subreddit']}")
-            if s.get("url"):
-                meta_parts.append(f"url: {s['url']}")
-            if s.get("title"):
-                meta_parts.append(f"title: {s['title']}")
-            if meta_parts:
-                header = " | ".join(meta_parts)
-                parts.append(f"[{header}]\n{snippet}")
-            else:
-                parts.append(snippet)
-        src_text = "\n\n".join(parts).strip()
-
-        # Build KEEP_TERMS dynamically from references so it also works for other anime.
-        # Keep English verse terms/proper nouns as-is; translate everything else normally.
-        joined = src_text
-        is_aot = bool(re.search(r"(attack on titan|shingeki|aot)", (last_user or "").lower()))
-        aot_keep = [
-            "the Scout Regiment",
-            "Scout Regiment",
-            "Founding Titan",
-            "Rumbling",
-            "the Rumbling",
-            "Fort Salta",
-            "Marleyans",
-            "Eldians",
-            "Paradis",
-            "war of all wars",
-            "Eren",
-            "Mikasa",
-            "Armin",
-            "Jean",
-            "Conny",
-            "Reiner",
-            "Pieck",
-            "Levi",
-        ] if is_aot else []
-
-        stop_singles = {
-            "The",
-            "And",
-            "But",
-            "For",
-            "With",
-            "From",
-            "Into",
-            "Over",
-            "After",
-            "Before",
-            "Will",
-            "Would",
-            "However",
-            "This",
-            "That",
-            "There",
-            "Their",
-            "When",
-            "Where",
-            "Why",
-            "Who",
-            "What",
-        }
-        meta_drop = {"ANIME", "TV", "eps", "eps.", "ch", "episodes", "chapters"}
-
-        # Extract TitleCase proper noun phrases from the reference text.
-        multi = re.findall(r"\b[A-Z][a-z]{2,}(?:\s+[A-Z][a-z]{2,})+\b", joined)
-        singles = re.findall(r"\b[A-Z][a-z]{2,}\b", joined)
-
-        keep_terms = []
-        seen = set()
-        for t in aot_keep:
-            if t not in seen:
-                keep_terms.append(t)
-                seen.add(t)
-
-        for t in multi + singles:
-            tt = t.strip()
-            if not tt or tt in seen:
-                continue
-            if tt in stop_singles:
-                continue
-            if tt in meta_drop:
-                continue
-            low = tt.lower()
-            if low in {"crunchyroll", "funimation", "anime", "news", "marleyans", "eldians", "paradis"} and not is_aot:
-                # For non-AoT, only keep these if they come from the actual extracted terms (to avoid source/meta artifacts).
-                continue
-            seen.add(tt)
-            keep_terms.append(tt)
-            if len(keep_terms) >= 30:
-                break
-
-        keep_block = "KEEP_TERMS:\n" + "\n".join([f"- {t}" for t in keep_terms]) + "\n\n"
-
-        is_community = all(s.get("source") == "community" for s in sources)
-
-        strict_hint = ""
-        if any((s.get("source") == "wikipedia") for s in sources):
-            strict_hint += "\n\nChế độ Wikipedia STRICT: bạn phải bám sát wording/thuật ngữ trong extract, không tự chế lại tên."
-        if any((s.get("source") == "anilist") for s in sources):
-            strict_hint += "\n\nChế độ AniList STRICT: chỉ bám sát synopsis/metadata từ AniList trong extract; KHÔNG thêm tình tiết ngoài nguồn."
-
-        if is_community:
-            system = (
-                COMMUNITY_PRESENTER_SYSTEM
-                + keep_block
-                + GROUNDED_KNOWLEDGE_RULES
-                + "\n\nTổng hợp ý kiến cộng đồng từ phần Tham khảo bên dưới. KHÔNG tự bịa thêm.\n\nTham khảo:\n"
-                + src_text
-            )
-        else:
-            system = (
-                ENTERTAINMENT_EXPERT_SYSTEM
-                + keep_block
-                + GROUNDED_KNOWLEDGE_RULES
-                + strict_hint
-                + "\n\nChỉ xuất bản dịch tiếng Việt từ phần Tham khảo bên dưới. KHÔNG thêm bất kỳ câu nào khác.\n\nTham khảo:\n"
-                + src_text
-            )
-        # Translator node: avoid full chat history that can reintroduce chatty tone.
-        draft = await generate(system, last_user)
-        draft = draft or ""
-        source_fallback = src_text.strip()
-
-        # Hard post-check: must not contain source attribution/chatty ellipsis.
-        ok = False
-        fixed = ""
-        if re.search(r"(source\s*:|^\s*\(?\s*source\s*:)", draft, flags=re.IGNORECASE | re.MULTILINE):
-            ok = False
-        elif "..." in draft:
-            ok = False
-        else:
-            ok, conf, reason, fixed = await judge_answer(last_user, src_text, draft)
-            try:
-                logger.info(
-                    "entertainment_expert judge verdict={} conf={} reason={} fixed_len={}",
-                    ok,
-                    conf,
-                    reason,
-                    len(fixed or ""),
-                )
-            except Exception:
-                pass
-        _REFUSAL_MARKERS = [
-            "không đủ dữ liệu", "thiếu dữ liệu", "không thể trả lời",
-            "không có đủ", "dừng lại", "không lấy được",
-            "không có thông tin", "mình có thể giúp bạn tìm",
-            "không tìm thấy", "không tìm được",
-        ]
-
-        def _is_refusal(text: str) -> bool:
-            low = (text or "").strip().lower()
-            return any(m in low for m in _REFUSAL_MARKERS)
-
-        if ok and draft.strip():
-            reply = draft
-        else:
-            # Judge rejected or hard-check failed.
-            # Prefer: fixed > draft (only if not a refusal) > raw source text.
-            if (fixed or "").strip() and not _is_refusal(fixed):
-                reply = fixed.strip()
-            elif draft.strip() and not _is_refusal(draft):
-                reply = draft.strip()
-            elif source_fallback:
-                reply = source_fallback
-            else:
-                reply = "Mình không thể trả lời chính xác phần bạn hỏi vì thiếu dữ liệu từ nguồn tham khảo."
-    else:
-        # No retriever context available -> do NOT guess
-        reply = "Mình chưa lấy được nguồn tham khảo để tóm tắt chính xác phần bạn hỏi, nên mình dừng lại."
-    if not reply:
-        reply = "Mình không thể trả lời chính xác phần bạn hỏi vì thiếu dữ liệu từ nguồn tham khảo."
+    retrieval_query = f"{prev_user}\nFollow-up: {last_user}" if needs_prev else last_user
+    conv_ctx = _conversation_context_for_entertainment(state)
+    aid = _canonical_agent_id(state)
+    lock = _identity_lock(aid)
+    community = re.sub(r"\btuq27\b", aid, COMMUNITY_PRESENTER_SYSTEM, flags=re.IGNORECASE)
+    reply = await run_entertainment_pipeline(
+        user_query=retrieval_query,
+        expert_system=lock + "\n\n" + ENTERTAINMENT_VOICE + "\n\n" + ENTERTAINMENT_EXPERT_SYSTEM,
+        community_system=lock + "\n\n" + community,
+        grounded_rules=GROUNDED_KNOWLEDGE_RULES,
+        no_source_reply="Mình chưa lấy được nguồn tham khảo để tóm tắt chính xác phần bạn hỏi, nên mình dừng lại.",
+        no_relevant_reply="Mình chưa tìm được nguồn tham khảo đủ liên quan trực tiếp cho câu hỏi này, nên mình dừng lại để tránh trả sai.",
+        conversation_context=conv_ctx,
+    )
+    reply = _nonempty_reply(
+        reply,
+        "Mình không thể trả lời chính xác phần bạn hỏi vì thiếu dữ liệu từ nguồn tham khảo.",
+    )
     return {
         "messages": [AIMessage(content=reply)],
         "emotion": "surprised",
@@ -407,9 +259,8 @@ async def entertainment_expert_node(state: AgentState) -> dict:
 
 
 async def comfort_node(state: AgentState) -> dict:
-    reply = await generate_with_history(COMFORT_SYSTEM, state["messages"])
-    if not reply:
-        reply = _mock_comfort()
+    reply = await generate_with_history(_system_with_identity(COMFORT_SYSTEM, state), state["messages"])
+    reply = _nonempty_reply(reply, _mock_comfort())
     return {
         "messages": [AIMessage(content=reply)],
         "emotion": "sad",
@@ -418,9 +269,8 @@ async def comfort_node(state: AgentState) -> dict:
 
 
 async def advice_node(state: AgentState) -> dict:
-    reply = await generate_with_history(ADVICE_SYSTEM, state["messages"])
-    if not reply:
-        reply = _mock_advice()
+    reply = await generate_with_history(_system_with_identity(ADVICE_SYSTEM, state), state["messages"])
+    reply = _nonempty_reply(reply, _mock_advice())
     return {
         "messages": [AIMessage(content=reply)],
         "emotion": "neutral",
@@ -430,9 +280,8 @@ async def advice_node(state: AgentState) -> dict:
 
 
 async def crisis_node(state: AgentState) -> dict:
-    reply = await generate_with_history(CRISIS_SYSTEM, state["messages"])
-    if not reply:
-        reply = _mock_crisis()
+    reply = await generate_with_history(_system_with_identity(CRISIS_SYSTEM, state), state["messages"])
+    reply = _nonempty_reply(reply, _mock_crisis())
     return {
         "messages": [AIMessage(content=reply)],
         "emotion": "crisis",

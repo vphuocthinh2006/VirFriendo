@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { useGoogleSignIn } from '../hooks/useGoogleSignIn'
+import AuthPageShell from '../components/AuthPageShell'
+import GoogleGlyph from '../components/GoogleGlyph'
 
 export default function Login() {
   const [username, setUsername] = useState('')
@@ -9,6 +12,13 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
+  const {
+    ready: googleReady,
+    loading: googleLoading,
+    error: googleError,
+    googleMountRef,
+    triggerGoogleSignIn,
+  } = useGoogleSignIn()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -16,59 +26,86 @@ export default function Login() {
     setLoading(true)
     try {
       await login(username, password)
-      navigate('/chat', { replace: true })
+      navigate('/menu', { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Đăng nhập thất bại')
+      setError(err instanceof Error ? err.message : 'Sign-in failed')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-cream-100">
-      <div className="w-full max-w-sm rounded-2xl border border-chat-border bg-cream-50 p-8 shadow-sm">
-        <h1 className="text-xl font-semibold text-stone-800 mb-6 text-center">Đăng nhập</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="text-sm text-red-600 bg-red-50/80 rounded-lg px-3 py-2">{error}</div>
-          )}
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Tên đăng nhập</label>
+    <AuthPageShell title="Sign in" subtitle="Welcome back to VirFriendo">
+      <div className="aid-auth-stack">
+        <div className="aid-google-auth-wrap aid-auth-google-full">
+          <div ref={googleMountRef} className="aid-google-gsi-offscreen" aria-hidden />
+          <button
+            type="button"
+            className={`aid-cta-google aid-auth-google-full${!googleReady ? ' aid-google-styled-cta--pending' : ''}`}
+            onClick={() => void triggerGoogleSignIn()}
+            disabled={!googleReady || googleLoading}
+          >
+            <span className="aid-cta-label aid-cta-label--row">
+              <GoogleGlyph />
+              {googleLoading ? 'CONNECTING…' : 'CONTINUE WITH GOOGLE'}
+            </span>
+          </button>
+        </div>
+        {googleLoading ? <p className="aid-auth-msg">Signing in with Google…</p> : null}
+        {googleError ? <p className="aid-auth-msg aid-auth-msg--error">{googleError}</p> : null}
+
+        <div className="aid-auth-or" role="separator">
+          <span className="aid-auth-or__line" aria-hidden />
+          <span className="aid-auth-or__text">or</span>
+          <span className="aid-auth-or__line" aria-hidden />
+        </div>
+
+        <form onSubmit={handleSubmit} className="aid-auth-form">
+          {error ? <div className="aid-auth-msg aid-auth-msg--error">{error}</div> : null}
+
+          <div className="aid-auth-field">
+            <label htmlFor="login-user">Username</label>
             <input
+              id="login-user"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full rounded-xl border border-chat-border px-3 py-2.5 text-stone-800 bg-cream-50 focus:ring-2 focus:ring-accent/40 focus:border-accent/50 outline-none"
+              className="aid-auth-input"
               required
               autoComplete="username"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Mật khẩu</label>
+
+          <div className="aid-auth-field">
+            <div className="aid-auth-label-row">
+              <label htmlFor="login-pass">Password</label>
+              <Link to="/forgot-password" className="aid-auth-forgot">
+                Forgot password?
+              </Link>
+            </div>
             <input
+              id="login-pass"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border border-chat-border px-3 py-2.5 text-stone-800 bg-cream-50 focus:ring-2 focus:ring-accent/40 focus:border-accent/50 outline-none"
+              className="aid-auth-input"
               required
               autoComplete="current-password"
             />
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 rounded-xl bg-accent text-cream-50 text-sm font-medium hover:bg-accent-hover disabled:opacity-50 transition"
-          >
-            {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+
+          <button type="submit" disabled={loading} className="aid-cta-primary aid-auth-submit">
+            {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
-        <p className="mt-6 text-center text-sm text-stone-500">
-          Chưa có tài khoản?{' '}
-          <Link to="/register" className="text-accent-dark font-medium hover:underline">
-            Đăng ký
+
+        <p className="aid-auth-footer-text">
+          No account?{' '}
+          <Link to="/register" className="aid-auth-footer-link">
+            Create account
           </Link>
         </p>
       </div>
-    </div>
+    </AuthPageShell>
   )
 }
