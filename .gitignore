@@ -52,6 +52,14 @@ services/agent_service/models/intent/adapter_model.safetensors
 # Frontend & deps
 node_modules/
 frontend/node_modules/
+# TypeScript / Vite generated (tsc -b)
+*.tsbuildinfo
+frontend/vite.config.d.ts
+# Duplicate config (use vite.config.ts only)
+frontend/vite.config.js
+
+# Generated datasets (recreate with scripts/build_golden_intent_dataset.py etc.)
+data/golden_intent*.xlsx
 
 # IDEs and Editors
 .idea/
@@ -60,6 +68,16 @@ frontend/node_modules/
 *.swo
 *~
 .DS_Store
+
+# Local game clones / Godot integration — use branch `archive/sourceofmana-integration` for addon only
+integrations/
+
+# Cursor IDE
+.cursor/
+
+# Large local exports (Blender, etc.)
+/Untitled.fbx
+/exports/
 
 # Local temp / debug files
 .tempmediaStorage/
@@ -71,5 +89,11 @@ test_register.py
 Thumbs.db
 ehthumbs.db
 
-# Large local Blender exports (optional; use Git LFS if team needs the asset)
-/Untitled.fbx
+# --- Local-only (benchmarks, internal docs, ad-hoc scripts) ---
+tests/
+.pytest_cache/
+/docs/
+/scripts/
+/pytest.ini
+/run.ps1
+ml/*.jsonl

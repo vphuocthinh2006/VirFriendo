@@ -14,6 +14,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
+
 from services.core.config import settings
 from services.core.api import agents, auth, chat, diary, external_game, game
 from services.core.api.caro import router as caro_router
@@ -30,18 +32,31 @@ async def lifespan(app: FastAPI):
     yield
 
 
+_docs = settings.DEBUG or (settings.APP_ENV or "").lower() != "production"
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
     lifespan=lifespan,
+    docs_url="/docs" if _docs else None,
+    redoc_url="/redoc" if _docs else None,
+    openapi_url="/openapi.json" if _docs else None,
 )
+
+_hosts = settings.trusted_host_list()
+if _hosts:
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=_hosts)
+
+_cors = settings.cors_origin_list()
+if not _cors:
+    _cors = ["http://localhost:5173", "http://127.0.0.1:5173"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "X-Requested-With"],
 )
 
 app.include_router(auth.router)

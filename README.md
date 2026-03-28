@@ -8,7 +8,7 @@
 - **Chat kiểu VN:** Hội thoại hiển thị từng đoạn (chunks), hiệu ứng karaoke (từng chữ đổi màu), cooldown 5s trước đoạn đầu, click dialogue để skip/advance.
 - **Backend:** FastAPI (auth, chat API), LangGraph (intent classification, 6 agent: chit_chat, guardrail, entertainment_expert, comfort, advice, crisis), PostgreSQL + Redis + ChromaDB.
 - **Mở rộng:** Emotion-driven avatar, RAG entertainment (anime, manga, game, phim), mini-game (Chess, Quiz), mood tracking (theo kế hoạch).
-- **Vận hành hiện tại:** ưu tiên `GPT-4o + RAG + guardrails`, khong can fine-tune model de chay production.
+- **Vận hành hiện tại:** ưu tiên `GPT-4o + RAG + guardrails`, không cần fine-tune model để chạy production.
 
 ---
 
@@ -24,18 +24,20 @@ Data — PostgreSQL, ChromaDB, Redis (docker-compose)
 
 ---
 
-## Cấu trúc thư mục
+## Cấu trúc thư mục (repo “product”)
+
+`docs/`, `scripts/`, `tests/`, `integrations/` không được track trong Git (xem `.gitignore`) — giữ bản cục bộ nếu cần. **Addon Source of Mana (Godot)** nằm trên nhánh `archive/sourceofmana-integration`.
 
 ```
-├── frontend/                 # React + Vite + TypeScript, giao diện VN
+├── frontend/          # React + Vite + TypeScript (UI)
 ├── services/
-│   ├── core/                 # FastAPI — main, auth, chat, database
-│   └── agent_service/        # LangGraph — workflow, state, agents, intent_classifier
-├── shared/                   # Shared schemas (auth)
-├── docs/                     # Tài liệu dự án
-├── migrations/               # Alembic
+│   ├── core/          # FastAPI — auth, chat, API
+│   └── agent_service/ # LangGraph — agents, RAG, LLM
+├── shared/            # Schemas dùng chung
+├── migrations/        # Alembic
 ├── requirements.txt
-└── docker-compose.yml        # PostgreSQL, Redis, ChromaDB
+├── docker-compose.yml
+└── Makefile
 ```
 
 ---
@@ -48,16 +50,15 @@ Data — PostgreSQL, ChromaDB, Redis (docker-compose)
 - Node.js 18+ (cho frontend)
 - Docker & Docker Compose (cho DB/infra)
 
+Tạo file **`.env`** ở thư mục gốc (không commit): `SECRET_KEY`, `DATABASE_URL`, và các khóa LLM/search theo nhu cầu. Tuỳ chọn: `CORS_ORIGINS`, `APP_ENV`, `TRUSTED_HOSTS` (xem `services/core/config.py`).
+
 ### Backend (Core API)
 
 ```bash
-# Tạo venv và cài dependency
 python -m venv .venv
 .venv\Scripts\activate   # Windows
 pip install -r requirements.txt
-
-# Chạy API (port 8000)
-uvicorn services.core.main:app --reload
+uvicorn services.core.main:app --reload --port 8000
 ```
 
 ### Frontend
@@ -68,25 +69,13 @@ npm install
 npm run dev
 ```
 
-Mở http://localhost:5173. **Core API** chạy tại **port 8000**. Frontend (dev) gọi trực tiếp `http://localhost:8000` cho REST và WebSocket (xem `frontend/src/services/api.ts`); Vite vẫn có proxy `/auth`, `/chat` nếu bạn để `VITE_API_URL` trống — khuyến nghị để mặc định code dev trỏ thẳng API để WebSocket ổn định.
-
-**Tài liệu trạng thái & checklist:** [docs/04_current_status.md](docs/04_current_status.md) · [docs/05_checklist.md](docs/05_checklist.md).
+Mở http://localhost:5173. **API** chạy tại **http://localhost:8000**. Trong dev, `frontend/src/services/api.ts` mặc định gọi thẳng API (REST + WebSocket `/chat/ws`) — tránh proxy WS qua Vite.
 
 ### Hạ tầng (DB, Redis, ChromaDB)
 
 ```bash
 docker-compose up -d
 ```
-
----
-
-## Tài liệu
-
-- [01 — Project Plan](docs/01_project_plan.md)
-- [02 — System Architecture](docs/02_system_architecture.md)
-- [03 — Taxonomy & Dataset](docs/03_taxonomy_and_dataset.md)
-- [04 — Current Status](docs/04_current_status.md)
-- [05 — Checklist (dev & production)](docs/05_checklist.md)
 
 ---
 

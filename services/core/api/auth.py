@@ -73,7 +73,7 @@ async def _verify_google_id_token(id_token: str) -> dict:
     return data
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
+async def register(request: Request, user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     """
     API Đăng ký người dùng mới.
     Nhận vào: username, email, password (mật khẩu gốc)
