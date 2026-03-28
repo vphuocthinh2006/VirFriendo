@@ -495,3 +495,19 @@ CREATE TABLE game_sessions (
 - [ ] Load testing & optimization
 - [ ] Documentation hoàn chỉnh
 - [ ] Demo preparation
+
+---
+
+## 11. Trạng thái triển khai thực tế (2026-03)
+
+Bảng milestone ở **§10** là kế hoạch gốc. Thực tế repo đã vượt một phần Phase 1–2 (auth, chat, LangGraph, RAG, WebSocket, nhiều route `/game`, tests pytest). Chi tiết phần trăm phase, backlog và checklist vận hành: **[04_current_status.md](04_current_status.md)** và **[05_checklist.md](05_checklist.md)**.
+
+| Mục kế hoạch §10 | Ghi chú nhanh |
+|------------------|---------------|
+| Phase 1 — Foundation | Gần xong; thiếu CI/CD |
+| Phase 2 — Core AI | MVP AI xong; Chroma vector RAG “đúng bài” vẫn tùy chọn |
+| Phase 3 — Avatar | UI có; animation nâng cao chưa đủ |
+| Phase 4 — Games | Chess/caro backend + nhiều mini-game FE; quiz/bibliotherapy đầy đủ theo spec còn mở |
+| Phase 5 — Production | Docker Compose dev có; K8s/monitoring/CI chưa |
+
+Cấu trúc thư mục trong **§6** (api-gateway / agent-service tách container) mô tả kiến trúc mục tiêu dài hạn; **triển khai hiện tại** là monolith FastAPI trong `services/core` + package `services/agent_service` trong cùng process.

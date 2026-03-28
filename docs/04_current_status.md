@@ -1,117 +1,116 @@
-# Trạng thai hien tai & Buoc tiep theo (VirFriendo)
+# Trạng thái dự án & lộ trình (VirFriendo)
 
-> Cap nhat: 2026-03-20
-
----
-
-## 1. Project dang o buoc nao?
-
-| Phase | Noi dung | Trang thai |
-|-------|----------|------------|
-| **Phase 1 — Foundation** | Monorepo, Docker, DB, Auth, Chat API, Frontend | **~95%** — Thieu CI/CD |
-| **Phase 2 — Core AI** | Intent/Emotion, RAG, Agents, LLM, Retriever Router | **~80%** — Thieu WebSocket streaming, ChromaDB |
-| **Phase 3 — Avatar & Frontend** | Avatar animation, Mood tracking | **~30%** — Frontend co, avatar chua animation |
-| **Phase 4 — Games & Extras** | Chess, Quiz, Bibliotherapy | **0%** |
-| **Phase 5 — Production** | K8s, Monitoring, Tests, Docs | **~10%** — Co Docker Compose, chua CI/CD |
-
-**Ket luan:** Project dang o **giua Phase 2**. Backend, frontend, AI pipeline (intent + emotion + RAG + LLM + judge + user memory) deu hoat dong. Can lam tiep: WebSocket streaming, tests, cleanup, roi avatar animation.
+> **Cập nhật:** 2026-03-29  
+> **Tài liệu liên quan:** [01_project_plan.md](01_project_plan.md) · [05_checklist.md](05_checklist.md) · [THESIS_DELTA.md](THESIS_DELTA.md)
 
 ---
 
-## 2. Da co (implemented & working)
+## 1. Tóm tắt: đang ở giai đoạn nào?
 
-### Infrastructure
-- **Docker Compose:** PostgreSQL 16, Redis 7, ChromaDB
-- **Database:** Schema User, Conversation, Message, UserMemory (Alembic migrations)
-- **Auth:** Register, Login, JWT; `get_current_user_id` cho protected routes
+| Phase | Nội dung | Trạng thái (ước lượng) | Ghi chú |
+|-------|----------|------------------------|---------|
+| **Phase 1 — Foundation** | Monorepo, Docker Compose (DB/Redis/Chroma), Auth, Chat API, Frontend SPA | **~98%** | Thiếu CI/CD tự động |
+| **Phase 2 — Core AI** | Intent, Emotion, LangGraph agents, RAG, retriever router, LLM, user memory | **~90%** | WebSocket streaming **đã có**; ChromaDB trong compose **chưa** làm RAG vector chính (đang ưu tiên API ngoài + pipeline code) |
+| **Phase 3 — Avatar & UX** | UI VN, portrait, theme; animation nâng cao | **~45%** | Chat/landing/menu ổn; **avatar Spine/Pixi theo emotion** chưa đầy đủ |
+| **Phase 4 — Games & tích hợp** | Cờ, mini-game, Godot bridge | **~35%** | Backend chess + caro; helper `turn_game_ai`; frontend: Snake, Tetris, Ringrealms (RTS); tích hợp Source of Mana (addon) |
+| **Phase 5 — Production** | Deploy, quan sát, bảo mật vận hành | **~25%** | Có Docker Compose dev; **chưa** K8s/Actions; có pytest nhưng chưa gate CI |
 
-### Backend API (FastAPI)
-- `POST /chat` — gui tin, chay LangGraph, tra reply + intent + emotion + avatar_action
-- `GET /chat/conversations` — danh sach hoi thoai
-- `GET /chat/history/{id}` — lich su tin nhan
-
-### LangGraph Workflow
-- **6 agent nodes:** chit_chat, guardrail, entertainment_expert, comfort, advice, crisis
-- **Intent classifier:** Hybrid keyword + Groq LLM (co the bat PEFT model qua env)
-- **Emotion detector:** Keyword-based (7 class) trong emotion_node
-- **Retriever Router:** Groq reasoning chon retriever tot nhat truoc khi search
-
-### Entertainment Expert (RAG Pipeline)
-- **4 retriever sources:** AniList API, Wikipedia API, Community Search (Reddit/Fandom/wiki.gg via Tavily), Tavily Web Search
-- **Retriever Router:** Groq phan tich cau hoi → chon retriever phu hop (anilist/wiki/community/tavily)
-- **Fallback chain:** Primary retriever → fallback qua cac retriever con lai
-- **Knowledge Judge:** LLM-based anti-hallucination, kiem tra draft answer vs references
-- **Dynamic KEEP_TERMS:** Tu dong extract proper nouns tu references de giu nguyen khi dich
-- **Community Presenter:** Format rieng cho community sources (trich dan + subreddit attribution)
-- **Query normalization:** Strip Vietnamese filler, router artifacts, summarization qualifiers
-
-### User Memory
-- Tu dong extract facts/preferences/triggers tu hoi thoai
-- Inject vao context cho cac lan chat sau
-- Luu trong bang `user_memories` (PostgreSQL)
-
-### LLM Integration
-- **Groq** (llama-3.1-8b-instant) — primary, nhanh
-- **OpenAI** (gpt-4o) — fallback
-- Persona system (tuq27 — anime girl character)
-- Fine-tuning dataset (Level 2, 50+ mau JSONL)
-
-### Frontend (React + Vite + TypeScript)
-- Visual Novel UI: stage, portrait, dialogue chunks
-- Karaoke text effect (tung chu doi mau)
-- Login/Register pages
-- Chat interface voi conversation management
-- Nature-inspired theme (do, chill, branch decorations)
-- TailwindCSS styling
+**Kết luận ngắn:** Có thể coi **Phase 2 đã đạt mục tiêu chức năng chính** (chat AI end-to-end + RAG + WS). Còn lại chủ yếu là **đánh bóng UX/avatar**, **mở rộng game**, và **chuẩn hóa production** (CI, secrets, HTTPS, backup).
 
 ---
 
-## 3. Chua co / Can lam
+## 2. Đã có (đúng với code hiện tại)
 
-### Uu tien cao (P0)
-- [ ] **WebSocket / Streaming:** Chat chi REST, chua real-time streaming
-- [ ] **Tests (pytest):** 0 test — can test auth, chat API, intent classifier
-- [ ] **CI/CD:** Chua co GitHub Actions (lint, test, build)
+### Hạ tầng
 
-### Uu tien vua (P1)
-- [ ] **Avatar Animation:** Frontend co stage nhung chua co PixiJS/Spine animation theo emotion
-- [ ] **Mood Tracking API:** Co user_memory nhung chua co mood timeline/dashboard
-- [ ] **ChromaDB RAG:** Co trong docker-compose nhung chua dung (dang dung external APIs)
-- [ ] **Translation Layer:** Chua co VN↔EN translation rieng (Groq/LLM dang handle)
+- **Docker Compose:** PostgreSQL 16, Redis 7, ChromaDB (Chroma chưa bắt buộc cho luồng chat chính).
+- **DB:** User, Conversation, Message, UserMemory, quan hệ agent/user (Alembic migrations trong `migrations/`).
+- **Auth:** Đăng ký, đăng nhập, JWT; Google OAuth (frontend + env); route bảo vệ bằng `get_current_user_id`.
 
-### Uu tien thap (P2)
-- [ ] **Mini-games:** Chess (Stockfish), Anime Quiz
-- [ ] **Adaptive Personality:** relationship_level
-- [ ] **TTS:** Text-to-speech anime voice
+### Backend (FastAPI — `services/core`)
+
+- **`/auth`** — register, login, forgot password, Google.
+- **`/chat`** — `POST` chat đồng bộ; **`GET`** conversations, history, memories, relationship; **`WebSocket /chat/ws`** — streaming token (LangGraph).
+- **`/agents`** — stats, like, play counter.
+- **`/diary`** — nhật ký companion.
+- **`/game`** — chess (python-chess + Stockfish nếu có `STOCKFISH_PATH`), caro, nền tảng cờ (`game.py`, `caro`); `turn_game_ai` dùng nội bộ cho bot/lượt.
+- **`/game/external`** — API cho client ngoài (Godot): `external_game.py`.
+- **`/health`** — health check.
+
+### Agent service (LangGraph — `services/agent_service`)
+
+- Workflow: intent → routing → các agent (chit_chat, guardrail, entertainment_expert, comfort, advice, crisis).
+- Intent hybrid (keyword + LLM); emotion; RAG + retriever router + knowledge judge; entertainment pipeline; retriever bổ sung (fanwiki, reddit, v.v. theo env).
+
+### Frontend (`frontend/`)
+
+- React + Vite + TypeScript + Tailwind; chat kiểu Visual Novel (chunks, karaoke text).
+- Trang: Landing, Menu, Chat, Login/Register, Contact, ForgotPassword, Updates.
+- **API client:** `src/services/api.ts` — dev mặc định gọi API **`http://localhost:8000`** (tránh proxy WebSocket qua Vite).
+- Mini-game trong app: Snake, Tetris, Ringrealms (Ancient RTS), v.v.
+- Loading/connect: overlay CSS (không còn bundle Three.js cho màn hình chờ).
+
+### Kiểm thử
+
+- Thư mục **`tests/`**: `test_auth_api`, `test_chat_api`, `test_intent`, `test_retriever_router`, `test_security`, `test_ws`, `conftest.py`, golden retrieval JSONL.
+
+### Tích hợp khác
+
+- **`integrations/sourceofmana/`** — addon Godot Companion AI bridge (tài liệu trong thư mục).
 
 ---
 
-## 4. Technical Debt
+## 3. Chưa có / cần làm (ưu tiên)
 
-- [ ] Xoa folder `services/agent-service/` (cu, duplicate voi `services/agent_service/`)
-- [ ] Commit + push tat ca code chua commit len GitHub
-- [ ] Update `.env.example` cho day du cac env vars moi
+### P0 — Nên làm trước khi “production thật”
+
+- [ ] **CI (GitHub Actions):** lint Python + `pytest` + `npm run build` (hoặc `vite build`) trên push/PR.
+- [ ] **Bí mật & cấu hình:** `SECRET_KEY`, DB, API keys chỉ trên host / secret manager; không commit `.env`.
+- [ ] **HTTPS + reverse proxy** (Caddy/nginx/Cloudflare) cho domain thật.
+- [ ] **Build frontend production:** `VITE_API_URL=https://api.của-bạn...` tại thời điểm build.
+
+### P1 — Sản phẩm & chất lượng
+
+- [ ] **Chroma / embedding RAG** nếu muốn vector store nội bộ thay vì chỉ API ngoài.
+- [ ] **Avatar animation** theo `avatar_action` / emotion (Spine/Pixi hoặc sprite).
+- [ ] **Mood timeline / dashboard** (hiện có memory + relationship, chưa dashboard tổng hợp).
+- [ ] **Giám sát:** logging tập trung, uptime (tối thiểu health + log errors).
+
+### P2 — Mở rộng
+
+- [ ] Anime Quiz (RAG) hoàn chỉnh trong UI nếu chưa có.
+- [ ] TTS (Edge/VOICEVOX).
+- [ ] Adaptive personality nâng cao (ngoài relationship level hiện tại).
+
+### Nợ kỹ thuật (định kỳ dọn)
+
+- [ ] Rà soát folder/agent trùng tên cũ (nếu còn trong repo).
+- [ ] Đồng bộ `docs/01_project_plan.md` diagram “monorepo cũ” với cấu trúc `services/core` + `services/agent_service` hiện tại (hoặc đọc như lịch sử thiết kế).
 
 ---
 
-## 5. Architecture Overview
+## 4. Sơ đồ kiến trúc (thực tế triển khai dev)
 
 ```
-Frontend (React + Vite + TS) — Visual Novel UI
-    |
-Core API (FastAPI) — Auth + Chat + LangGraph
-    |
-    +-- Intent Classifier (Hybrid: Keyword + Groq)
-    +-- Emotion Detector (Keyword-based)
-    +-- Retriever Router (Groq Reasoning)
-    |       |
-    |       +-- AniList API (anime/manga)
-    |       +-- Wikipedia API (factual)
-    |       +-- Community Search (Reddit/Fandom via Tavily)
-    |       +-- Tavily Web Search (general)
-    |
-    +-- Knowledge Judge (anti-hallucination)
-    +-- User Memory (extract + inject)
-    |
-Data — PostgreSQL, ChromaDB (unused), Redis (docker-compose)
+Browser (localhost:5173)
+    │  REST + WebSocket trực tiếp tới API (khuyến nghị: localhost:8000)
+    ▼
+FastAPI (services.core.main)
+    ├── auth, chat (+ WS /chat/ws), agents, diary, game, external_game, caro
+    └── LangGraph + agent_service (cùng process)
+            ├── PostgreSQL
+            ├── Redis (tùy tính năng)
+            └── LLM / search APIs (OpenAI, Groq, Tavily, … theo .env)
 ```
+
+---
+
+## 5. Định nghĩa “xong Phase 2” (gợi ý)
+
+Có thể **chốt Phase 2** khi:
+
+1. Chat qua **REST + WebSocket** ổn định với token hợp lệ.  
+2. Intent + emotion + ít nhất một đường RAG entertainment **chạy được trên staging**.  
+3. Có **ít nhất một bộ test tự động** chạy được locally (đã có trong `tests/` — cần **CI** để khỏi regress).
+
+Phase 3–5 là **độ sâu UX, game, và vận hành** — không chặn việc gọi Phase 2 “đã đạt MVP AI”.

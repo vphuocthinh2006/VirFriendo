@@ -12,6 +12,7 @@ export default defineConfig({
       '/diary': { target: 'http://localhost:8000', changeOrigin: true },
       // API: POST /chat, GET /chat/conversations, WS /chat/ws — but React route is GET /chat
       // Without bypass, GET /chat is proxied to FastAPI → 405. Serve SPA index.html instead.
+      // Used when VITE_API_URL is empty (same-origin fetches). If VITE_API_URL=http://localhost:8000, browser hits API directly.
       '/chat': {
         target: 'http://localhost:8000',
         changeOrigin: true,

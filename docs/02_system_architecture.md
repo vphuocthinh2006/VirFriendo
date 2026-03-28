@@ -4,6 +4,13 @@
 
 > **Xem trước:** [01_project_plan.md](01_project_plan.md) để nắm tổng quan tính năng và tech stack.
 
+### Điều chỉnh so với diagram dưới đây (2026-03)
+
+- **Một process FastAPI** (`services.core.main`): mount `auth`, `chat` (kèm **WebSocket `/chat/ws`**), `agents`, `diary`, `game`, `external_game`, `caro` — không phải nhiều microservice riêng như sơ đồ “API Gateway / Game Service” tách biệt.
+- **LangGraph** nằm trong `services/agent_service`, được gọi từ `services/core` (cùng codebase, cùng venv).
+- **Frontend** gọi trực tiếp API (trong dev: `http://localhost:8000`), không bắt buộc qua proxy WebSocket của Vite.
+- Trạng thái cập nhật: [04_current_status.md](04_current_status.md).
+
 ---
 
 ## 0. Tổng quan hệ thống (System Overview)

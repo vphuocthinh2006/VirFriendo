@@ -1,4 +1,16 @@
-const API_BASE = import.meta.env.VITE_API_URL || ''
+/** Dev defaults to :8000 so the API (and chat WS) do not go through Vite’s proxy. */
+function resolveApiBase(): string {
+  const v = typeof import.meta.env.VITE_API_URL === 'string' ? import.meta.env.VITE_API_URL.trim() : ''
+  if (v !== '') {
+    // Common mistake: pointing at the Vite dev server instead of FastAPI
+    if (import.meta.env.DEV && /:5173\b/.test(v)) return 'http://localhost:8000'
+    return v
+  }
+  if (import.meta.env.DEV) return 'http://localhost:8000'
+  return ''
+}
+
+const API_BASE = resolveApiBase()
 
 function getToken(): string | null {
   return localStorage.getItem('access_token')
@@ -41,7 +53,9 @@ export function createChatWs(onMessage: (msg: WsMessage) => void, onClose?: () =
   const token = getToken()
   if (!token) return null
 
-  const httpBase = API_BASE || window.location.origin
+  // Never fall back to Vite’s origin (5173) for chat WS — that hits the broken proxy.
+  const httpBase =
+    API_BASE || (import.meta.env.DEV ? 'http://localhost:8000' : window.location.origin)
   const wsBase = httpBase.replace(/^http/, 'ws')
   const url = `${wsBase}/chat/ws?token=${encodeURIComponent(token)}`
 
@@ -51,7 +65,18 @@ export function createChatWs(onMessage: (msg: WsMessage) => void, onClose?: () =
       onMessage(JSON.parse(ev.data))
     } catch { /* ignore malformed */ }
   }
-  ws.onclose = () => onClose?.()
+  ws.onclose = (ev) => {
+    if (import.meta.env.DEV) {
+      const hint =
+        ev.code === 1006
+          ? ' (abnormal — often refused, invalid JWT, or API not on this port)'
+          : ev.code === 4001 || ev.reason?.includes('token')
+            ? ' (log out and log in again if SECRET_KEY changed or token expired)'
+            : ''
+      console.warn(`[chat WS] closed code=${ev.code} reason=${ev.reason || '(none)'}${hint}`)
+    }
+    onClose?.()
+  }
   ws.onerror = () => onClose?.()
   return ws
 }

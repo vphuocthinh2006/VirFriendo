@@ -68,7 +68,9 @@ npm install
 npm run dev
 ```
 
-Mở http://localhost:5173. Proxy `/auth` và `/chat` tới backend (cần chạy Core API tại port 8000).
+Mở http://localhost:5173. **Core API** chạy tại **port 8000**. Frontend (dev) gọi trực tiếp `http://localhost:8000` cho REST và WebSocket (xem `frontend/src/services/api.ts`); Vite vẫn có proxy `/auth`, `/chat` nếu bạn để `VITE_API_URL` trống — khuyến nghị để mặc định code dev trỏ thẳng API để WebSocket ổn định.
+
+**Tài liệu trạng thái & checklist:** [docs/04_current_status.md](docs/04_current_status.md) · [docs/05_checklist.md](docs/05_checklist.md).
 
 ### Hạ tầng (DB, Redis, ChromaDB)
 
@@ -84,6 +86,7 @@ docker-compose up -d
 - [02 — System Architecture](docs/02_system_architecture.md)
 - [03 — Taxonomy & Dataset](docs/03_taxonomy_and_dataset.md)
 - [04 — Current Status](docs/04_current_status.md)
+- [05 — Checklist (dev & production)](docs/05_checklist.md)
 
 ---
 

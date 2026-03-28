@@ -1,5 +1,7 @@
 # 🏷️ Taxonomy & Golden Dataset (English Pipeline)
 
+> **Phụ lục trạng thái code:** [04_current_status.md](04_current_status.md) (cập nhật định kỳ). Bảng intent/emotion dưới đây là đặc tả; pipeline dịch EN có thể bật tùy cấu hình.
+
 ## 📌 1. Intent Taxonomy (6 Classes)
 
 Hệ thống phân loại 8 ý định (intent) cho AI Anime Companion. Mọi input tiếng Việt được auto-translate sang tiếng Anh qua Translation Layer trước khi đi vào classifier.

@@ -44,6 +44,12 @@ Tài liệu này tóm tắt **những gì đã có thêm / đổi** so với bas
 - `data/` (trong repo; raw/processed vẫn tuân `.gitignore` có sẵn).
 - `exports/` (nếu có trong commit).
 
+## Tài liệu (đồng bộ 2026-03)
+
+- **`docs/04_current_status.md`** — trạng thái phase, đã có gì / chưa có gì.  
+- **`docs/05_checklist.md`** — checklist dev & production.  
+- **`docs/01_project_plan.md` §11** — đối chiếu milestone §10 với thực tế repo.
+
 ## Không đưa vào Git (cố ý)
 
 - **`.env`** — secrets; chỉ có `.env.example`.

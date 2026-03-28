@@ -15,7 +15,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from services.core.config import settings
-from services.core.api import agents, auth, chat, diary, game
+from services.core.api import agents, auth, chat, diary, external_game, game
 from services.core.api.caro import router as caro_router
 
 
