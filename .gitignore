@@ -55,6 +55,8 @@ frontend/node_modules/
 # TypeScript / Vite generated (tsc -b)
 *.tsbuildinfo
 frontend/vite.config.d.ts
+# Duplicate config (use vite.config.ts only)
+frontend/vite.config.js
 
 # Generated datasets (recreate with scripts/build_golden_intent_dataset.py etc.)
 data/golden_intent*.xlsx
@@ -87,10 +89,11 @@ test_register.py
 Thumbs.db
 ehthumbs.db
 
-# --- Local-only: do not publish to GitHub ---
+# --- Local-only (benchmarks, internal docs, ad-hoc scripts) ---
 tests/
 .pytest_cache/
-scripts/benchmark_retrievers.py
-scripts/build_golden_intent_dataset.py
-scripts/generate_golden_samples_openai.py
-docs/PROMPTS.md
+/docs/
+/scripts/
+/pytest.ini
+/run.ps1
+ml/*.jsonl

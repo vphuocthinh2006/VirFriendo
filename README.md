@@ -27,15 +27,16 @@ Data — PostgreSQL, ChromaDB, Redis (docker-compose)
 ## Cấu trúc thư mục
 
 ```
-├── frontend/                 # React + Vite + TypeScript, giao diện VN
+├── frontend/          # React + Vite + TypeScript (UI)
 ├── services/
-│   ├── core/                 # FastAPI — main, auth, chat, database
-│   └── agent_service/        # LangGraph — workflow, state, agents, intent_classifier
-├── shared/                   # Shared schemas (auth)
-├── docs/                     # Tài liệu dự án
-├── migrations/               # Alembic
+│   ├── core/          # FastAPI — auth, chat, API
+│   └── agent_service/ # LangGraph — agents, RAG, LLM
+├── shared/            # Schemas dùng chung
+├── migrations/        # Alembic
+├── ml/                # Gói training / style (optional)
 ├── requirements.txt
-└── docker-compose.yml        # PostgreSQL, Redis, ChromaDB
+├── docker-compose.yml
+└── Makefile
 ```
 
 ---
@@ -75,15 +76,6 @@ Mở http://localhost:5173. Proxy `/auth` và `/chat` tới backend (cần chạ
 ```bash
 docker-compose up -d
 ```
-
----
-
-## Tài liệu
-
-- [01 — Project Plan](docs/01_project_plan.md)
-- [02 — System Architecture](docs/02_system_architecture.md)
-- [03 — Taxonomy & Dataset](docs/03_taxonomy_and_dataset.md)
-- [04 — Current Status](docs/04_current_status.md)
 
 ---
 
