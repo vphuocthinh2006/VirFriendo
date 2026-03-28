@@ -52,6 +52,12 @@ services/agent_service/models/intent/adapter_model.safetensors
 # Frontend & deps
 node_modules/
 frontend/node_modules/
+# TypeScript / Vite generated (tsc -b)
+*.tsbuildinfo
+frontend/vite.config.d.ts
+
+# Generated datasets (recreate with scripts/build_golden_intent_dataset.py etc.)
+data/golden_intent*.xlsx
 
 # IDEs and Editors
 .idea/
