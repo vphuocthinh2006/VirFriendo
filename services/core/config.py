@@ -9,10 +9,14 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str  # Required: generate with `openssl rand -hex 32`
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    # Longer default so refresh / WebSocket stay valid during a session (override in .env)
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
 
     # Groq API Key for LLM inference
     GROQ_API_KEY: str | None = None
+
+    # Optional: Quickstart personality buffer + summary (chat entry mode)
+    REDIS_URL: str | None = None
     
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

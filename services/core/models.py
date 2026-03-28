@@ -51,6 +51,23 @@ class Message(Base):
 
 
 # 4. Model cho User Memory (facts/preferences/goals...)
+class AgentStat(Base):
+    """Aggregated play opens per agent (likes counted via user_agent_likes)."""
+
+    __tablename__ = "agent_stats"
+
+    agent_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    plays: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+
+class UserAgentLike(Base):
+    __tablename__ = "user_agent_likes"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    agent_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class UserMemory(Base):
     __tablename__ = "user_memories"
 
@@ -62,3 +79,26 @@ class UserMemory(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=datetime.utcnow)
+
+
+class DiaryEntry(Base):
+    """User-written diary lines per companion (for team review)."""
+
+    __tablename__ = "diary_entries"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    agent_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, index=True)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class UserAgentRelationship(Base):
+    """Per-companion stats: user message count drives relationship level (1000 msgs / level)."""
+
+    __tablename__ = "user_agent_relationships"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    agent_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_message_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    last_fun_fact_level_ack: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

@@ -5,13 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "changelog": "node ../scripts/generate-changelog.mjs",
+    "build": "npm run changelog && tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-three/drei": "^9.105.6",
+    "@react-three/fiber": "^8.15.19",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.0"
+    "react-router-dom": "^6.22.0",
+    "three": "^0.160.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.55",

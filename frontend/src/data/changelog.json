@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-03-27T12:43:02.311Z",
+  "entries": [
+    {
+      "id": 1,
+      "hash": "99fb6b28ecf2bde53a5ab9b2d332924df7e4fcda",
+      "short": "99fb6b2",
+      "date": "2026-03-16T04:55:28+07:00",
+      "subject": "VirFriendo: single clean commit (no node_modules, no large models)",
+      "kind": "update"
+    },
+    {
+      "id": 2,
+      "hash": "e2c56698b7b76a35dfea0f72e9b4e2e5f013b209",
+      "short": "e2c5669",
+      "date": "2026-03-16T14:27:50+07:00",
+      "subject": "Clean up README by removing initial description",
+      "kind": "docs"
+    },
+    {
+      "id": 3,
+      "hash": "ead8542f486c8f3a57b1268adac826231cfc0679",
+      "short": "ead8542",
+      "date": "2026-03-20T08:18:13+07:00",
+      "subject": "Phase 2 consolidation: RAG pipeline, retriever router, user memory, tests, cleanup",
+      "kind": "release"
+    }
+  ]
+}

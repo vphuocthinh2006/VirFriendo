@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { useGoogleSignIn } from '../hooks/useGoogleSignIn'
+import AuthPageShell from '../components/AuthPageShell'
+import GoogleGlyph from '../components/GoogleGlyph'
 
 export default function Register() {
   const [username, setUsername] = useState('')
@@ -10,6 +13,13 @@ export default function Register() {
   const [loading, setLoading] = useState(false)
   const { register } = useAuth()
   const navigate = useNavigate()
+  const {
+    ready: googleReady,
+    loading: googleLoading,
+    error: googleError,
+    googleMountRef,
+    triggerGoogleSignIn,
+  } = useGoogleSignIn()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -17,70 +27,94 @@ export default function Register() {
     setLoading(true)
     try {
       await register({ username, email, password })
-      navigate('/chat', { replace: true })
+      navigate('/menu', { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Đăng ký thất bại')
+      setError(err instanceof Error ? err.message : 'Registration failed')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-cream-100">
-      <div className="w-full max-w-sm rounded-2xl border border-chat-border bg-cream-50 p-8 shadow-sm">
-        <h1 className="text-xl font-semibold text-stone-800 mb-6 text-center">Đăng ký</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="text-sm text-red-600 bg-red-50/80 rounded-lg px-3 py-2">{error}</div>
-          )}
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Tên đăng nhập</label>
+    <AuthPageShell title="Create account" subtitle="Sign up to chat and play games with AI">
+      <div className="aid-auth-stack">
+        <div className="aid-google-auth-wrap aid-auth-google-full">
+          <div ref={googleMountRef} className="aid-google-gsi-offscreen" aria-hidden />
+          <button
+            type="button"
+            className={`aid-cta-google aid-auth-google-full${!googleReady ? ' aid-google-styled-cta--pending' : ''}`}
+            onClick={() => void triggerGoogleSignIn()}
+            disabled={!googleReady || googleLoading}
+          >
+            <span className="aid-cta-label aid-cta-label--row">
+              <GoogleGlyph />
+              {googleLoading ? 'CONNECTING…' : 'CONTINUE WITH GOOGLE'}
+            </span>
+          </button>
+        </div>
+        {googleLoading ? <p className="aid-auth-msg">Signing in with Google…</p> : null}
+        {googleError ? <p className="aid-auth-msg aid-auth-msg--error">{googleError}</p> : null}
+
+        <div className="aid-auth-or" role="separator">
+          <span className="aid-auth-or__line" aria-hidden />
+          <span className="aid-auth-or__text">or sign up with email</span>
+          <span className="aid-auth-or__line" aria-hidden />
+        </div>
+
+        <form onSubmit={handleSubmit} className="aid-auth-form">
+          {error ? <div className="aid-auth-msg aid-auth-msg--error">{error}</div> : null}
+
+          <div className="aid-auth-field">
+            <label htmlFor="reg-user">Username</label>
             <input
+              id="reg-user"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full rounded-xl border border-chat-border px-3 py-2.5 text-stone-800 bg-cream-50 focus:ring-2 focus:ring-accent/40 focus:border-accent/50 outline-none"
+              className="aid-auth-input"
               required
               autoComplete="username"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Email</label>
+
+          <div className="aid-auth-field">
+            <label htmlFor="reg-email">Email</label>
             <input
+              id="reg-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-chat-border px-3 py-2.5 text-stone-800 bg-cream-50 focus:ring-2 focus:ring-accent/40 focus:border-accent/50 outline-none"
+              className="aid-auth-input"
               required
               autoComplete="email"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Mật khẩu</label>
+
+          <div className="aid-auth-field">
+            <label htmlFor="reg-pass">Password</label>
             <input
+              id="reg-pass"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border border-chat-border px-3 py-2.5 text-stone-800 bg-cream-50 focus:ring-2 focus:ring-accent/40 focus:border-accent/50 outline-none"
+              className="aid-auth-input"
               required
               autoComplete="new-password"
             />
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 rounded-xl bg-accent text-cream-50 text-sm font-medium hover:bg-accent-hover disabled:opacity-50 transition"
-          >
-            {loading ? 'Đang đăng ký...' : 'Đăng ký'}
+
+          <button type="submit" disabled={loading} className="aid-cta-primary aid-auth-submit">
+            {loading ? 'Creating account...' : 'Create account'}
           </button>
         </form>
-        <p className="mt-6 text-center text-sm text-stone-500">
-          Đã có tài khoản?{' '}
-          <Link to="/login" className="text-accent-dark font-medium hover:underline">
-            Đăng nhập
+
+        <p className="aid-auth-footer-text">
+          Already have an account?{' '}
+          <Link to="/login" className="aid-auth-footer-link">
+            Sign in
           </Link>
         </p>
       </div>
-    </div>
+    </AuthPageShell>
   )
 }

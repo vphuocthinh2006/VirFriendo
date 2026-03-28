@@ -10,6 +10,10 @@ export interface ChatResponse {
   detected_emotion: string | null
   avatar_action: string | null
   bibliotherapy_suggestion: string | null
+  user_message_count?: number | null
+  relationship_level?: number | null
+  relationship_level_up?: boolean
+  new_relationship_level?: number | null
 }
 
 export interface ConversationSummary {

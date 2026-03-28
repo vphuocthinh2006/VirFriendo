@@ -15,31 +15,58 @@ def _get_llm():
         return _llm
     groq_key = (os.environ.get("GROQ_API_KEY") or "").strip()
     openai_key = (os.environ.get("OPENAI_API_KEY") or "").strip()
-    # Ưu tiên Groq trước (nhanh, .env thường dùng GROQ_API_KEY)
-    if groq_key:
-        try:
-            from langchain_groq import ChatGroq
-            _llm = ChatGroq(
-                model=os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant"),
-                temperature=0.7,
-                api_key=groq_key,
-            )
-            logger.info("LLM client: using Groq")
-            return _llm
-        except ImportError:
-            logger.warning("langchain-groq not installed")
-    if openai_key:
+    provider = (os.environ.get("LLM_PROVIDER") or "openai").strip().lower()
+
+    def _build_openai():
+        nonlocal openai_key
+        if not openai_key:
+            return None
         try:
             from langchain_openai import ChatOpenAI
-            _llm = ChatOpenAI(
+
+            return ChatOpenAI(
                 model=os.environ.get("OPENAI_MODEL", "gpt-4o"),
                 temperature=0.7,
                 api_key=openai_key,
             )
-            logger.info("LLM client: using OpenAI")
-            return _llm
         except ImportError:
             logger.warning("langchain-openai not installed")
+            return None
+
+    def _build_groq():
+        nonlocal groq_key
+        if not groq_key:
+            return None
+        try:
+            from langchain_groq import ChatGroq
+
+            return ChatGroq(
+                model=os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant"),
+                temperature=0.7,
+                api_key=groq_key,
+            )
+        except ImportError:
+            logger.warning("langchain-groq not installed")
+            return None
+
+    selected_provider = ""
+    if provider == "groq":
+        _llm = _build_groq()
+        selected_provider = "groq" if _llm is not None else ""
+        if _llm is None:
+            _llm = _build_openai()
+            selected_provider = "openai" if _llm is not None else ""
+    else:
+        # Default to OpenAI first to match current project setup.
+        _llm = _build_openai()
+        selected_provider = "openai" if _llm is not None else ""
+        if _llm is None:
+            _llm = _build_groq()
+            selected_provider = "groq" if _llm is not None else ""
+    if _llm is not None:
+        logger.info("LLM client: using {}", selected_provider or "unknown")
+        return _llm
+    logger.warning("LLM client: no provider available (set OPENAI_API_KEY or GROQ_API_KEY)")
     return None
 
 
@@ -70,7 +97,7 @@ async def generate(system_prompt: str, user_message: str) -> Optional[str]:
 
 
 # Số tin nhắn tối đa gửi vào LLM (context window) — trùng với core/context
-MAX_HISTORY_MESSAGES = 21  # ~10 cặp user/assistant + 1 tin mới
+MAX_HISTORY_MESSAGES = 20  # aligned with core/context MAX_CONTEXT_MESSAGES
 
 
 async def generate_with_history(

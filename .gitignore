@@ -46,8 +46,8 @@ data/models/*
 !data/models/.gitkeep
 # Large model files (host elsewhere or LFS)
 my_trained_model.zip
-services/agent-service/models/intent/*.safetensors
-services/agent-service/models/intent/adapter_model.safetensors
+services/agent_service/models/intent/*.safetensors
+services/agent_service/models/intent/adapter_model.safetensors
 
 # Frontend & deps
 node_modules/
@@ -70,3 +70,6 @@ test_register.py
 # OS files
 Thumbs.db
 ehthumbs.db
+
+# Large local Blender exports (optional; use Git LFS if team needs the asset)
+/Untitled.fbx

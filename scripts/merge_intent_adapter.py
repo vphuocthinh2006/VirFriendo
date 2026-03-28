@@ -1,6 +1,6 @@
 """
 Chạy 1 lần để merge LoRA adapter vào base model.
-Output: services/agent-service/models/intent_merged/
+Output: services/agent_service/models/intent_merged/
 
 Usage:
     python scripts/merge_intent_adapter.py
@@ -14,8 +14,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 BASE_MODEL_ID = "unsloth/llama-3-8b-Instruct"
 FALLBACK_QUANTIZED_BASE_MODEL_ID = "unsloth/llama-3-8b-Instruct-bnb-4bit"
-ADAPTER_DIR = Path("services/agent-service/models/intent")
-OUTPUT_DIR = Path("services/agent-service/models/intent_merged")
+ADAPTER_DIR = Path("services/agent_service/models/intent")
+OUTPUT_DIR = Path("services/agent_service/models/intent_merged")
 
 
 def main():
@@ -55,8 +55,8 @@ def main():
     merged.save_pretrained(OUTPUT_DIR, safe_serialization=False)
     tokenizer.save_pretrained(OUTPUT_DIR)
 
-    print("Done! Update INTENT_MODEL_DIR in .env to:")
-    print(f"  INTENT_MODEL_DIR=services/agent-service/models/intent_merged")
+    print("Done! Update INTENT_MODEL_PATH in .env to:")
+    print("  INTENT_MODEL_PATH=services/agent_service/models/intent_merged")
 
 
 if __name__ == "__main__":

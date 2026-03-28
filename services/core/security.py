@@ -3,9 +3,10 @@ from jose import jwt
 import bcrypt
 from services.core.config import settings
 from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordBearer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl = "/auth/login")
+_optional_bearer = HTTPBearer(auto_error=False)
 # Hàm 1: Kiểm tra mật khẩu (So sánh pass user nhập vs pass đã băm trong DB)
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(
@@ -39,3 +40,17 @@ async def get_current_user_id(token: str = Depends(oauth2_scheme)) -> str:
         return user_id
     except Exception:
         raise HTTPException(status_code=401, detail="Token không hợp lệ hoặc đã hết hạn")
+
+
+async def get_optional_user_id(
+    creds: HTTPAuthorizationCredentials | None = Depends(_optional_bearer),
+) -> str | None:
+    """Bearer JWT optional — returns user id or None."""
+    if creds is None or not creds.credentials:
+        return None
+    try:
+        payload = jwt.decode(creds.credentials, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        sub = payload.get("sub")
+        return str(sub) if sub else None
+    except Exception:
+        return None
