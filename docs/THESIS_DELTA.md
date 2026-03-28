@@ -46,7 +46,6 @@ Tài liệu này tóm tắt **những gì đã có thêm / đổi** so với bas
 
 ## Không đưa vào Git (cố ý)
 
-- **`Untitled.fbx`** (~48 MB) — file Blender tạm; **GitHub giới hạn file lớn**; giữ local hoặc dùng Git LFS nếu cần chia sẻ.
 - **`.env`** — secrets; chỉ có `.env.example`.
 
 ---

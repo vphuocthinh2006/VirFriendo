@@ -47,6 +47,8 @@ type Props = {
   agentDisplayName: string
   onQuickstart: () => void
   onCharacterComplete: (data: CharacterFormData) => void
+  /** Deep-link into /chat with ?tab=game&game=… after picking a title */
+  onPickGame?: (gameId: string) => void
 }
 
 function IconPlay({ className }: { className?: string }) {
@@ -80,7 +82,7 @@ function IconGamepad({ className }: { className?: string }) {
   )
 }
 
-export default function ChatEntryGate({ agentDisplayName, onQuickstart, onCharacterComplete }: Props) {
+export default function ChatEntryGate({ agentDisplayName, onQuickstart, onCharacterComplete, onPickGame }: Props) {
   const [panel, setPanel] = useState<Panel>('main')
   const [step, setStep] = useState(1)
   const [name, setName] = useState('')
@@ -175,10 +177,17 @@ export default function ChatEntryGate({ agentDisplayName, onQuickstart, onCharac
             <ul className="chat-entry-game-grid">
               {CHAT_GATE_GAMES.map((g) => (
                 <li key={g.id} className="chat-entry-game-tile">
-                  <div className="chat-entry-game-img-wrap">
-                    <img src={g.imageUrl} alt="" className="chat-entry-game-img" loading="lazy" />
-                  </div>
-                  <span className="chat-entry-game-name">{g.name}</span>
+                  <button
+                    type="button"
+                    className="chat-entry-game-tile-btn"
+                    disabled={!onPickGame}
+                    onClick={() => onPickGame?.(g.id)}
+                  >
+                    <div className="chat-entry-game-img-wrap">
+                      <div className={`vf-game-card__art vf-game-card__art--${g.id} chat-entry-game-thumb`} aria-hidden />
+                    </div>
+                    <span className="chat-entry-game-name">{g.name}</span>
+                  </button>
                 </li>
               ))}
             </ul>

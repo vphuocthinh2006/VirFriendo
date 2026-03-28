@@ -1,8 +1,8 @@
 import {
-  ATTACK_COOLDOWN_MS,
+  BASE_DROP_RADIUS_TILES,
   BASE_MAX_HP,
-  GATHER_INTERVAL_MS,
   GATHER_RATE,
+  MOVEMENT_PER_TURN,
   UNIT_STATS,
   type AnyEntity,
   type BaseEntity,
@@ -16,6 +16,9 @@ import {
 export const MAP_W = 26
 export const MAP_H = 26
 export const TILE = 20
+/** Ms between each tile step when resolving moves (visible march). */
+export const MARCH_STEP_MS = 88
+export { BASE_DROP_RADIUS_TILES, MOVEMENT_PER_TURN }
 
 function mulberry32(seed: number) {
   return function () {
@@ -36,6 +39,25 @@ function inBounds(x: number, y: number) {
   return x >= 0 && y >= 0 && x < MAP_W && y < MAP_H
 }
 
+function chebyshev(ax: number, ay: number, bx: number, by: number) {
+  return Math.max(Math.abs(ax - bx), Math.abs(ay - by))
+}
+
+function baseCenter(b: BaseEntity): [number, number] {
+  return [b.x + b.w / 2, b.y + b.h / 2]
+}
+
+function inDropCircle(u: UnitEntity, b: BaseEntity): boolean {
+  const [cx, cy] = baseCenter(b)
+  const ux = u.x + 0.5
+  const uy = u.y + 0.5
+  const dx = ux - cx
+  const dy = uy - cy
+  return Math.sqrt(dx * dx + dy * dy) <= BASE_DROP_RADIUS_TILES
+}
+
+export type PendingMarshalChoice = { attackerId: string; marshalId: string }
+
 export class AncientRtsEngine {
   rng: () => number
   seed: number
@@ -45,8 +67,15 @@ export class AncientRtsEngine {
   gold: [number, number]
   selectedId: string | null
   winner: 0 | 1 | null
-  aiCd = 0
-
+  /** Whose turn to give orders: 0 = you, 1 = AI (orders applied on End Turn) */
+  turnOwner: Owner = 0
+  turnNumber = 1
+  pendingMarshalChoice: PendingMarshalChoice | null = null
+  /** Set each frame from the UI for path / selection / range VFX (ms, e.g. performance.now()). */
+  visualTimeMs = 0
+  /** After End turn: resolve paths one tile at a time so units visibly march. */
+  private marchInProgress: 'none' | 'player' | 'ai' = 'none'
+  private marchAccumMs = 0
   constructor(seed = Date.now() & 0xffff) {
     this.seed = seed
     this.rng = mulberry32(seed)
@@ -68,8 +97,11 @@ export class AncientRtsEngine {
     this.gold = [80, 80]
     this.selectedId = null
     this.winner = null
-    this.aiCd = 0
-
+    this.turnOwner = 0
+    this.turnNumber = 1
+    this.pendingMarshalChoice = null
+    this.marchInProgress = 'none'
+    this.marchAccumMs = 0
     const pBase: BaseEntity = {
       id: nid(),
       kind: 'base',
@@ -95,10 +127,16 @@ export class AncientRtsEngine {
     this.entities.set(pBase.id, pBase)
     this.entities.set(eBase.id, eBase)
 
-    this.placeResources()
-
+    // Spawn units BEFORE random resources — a tree/gold on (4,22) etc. used to block spawnUnit() → empty map.
     this.spawnUnit(0, 'villager', pBase.x + pBase.w, pBase.y)
     this.spawnUnit(1, 'villager', eBase.x - 1, eBase.y + eBase.h - 1)
+    const pSpear = this.freeAdjacentGrass(pBase)
+    if (pSpear) this.spawnUnit(0, 'spearman', pSpear[0], pSpear[1])
+    const eSpear = this.freeAdjacentGrass(eBase)
+    if (eSpear) this.spawnUnit(1, 'spearman', eSpear[0], eSpear[1])
+
+    this.placeResources()
+    this.beginPlayerTurn()
   }
 
   private buildTerrain(): Terrain[][] {
@@ -130,6 +168,7 @@ export class AncientRtsEngine {
       const y = 4 + Math.floor(this.rng() * (MAP_H - 8))
       if (this.terrain[y][x] !== 'grass') continue
       if (this.occupiedByBase(x, y)) continue
+      if (this.unitAt(x, y)) continue
       const res: ResourceEntity = {
         id: nid(),
         kind: 'resource',
@@ -183,13 +222,19 @@ export class AncientRtsEngine {
       lastAttack: 0,
       lastGather: 0,
       stepCd: 0,
+      skillUsedThisTurn: false,
+      hustleDoubleGather: false,
+      nextBlock: false,
+      buffNextAttackBonus: 0,
     }
     this.entities.set(u.id, u)
     return u
   }
 
   tryTrainExpanded(owner: Owner, kind: UnitKind): boolean {
+    if (this.marchInProgress !== 'none') return false
     const st = UNIT_STATS[kind]
+    if (!st.trainable) return false
     if (this.wood[owner] < st.costW || this.gold[owner] < st.costG) return false
     const b = this.baseFor(owner)
     if (!b) return false
@@ -201,14 +246,201 @@ export class AncientRtsEngine {
     return true
   }
 
+  resolveMarshalChoice(choice: 'capture' | 'eliminate') {
+    if (!this.pendingMarshalChoice) return
+    const m = this.entities.get(this.pendingMarshalChoice.marshalId) as UnitEntity | undefined
+    this.pendingMarshalChoice = null
+    if (!m || m.kind !== 'unit' || m.unit !== 'marshal') return
+    if (choice === 'eliminate') {
+      this.entities.delete(m.id)
+      return
+    }
+    m.owner = 0
+    m.unit = 'knight'
+    m.maxHp = UNIT_STATS.knight.maxHp
+    m.hp = Math.floor(UNIT_STATS.knight.maxHp * 0.55)
+    m.dmg = UNIT_STATS.knight.dmg
+    m.speed = UNIT_STATS.knight.speed
+    m.skillUsedThisTurn = false
+    m.hustleDoubleGather = false
+  }
+
+  tryUseSkill(owner: Owner): boolean {
+    if (this.pendingMarshalChoice || this.turnOwner !== 0 || this.marchInProgress !== 'none') return false
+    const sel = this.selectedId ? this.entities.get(this.selectedId) : null
+    if (!sel || sel.kind !== 'unit') return false
+    const u = sel as UnitEntity
+    if (u.owner !== owner) return false
+    if (u.skillUsedThisTurn) return false
+
+    switch (u.unit) {
+      case 'villager':
+        u.hustleDoubleGather = true
+        break
+      case 'spearman':
+        u.nextBlock = true
+        break
+      case 'archer':
+        u.buffNextAttackBonus += 10
+        break
+      case 'knight':
+        u.buffNextAttackBonus += 16
+        break
+      default:
+        return false
+    }
+    u.skillUsedThisTurn = true
+    return true
+  }
+
+  beginPlayerTurn() {
+    this.turnOwner = 0
+    for (const e of this.entities.values()) {
+      if (e.kind !== 'unit') continue
+      const u = e as UnitEntity
+      u.skillUsedThisTurn = false
+      u.hustleDoubleGather = false
+    }
+  }
+
+  /** True while moves from End turn are playing out tile-by-tile. */
+  get marching() {
+    return this.marchInProgress !== 'none'
+  }
+
+  /**
+   * Drive animated march after endPlayerTurn. Call from rAF with ~frame delta.
+   * Returns true when React should refresh (combat/round/winner changed).
+   */
+  tickMarchFrame(deltaMs: number): boolean {
+    if (this.marchInProgress === 'none') return false
+    if (this.winner != null) {
+      this.marchInProgress = 'none'
+      this.marchAccumMs = 0
+      return true
+    }
+    this.marchAccumMs += deltaMs
+    if (this.marchAccumMs < MARCH_STEP_MS) return false
+    this.marchAccumMs -= MARCH_STEP_MS
+
+    if (!this.hasAnyPath()) {
+      this.finishMarchSegment()
+      return true
+    }
+    const moved = this.flushPathsOneStep()
+    if (!this.hasAnyPath()) {
+      this.finishMarchSegment()
+      return true
+    }
+    if (!moved) {
+      this.flushPaths()
+      this.finishMarchSegment()
+      return true
+    }
+    return false
+  }
+
+  /** Call when you finish issuing moves / training for this round. */
+  endPlayerTurn() {
+    if (this.winner != null || this.pendingMarshalChoice) return
+    if (this.turnOwner !== 0) return
+    if (this.marchInProgress !== 'none') return
+
+    if (this.hasAnyPathForOwner(0)) {
+      this.marchInProgress = 'player'
+      this.marchAccumMs = 0
+      return
+    }
+    this.afterPlayerMarchSync()
+  }
+
+  private finishMarchSegment() {
+    const phase = this.marchInProgress
+    this.marchInProgress = 'none'
+    this.marchAccumMs = 0
+    if (phase === 'player') this.afterPlayerMarchSync()
+    else if (phase === 'ai') this.finishAiHalf()
+  }
+
+  private afterPlayerMarchSync() {
+    this.resolveCombatGather()
+    this.checkWin()
+    if (this.winner != null) return
+
+    this.runAiTurn()
+    if (this.hasAnyPathForOwner(1)) {
+      this.marchInProgress = 'ai'
+      this.marchAccumMs = 0
+      return
+    }
+    this.finishAiHalf()
+  }
+
+  private finishAiHalf() {
+    this.resolveCombatGather()
+    this.checkWin()
+    if (this.winner != null) return
+    this.turnNumber += 1
+    this.beginPlayerTurn()
+  }
+
+  private hasAnyPath(): boolean {
+    for (const e of this.entities.values()) {
+      if (e.kind === 'unit' && (e as UnitEntity).path.length > 0) return true
+    }
+    return false
+  }
+
+  private hasAnyPathForOwner(owner: Owner): boolean {
+    for (const e of this.entities.values()) {
+      if (e.kind !== 'unit') continue
+      const u = e as UnitEntity
+      if (u.owner === owner && u.path.length > 0) return true
+    }
+    return false
+  }
+
+  /** One tile forward for every unit that still has path (same beat for all). */
+  private flushPathsOneStep(): boolean {
+    let anyMoved = false
+    for (const e of this.entities.values()) {
+      if (e.kind !== 'unit') continue
+      const u = e as UnitEntity
+      if (u.path.length === 0) continue
+      const [nx, ny] = u.path[0]
+      const block = this.unitAt(nx, ny)
+      if (block && block.id !== u.id) continue
+      u.path.shift()
+      u.x = nx
+      u.y = ny
+      anyMoved = true
+    }
+    return anyMoved
+  }
+
+  private flushPaths() {
+    for (const e of this.entities.values()) {
+      if (e.kind !== 'unit') continue
+      const u = e as UnitEntity
+      while (u.path.length > 0) {
+        const [nx, ny] = u.path[0]
+        const block = this.unitAt(nx, ny)
+        if (block && block.id !== u.id) break
+        u.path.shift()
+        u.x = nx
+        u.y = ny
+      }
+      u.stepCd = 0
+    }
+  }
+
   private freeAdjacentGrass(b: BaseEntity): [number, number] | null {
     const cands: [number, number][] = []
     for (let y = b.y - 1; y <= b.y + b.h; y++) {
       for (let x = b.x - 1; x <= b.x + b.w; x++) {
-        if (x < b.x || x >= b.x + b.w || y < b.y || y >= b.y + b.h) {
-          if (inBounds(x, y) && this.terrain[y][x] === 'grass' && !this.blockedTile(x, y, null) && !this.unitAt(x, y)) {
-            cands.push([x, y])
-          }
+        if (x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h) continue
+        if (inBounds(x, y) && this.terrain[y][x] === 'grass' && !this.blockedTile(x, y, null) && !this.unitAt(x, y)) {
+          cands.push([x, y])
         }
       }
     }
@@ -245,12 +477,16 @@ export class AncientRtsEngine {
     return false
   }
 
-  neighbors4Fixed(x: number, y: number): [number, number][] {
+  neighbors8Fixed(x: number, y: number): [number, number][] {
     const out: [number, number][] = []
-    if (inBounds(x + 1, y)) out.push([x + 1, y])
-    if (inBounds(x - 1, y)) out.push([x - 1, y])
-    if (inBounds(x, y + 1)) out.push([x, y + 1])
-    if (inBounds(x, y - 1)) out.push([x, y - 1])
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        if (dx === 0 && dy === 0) continue
+        const nx = x + dx
+        const ny = y + dy
+        if (inBounds(nx, ny)) out.push([nx, ny])
+      }
+    }
     return out
   }
 
@@ -274,7 +510,7 @@ export class AncientRtsEngine {
         path.reverse()
         return path
       }
-      for (const [nx, ny] of this.neighbors4Fixed(x, y)) {
+      for (const [nx, ny] of this.neighbors8Fixed(x, y)) {
         const nk = `${nx},${ny}`
         if (prev.has(nk)) continue
         if (this.blockedTileForPath(nx, ny, mover, sx, sy)) continue
@@ -283,6 +519,28 @@ export class AncientRtsEngine {
       }
     }
     return []
+  }
+
+  /** Reachable tiles in ≤maxSteps moves (8-dir); values are step counts from start (start = 0). */
+  private bfsDistanceField(start: [number, number], maxSteps: number, mover: UnitEntity): Map<string, number> {
+    const [sx, sy] = start
+    const out = new Map<string, number>()
+    const q: [number, number][] = [[sx, sy]]
+    out.set(`${sx},${sy}`, 0)
+    while (q.length) {
+      const [x, y] = q.shift()!
+      const k = `${x},${y}`
+      const cd = out.get(k)!
+      if (cd >= maxSteps) continue
+      for (const [nx, ny] of this.neighbors8Fixed(x, y)) {
+        const nk = `${nx},${ny}`
+        if (out.has(nk)) continue
+        if (this.blockedTileForPath(nx, ny, mover, sx, sy)) continue
+        out.set(nk, cd + 1)
+        q.push([nx, ny])
+      }
+    }
+    return out
   }
 
   private blockedTileForPath(x: number, y: number, mover: UnitEntity, sx: number, sy: number): boolean {
@@ -304,17 +562,39 @@ export class AncientRtsEngine {
   }
 
   bestAdjacentTo(tx: number, ty: number, mover: UnitEntity): [number, number] | null {
-    const adj = this.neighbors4Fixed(tx, ty).filter(
+    const adj = this.neighbors8Fixed(tx, ty).filter(
       ([ax, ay]) => !this.blockedTileForPath(ax, ay, mover, mover.x, mover.y) || (ax === mover.x && ay === mover.y)
     )
     if (adj.length === 0) return null
     let best = adj[0]
-    let bestD = Math.abs(best[0] - mover.x) + Math.abs(best[1] - mover.y)
+    let bestD = chebyshev(mover.x, mover.y, best[0], best[1])
     for (const a of adj.slice(1)) {
-      const d = Math.abs(a[0] - mover.x) + Math.abs(a[1] - mover.y)
+      const d = chebyshev(mover.x, mover.y, a[0], a[1])
       if (d < bestD) {
         best = a
         bestD = d
+      }
+    }
+    return best
+  }
+
+  private bestStandTileForRanged(u: UnitEntity, foe: UnitEntity): [number, number] | null {
+    const r = UNIT_STATS[u.unit].rangedMax
+    if (r <= 0) return null
+    let best: [number, number] | null = null
+    let bestD = 1e9
+    for (let y = 0; y < MAP_H; y++) {
+      for (let x = 0; x < MAP_W; x++) {
+        const d = chebyshev(x, y, foe.x, foe.y)
+        if (d < 1 || d > r) continue
+        if (this.blockedTileForPath(x, y, u, u.x, u.y)) continue
+        const occ = this.unitAt(x, y)
+        if (occ && occ.id !== u.id) continue
+        const md = chebyshev(u.x, u.y, x, y)
+        if (md < bestD) {
+          bestD = md
+          best = [x, y]
+        }
       }
     }
     return best
@@ -328,7 +608,7 @@ export class AncientRtsEngine {
         if (x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h) continue
         if (!inBounds(x, y)) continue
         if (this.blockedTileForPath(x, y, mover, mover.x, mover.y) && (x !== mover.x || y !== mover.y)) continue
-        const d = Math.abs(x - mover.x) + Math.abs(y - mover.y)
+        const d = chebyshev(mover.x, mover.y, x, y)
         if (d < bestD) {
           bestD = d
           best = [x, y]
@@ -350,10 +630,17 @@ export class AncientRtsEngine {
       goalX = adj[0]
       goalY = adj[1]
     } else if (targetU && targetU.owner !== u.owner) {
-      const adj = this.bestAdjacentTo(targetU.x, targetU.y, u)
-      if (!adj) return
-      goalX = adj[0]
-      goalY = adj[1]
+      if (u.unit === 'archer' && UNIT_STATS.archer.rangedMax > 0) {
+        const stand = this.bestStandTileForRanged(u, targetU)
+        if (!stand) return
+        goalX = stand[0]
+        goalY = stand[1]
+      } else {
+        const adj = this.bestAdjacentTo(targetU.x, targetU.y, u)
+        if (!adj) return
+        goalX = adj[0]
+        goalY = adj[1]
+      }
     } else {
       for (const e of this.entities.values()) {
         if (e.kind !== 'base') continue
@@ -371,13 +658,36 @@ export class AncientRtsEngine {
     }
 
     const path = this.bfs([u.x, u.y], (x, y) => x === goalX && y === goalY, u)
-    u.path = path
-    u.goal = path.length ? [goalX, goalY] : null
+    const mov = MOVEMENT_PER_TURN[u.unit]
+    // BFS returns [] when start === goal (already adjacent / in range to strike or gather).
+    // Previously we returned early so clicks on enemies did nothing and stale paths could remain.
+    if (path.length === 0) {
+      if (u.x === goalX && u.y === goalY) {
+        u.path = []
+        u.goal = [goalX, goalY]
+        u.attackId = null
+        u.gatherId = null
+      }
+      return
+    }
+    if (path.length > mov) {
+      if (u.owner === 0) return
+      const trimmed = path.slice(0, mov)
+      u.path = trimmed
+      const last = trimmed[trimmed.length - 1]!
+      u.goal = [last[0], last[1]]
+    } else {
+      u.path = path
+      u.goal = [goalX, goalY]
+    }
     u.attackId = null
     u.gatherId = null
   }
 
   selectAt(gx: number, gy: number, owner: Owner) {
+    if (this.pendingMarshalChoice) return
+    if (this.marchInProgress !== 'none') return
+    if (owner === 0 && this.turnOwner !== 0) return
     for (const e of this.entities.values()) {
       if (e.kind === 'base' && e.owner === owner) {
         const b = e as BaseEntity
@@ -398,97 +708,80 @@ export class AncientRtsEngine {
     }
   }
 
-  adjacent(a: UnitEntity, b: UnitEntity): boolean {
-    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y) === 1
+  private canAttack(u: UnitEntity, foe: UnitEntity): boolean {
+    const d = chebyshev(u.x, u.y, foe.x, foe.y)
+    if (d < 1) return false
+    const st = UNIT_STATS[u.unit]
+    if (st.rangedMax > 0) return d <= st.rangedMax
+    return d <= st.meleeRange
   }
 
-  adjacentToBase(u: UnitEntity, b: BaseEntity): boolean {
-    for (let y = b.y; y < b.y + b.h; y++) {
-      for (let x = b.x; x < b.x + b.w; x++) {
-        if (Math.abs(u.x - x) + Math.abs(u.y - y) === 1) return true
-      }
-    }
-    return false
-  }
-
-  tick(dt: number) {
-    if (this.winner != null) return
-    this.moveStep(dt)
-    this.combatAndGather(dt)
-    this.aiCd -= dt
-    if (this.aiCd <= 0) {
-      this.aiCd = 0.45
-      this.tickAi()
-    }
+  /** Legacy hook — simulation is turn-based; no-op. */
+  tick(_dt: number) {
     this.checkWin()
   }
 
-  private moveStep(dt: number) {
+  /** One combat / gather pass after movement (turn-based). */
+  private resolveCombatGather() {
+    if (this.pendingMarshalChoice) return
     for (const e of this.entities.values()) {
       if (e.kind !== 'unit') continue
       const u = e as UnitEntity
-      if (u.path.length === 0) {
-        u.stepCd = 0
-        continue
-      }
-      u.stepCd -= dt * u.speed
-      while (u.stepCd <= 0 && u.path.length > 0) {
-        const [nx, ny] = u.path[0]
-        const block = this.unitAt(nx, ny)
-        if (block && block.id !== u.id) break
-        u.path.shift()
-        u.x = nx
-        u.y = ny
-        u.stepCd += 0.35
-      }
-    }
-  }
-
-  private combatAndGather(_dt: number) {
-    const now = performance.now()
-    for (const e of this.entities.values()) {
-      if (e.kind !== 'unit') continue
-      const u = e as UnitEntity
-      if (u.path.length > 0) continue
 
       if (u.unit === 'villager') {
         const own = this.baseFor(u.owner)
-        if (own && this.adjacentToBase(u, own) && (u.carryWood > 0 || u.carryGold > 0)) {
+        if (own && inDropCircle(u, own) && (u.carryWood > 0 || u.carryGold > 0)) {
           this.wood[u.owner] += u.carryWood
           this.gold[u.owner] += u.carryGold
           u.carryWood = 0
           u.carryGold = 0
           continue
         }
-        const res = this.neighbors4Fixed(u.x, u.y)
+        const res = this.neighbors8Fixed(u.x, u.y)
           .map(([x, y]) => this.resourceAt(x, y))
           .find((r) => r && r.amount > 0)
         if (res) {
-          if (now - u.lastGather < GATHER_INTERVAL_MS) continue
-          u.lastGather = now
-          const amt = Math.min(GATHER_RATE, res.amount)
+          let amt = Math.min(GATHER_RATE, res.amount)
+          if (u.hustleDoubleGather) {
+            amt = Math.min(GATHER_RATE * 2, res.amount)
+            u.hustleDoubleGather = false
+          }
           if (res.res === 'tree') u.carryWood += amt
           else u.carryGold += amt
           res.amount -= amt
           if (res.amount <= 0) this.entities.delete(res.id)
+          continue
         }
-        continue
+        /* else: no gather this tick — can still melee (fixes “farmer can’t attack”). */
       }
 
       let foe: UnitEntity | null = null
+      let bestPri = 1e9
       for (const o of this.entities.values()) {
         if (o.kind !== 'unit') continue
         const ou = o as UnitEntity
         if (ou.owner === u.owner) continue
-        if (this.adjacent(u, ou)) {
+        if (!this.canAttack(u, ou)) continue
+        const d = chebyshev(u.x, u.y, ou.x, ou.y)
+        const pri = UNIT_STATS[u.unit].rangedMax > 0 ? d * 10 + (d === 1 ? 0 : 2) : d
+        if (pri < bestPri) {
+          bestPri = pri
           foe = ou
-          break
         }
       }
+
       if (foe) {
-        if (now - u.lastAttack < ATTACK_COOLDOWN_MS) continue
-        u.lastAttack = now
-        foe.hp -= u.dmg
+        let dmg = u.dmg + u.buffNextAttackBonus
+        if (foe.unit === 'marshal' && foe.owner === 1 && u.owner === 0 && foe.hp - dmg <= 0) {
+          this.pendingMarshalChoice = { attackerId: u.id, marshalId: foe.id }
+          continue
+        }
+        if (u.buffNextAttackBonus > 0) u.buffNextAttackBonus = 0
+        if (foe.nextBlock) {
+          foe.nextBlock = false
+          dmg = 0
+        }
+        foe.hp -= dmg
         if (foe.hp <= 0) this.entities.delete(foe.id)
         continue
       }
@@ -500,12 +793,10 @@ export class AncientRtsEngine {
         let hit = false
         for (let y = b.y; y < b.y + b.h && !hit; y++) {
           for (let x = b.x; x < b.x + b.w && !hit; x++) {
-            if (Math.abs(u.x - x) + Math.abs(u.y - y) === 1) hit = true
+            if (chebyshev(u.x, u.y, x, y) <= 1) hit = true
           }
         }
         if (hit) {
-          if (now - u.lastAttack < ATTACK_COOLDOWN_MS) break
-          u.lastAttack = now
           b.hp -= u.dmg
           if (b.hp <= 0) {
             this.winner = u.owner
@@ -517,14 +808,19 @@ export class AncientRtsEngine {
     }
   }
 
-  private tickAi() {
-    if (this.winner != null) return
+  private runAiTurn() {
+    if (this.winner != null || this.pendingMarshalChoice) return
     const owner = 1 as Owner
     const b = this.baseFor(owner)
     if (!b) return
-    if (this.rng() < 0.22) {
-      const prefer = this.rng() < 0.5 ? 'spearman' : 'villager'
-      if (!this.tryTrainExpanded(owner, prefer)) this.tryTrainExpanded(owner, prefer === 'spearman' ? 'villager' : 'spearman')
+    if (this.rng() < 0.2) {
+      const pool: UnitKind[] = ['spearman', 'villager', 'archer', 'knight']
+      const prefer = pool[Math.floor(this.rng() * pool.length)]
+      if (!this.tryTrainExpanded(owner, prefer)) {
+        for (const k of pool) {
+          if (this.tryTrainExpanded(owner, k)) break
+        }
+      }
     }
 
     for (const e of this.entities.values()) {
@@ -543,7 +839,7 @@ export class AncientRtsEngine {
         for (const r of this.entities.values()) {
           if (r.kind !== 'resource' || r.amount <= 0) continue
           const res = r as ResourceEntity
-          const d = Math.abs(res.x - u.x) + Math.abs(res.y - u.y)
+          const d = chebyshev(res.x, res.y, u.x, u.y)
           if (d < bd) {
             bd = d
             best = res
@@ -559,7 +855,7 @@ export class AncientRtsEngine {
         if (o.kind !== 'unit') continue
         const ou = o as UnitEntity
         if (ou.owner === owner) continue
-        const d = Math.abs(ou.x - u.x) + Math.abs(ou.y - u.y)
+        const d = chebyshev(ou.x, ou.y, u.x, u.y)
         if (d < td) {
           td = d
           target = ou
@@ -581,13 +877,27 @@ export class AncientRtsEngine {
 
   render(ctx: CanvasRenderingContext2D) {
     ctx.imageSmoothingEnabled = false
+    const tSec = this.visualTimeMs * 0.001
     for (let y = 0; y < MAP_H; y++) {
       for (let x = 0; x < MAP_W; x++) {
-        const t = this.terrain[y][x]
-        ctx.fillStyle = t === 'water' ? '#2a4a6a' : '#3d6b3d'
+        const terr = this.terrain[y][x]
+        ctx.fillStyle = terr === 'water' ? '#2a4a6a' : '#3d6b3d'
         ctx.fillRect(x * TILE, y * TILE, TILE, TILE)
         ctx.strokeStyle = 'rgba(0,0,0,0.12)'
         ctx.strokeRect(x * TILE, y * TILE, TILE, TILE)
+      }
+    }
+
+    const selEnt = this.selectedId && this.turnOwner === 0 ? this.entities.get(this.selectedId) : undefined
+    const selUnit = selEnt?.kind === 'unit' ? (selEnt as UnitEntity) : undefined
+    if (selUnit && selUnit.owner === 0 && this.marchInProgress === 'none') {
+      const maxM = MOVEMENT_PER_TURN[selUnit.unit]
+      const dist = this.bfsDistanceField([selUnit.x, selUnit.y], maxM, selUnit)
+      for (const [k, d] of dist) {
+        if (d < 1 || d > maxM) continue
+        const [tx, ty] = k.split(',').map(Number)
+        ctx.fillStyle = 'rgba(34, 197, 94, 0.28)'
+        ctx.fillRect(tx * TILE, ty * TILE, TILE, TILE)
       }
     }
 
@@ -602,6 +912,20 @@ export class AncientRtsEngine {
     for (const e of this.entities.values()) {
       if (e.kind === 'base') {
         const b = e as BaseEntity
+        const [cx, cy] = baseCenter(b)
+        const px = cx * TILE
+        const py = cy * TILE
+        const r = BASE_DROP_RADIUS_TILES * TILE
+        ctx.strokeStyle = b.owner === 0 ? 'rgba(96,165,250,0.42)' : 'rgba(248,113,113,0.42)'
+        ctx.lineWidth = 1.5
+        ctx.setLineDash([5, 6])
+        ctx.lineDashOffset = -(tSec * 14) % 22
+        ctx.beginPath()
+        ctx.arc(px, py, r, 0, Math.PI * 2)
+        ctx.stroke()
+        ctx.setLineDash([])
+        ctx.lineDashOffset = 0
+
         ctx.fillStyle = b.owner === 0 ? 'rgba(40,80,160,0.85)' : 'rgba(160,50,50,0.85)'
         ctx.fillRect(b.x * TILE, b.y * TILE, b.w * TILE, b.h * TILE)
         ctx.strokeStyle = '#fff'
@@ -612,6 +936,42 @@ export class AncientRtsEngine {
         ctx.fillRect(b.x * TILE + 2, b.y * TILE + b.h * TILE - 5, b.w * TILE - 4, 4)
         ctx.fillStyle = '#4ade80'
         ctx.fillRect(b.x * TILE + 2, b.y * TILE + b.h * TILE - 5, (b.w * TILE - 4) * pct, 4)
+      }
+    }
+
+    if (selUnit && selUnit.owner === 0 && selUnit.path.length > 0 && this.marchInProgress === 'none') {
+      ctx.strokeStyle = 'rgba(253, 224, 71, 0.78)'
+      ctx.lineWidth = 2
+      ctx.setLineDash([5, 5])
+      ctx.lineJoin = 'round'
+      ctx.beginPath()
+      let px = selUnit.x * TILE + TILE / 2
+      let py = selUnit.y * TILE + TILE / 2
+      ctx.moveTo(px, py)
+      for (const [gx, gy] of selUnit.path) {
+        px = gx * TILE + TILE / 2
+        py = gy * TILE + TILE / 2
+        ctx.lineTo(px, py)
+      }
+      ctx.stroke()
+      ctx.setLineDash([])
+      ctx.lineDashOffset = 0
+    }
+
+    const labelChar = (u: UnitEntity) => {
+      switch (u.unit) {
+        case 'villager':
+          return 'V'
+        case 'spearman':
+          return 'S'
+        case 'archer':
+          return 'A'
+        case 'knight':
+          return 'K'
+        case 'marshal':
+          return 'M'
+        default:
+          return '?'
       }
     }
 
@@ -628,7 +988,19 @@ export class AncientRtsEngine {
       ctx.font = 'bold 11px system-ui,sans-serif'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.fillText(u.unit === 'villager' ? 'V' : 'S', cx, cy)
+      ctx.fillText(labelChar(u), cx, cy)
+    }
+
+    if (selUnit && selUnit.owner === 0 && this.marchInProgress === 'none') {
+      for (const e of this.entities.values()) {
+        if (e.kind !== 'unit') continue
+        const ou = e as UnitEntity
+        if (ou.owner === selUnit.owner) continue
+        if (!this.canAttack(selUnit, ou)) continue
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.92)'
+        ctx.lineWidth = 2.5
+        ctx.strokeRect(ou.x * TILE - 1, ou.y * TILE - 1, TILE + 2, TILE + 2)
+      }
     }
 
     if (this.selectedId) {
@@ -640,5 +1012,27 @@ export class AncientRtsEngine {
         ctx.strokeRect(u.x * TILE + 1, u.y * TILE + 1, TILE - 2, TILE - 2)
       }
     }
+
+    ctx.fillStyle = 'rgba(15, 12, 8, 0.82)'
+    ctx.fillRect(4, 4, MAP_W * TILE - 8, 38)
+    ctx.fillStyle = 'rgba(232, 197, 71, 0.95)'
+    ctx.font = 'bold 10px system-ui, sans-serif'
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'middle'
+    const movHint = selUnit && selUnit.owner === 0 ? ` · this unit: ${MOVEMENT_PER_TURN[selUnit.unit]} steps max` : ''
+    const line1 =
+      this.winner != null
+        ? 'Game over'
+        : this.pendingMarshalChoice
+          ? 'Choose: capture or eliminate'
+          : `Round ${this.turnNumber} — green = tiles you can reach${movHint}`
+    const line2 =
+      this.winner != null || this.pendingMarshalChoice
+        ? ''
+        : this.marchInProgress !== 'none'
+          ? 'Marching — units move one tile at a time'
+          : 'Red frame = can attack · Yellow = planned path · End turn to march & fight'
+    ctx.fillText(line1, 10, 14)
+    if (line2) ctx.fillText(line2, 10, 30)
   }
 }

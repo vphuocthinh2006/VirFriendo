@@ -501,6 +501,35 @@ body {
   background: transparent !important;
 }
 
+.vf-connect-stage--css {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+}
+
+.vf-connect-css-spinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid rgba(201, 162, 39, 0.22);
+  border-top-color: rgba(232, 197, 71, 0.88);
+  animation: vf-connect-spin 0.8s linear infinite;
+}
+
+@keyframes vf-connect-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vf-connect-css-spinner {
+    animation: none;
+    border-color: rgba(232, 197, 71, 0.45);
+  }
+}
+
 .vf-connect-caption {
   margin: 0;
   font-family: "Oswald", "Arial Narrow", system-ui, sans-serif;
@@ -5195,6 +5224,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   flex-direction: column;
   align-items: stretch;
   gap: 0.45rem;
+  width: 100%;
   margin: 0;
   padding: 0;
   border: none;
@@ -5204,6 +5234,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   color: inherit;
   border-radius: 8px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  touch-action: manipulation;
 }
 
 .chat-entry-game-tile-btn:hover:not(:disabled) {
@@ -5217,11 +5248,22 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .chat-entry-game-img-wrap {
+  position: relative;
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid rgba(201, 162, 39, 0.22);
   aspect-ratio: 16 / 10;
   background: #0a0805;
+}
+
+.chat-entry-game-img-wrap .chat-entry-game-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: unset;
+  min-height: 100%;
+  border-radius: 8px;
 }
 
 .chat-entry-game-img {
@@ -6747,7 +6789,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   }
 }
 
-/* Game hub — PLAY GAMES (4 cards, 2×2), gold + serif / dark bg */
+/* Game hub — PLAY GAMES (5 cards, 2-col grid), gold + serif / dark bg */
 .vf-game-hub {
   width: 100%;
   padding: 1rem 1rem 1.25rem;
@@ -6842,6 +6884,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   cursor: pointer;
   text-align: center;
   transition: transform 0.2s ease, filter 0.2s ease;
+  touch-action: manipulation;
+  width: 100%;
 }
 
 .vf-game-card:hover {
@@ -6866,6 +6910,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Let clicks register on the parent <button>, not only on decorative layers */
+  pointer-events: none;
 }
 
 .vf-game-card__art::after {
@@ -6873,6 +6919,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   line-height: 1;
   opacity: 0.9;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.65));
+  pointer-events: none;
 }
 
 .vf-game-card__art--chess {
@@ -6899,6 +6946,26 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   color: rgba(201, 162, 39, 0.75);
 }
 
+.vf-game-card__art--tetris {
+  background:
+    linear-gradient(145deg, #5b21b6 0%, #312e81 42%, #0f172a 100%);
+}
+
+.vf-game-card__art--tetris::after {
+  content: "▣";
+  color: rgba(196, 181, 253, 0.95);
+}
+
+.vf-game-card__art--snake {
+  background:
+    linear-gradient(180deg, #065f46 0%, #022c22 55%, #041f17 100%);
+}
+
+.vf-game-card__art--snake::after {
+  content: "◉";
+  color: rgba(52, 211, 153, 0.92);
+}
+
 .vf-game-card__art--story {
   background: linear-gradient(160deg, #2a1c38 0%, #0c080e 100%);
 }
@@ -6908,7 +6975,20 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   color: rgba(232, 197, 71, 0.88);
 }
 
-/* Ancient RTS (hub art id zeroad) — ancient / bronze tile */
+/* Ringrealms (hub art id ringrealms) — ancient / bronze tile */
+.vf-game-card__art--ringrealms {
+  background:
+    radial-gradient(ellipse 85% 70% at 40% 25%, rgba(201, 162, 39, 0.22), transparent 55%),
+    linear-gradient(165deg, #2a2214 0%, #0f0c08 55%, #060504 100%);
+}
+
+.vf-game-card__art--ringrealms::after {
+  content: "⚔";
+  font-size: clamp(1.45rem, 4vw, 2rem);
+  color: rgba(232, 197, 71, 0.88);
+}
+
+/* Back-compat hub art id */
 .vf-game-card__art--zeroad {
   background:
     radial-gradient(ellipse 85% 70% at 40% 25%, rgba(201, 162, 39, 0.22), transparent 55%),
@@ -6929,6 +7009,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   text-transform: uppercase;
   color: rgba(232, 197, 71, 0.92);
   line-height: 1.25;
+  pointer-events: none;
 }
 
 @media (min-width: 480px) {

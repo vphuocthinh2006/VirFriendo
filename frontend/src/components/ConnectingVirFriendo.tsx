@@ -1,16 +1,10 @@
 /**
- * Full-screen loading (phong cách gần AI Dungeon): parchment + progress; WebGL 3D — FBX/GLB trong `public/`.
+ * Full-screen loading: parchment + CSS progress only (no WebGL / FBX / GLB).
  * Thời gian tối thiểu overlay: `LOADING_MIN_MS` (đồng bộ App lazy + auth).
  */
-import { useEffect, type CSSProperties } from 'react'
+import { type CSSProperties } from 'react'
 import { useLocation } from 'react-router-dom'
-import { useLoader } from '@react-three/fiber'
-import { useGLTF } from '@react-three/drei'
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
 import { LOADING_MIN_MS } from '../constants/loading'
-import OwlbearLoadingScene from './connecting/OwlbearLoadingScene'
-
-const DEFAULT_MODEL = '/models/untitled.fbx'
 
 function isMarketingRoute(pathname: string) {
   return (
@@ -28,17 +22,6 @@ export default function ConnectingVirFriendo() {
     ? 'vf-connect-overlay vf-connect-overlay--marketing'
     : 'vf-connect-overlay vf-connect-overlay--app'
 
-  const glbUrl = import.meta.env.VITE_OWLBEAR_GLB_URL?.trim() || DEFAULT_MODEL
-
-  useEffect(() => {
-    const u = glbUrl.toLowerCase()
-    if (u.endsWith('.fbx')) {
-      useLoader.preload(FBXLoader, glbUrl)
-    } else {
-      useGLTF.preload(glbUrl, true, false)
-    }
-  }, [glbUrl])
-
   return (
     <div
       className={overlayClass}
@@ -54,8 +37,8 @@ export default function ConnectingVirFriendo() {
       <div className="vf-connect-parchment">
         <p className="vf-connect-title">Your story is loading</p>
         <p className="vf-connect-tagline">Hang tight — the next scene is almost ready.</p>
-        <div className="vf-connect-stage" aria-hidden>
-          <OwlbearLoadingScene glbUrl={glbUrl} />
+        <div className="vf-connect-stage vf-connect-stage--css" aria-hidden>
+          <div className="vf-connect-css-spinner" />
         </div>
         <div className="vf-connect-progress" aria-hidden>
           <div className="vf-connect-progress__fill" />

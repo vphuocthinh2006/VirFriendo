@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-27T12:43:02.311Z",
+  "generatedAt": "2026-03-28T20:51:28.362Z",
   "entries": [
     {
       "id": 1,
@@ -24,6 +24,14 @@
       "date": "2026-03-20T08:18:13+07:00",
       "subject": "Phase 2 consolidation: RAG pipeline, retriever router, user memory, tests, cleanup",
       "kind": "release"
+    },
+    {
+      "id": 4,
+      "hash": "fc82b228ee1b04befe15f0be43e2a58f8e000fed",
+      "short": "fc82b22",
+      "date": "2026-03-29T01:51:59+07:00",
+      "subject": "chore(thesis): snapshot Mar 2026 vs ead8542",
+      "kind": "chore"
     }
   ]
 }

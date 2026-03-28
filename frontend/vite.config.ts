@@ -3,21 +3,13 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.indexOf('node_modules/three') !== -1 || id.indexOf('@react-three') !== -1) {
-            return 'vendor-three'
-          }
-        },
-      },
-    },
-  },
   server: {
     port: 5173,
     proxy: {
       '/auth': { target: 'http://localhost:8000', changeOrigin: true },
+      '/game': { target: 'http://localhost:8000', changeOrigin: true },
+      '/agents': { target: 'http://localhost:8000', changeOrigin: true },
+      '/diary': { target: 'http://localhost:8000', changeOrigin: true },
       // API: POST /chat, GET /chat/conversations, WS /chat/ws — but React route is GET /chat
       // Without bypass, GET /chat is proxied to FastAPI → 405. Serve SPA index.html instead.
       '/chat': {
