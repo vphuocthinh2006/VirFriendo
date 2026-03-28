@@ -86,3 +86,11 @@ test_register.py
 # OS files
 Thumbs.db
 ehthumbs.db
+
+# --- Local-only: do not publish to GitHub ---
+tests/
+.pytest_cache/
+scripts/benchmark_retrievers.py
+scripts/build_golden_intent_dataset.py
+scripts/generate_golden_samples_openai.py
+docs/PROMPTS.md
