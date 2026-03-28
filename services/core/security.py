@@ -33,7 +33,12 @@ def create_access_token(data: dict) -> str:
 async def get_current_user_id(token: str = Depends(oauth2_scheme)) -> str:
     """Giải mã JWT token và trả về user_id (str)"""
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
+            options={"require": ["exp", "sub"]},
+        )
         user_id: str = payload.get("sub")
         if user_id is None:
             raise HTTPException(status_code=401, detail="Token không hợp lệ")
@@ -49,7 +54,12 @@ async def get_optional_user_id(
     if creds is None or not creds.credentials:
         return None
     try:
-        payload = jwt.decode(creds.credentials, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = jwt.decode(
+            creds.credentials,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
+            options={"require": ["exp", "sub"]},
+        )
         sub = payload.get("sub")
         return str(sub) if sub else None
     except Exception:
