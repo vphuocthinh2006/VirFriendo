@@ -339,7 +339,7 @@ project-root/
 ├── docker-compose.yml                 # Local dev orchestration
 ├── docker-compose.prod.yml            # Production compose
 ├── Makefile                           # Dev commands
-├── .env.example                       # Environment variables template
+├── .env                               # Local secrets (gitignored)
 ├── .gitignore
 └── README.md
 ```

@@ -90,7 +90,7 @@
 
 - [ ] Xoa folder `services/agent-service/` (cu, duplicate voi `services/agent_service/`)
 - [ ] Commit + push tat ca code chua commit len GitHub
-- [ ] Update `.env.example` cho day du cac env vars moi
+- [ ] Document required env vars (local `.env` only; not committed)
 
 ---
 
