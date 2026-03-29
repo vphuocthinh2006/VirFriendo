@@ -2,20 +2,33 @@
 
 ## 5.1 Vai trò
 
-`services/agent_service` triển khai **phân loại intent** và **đồ thị agent** (LangGraph): các nhánh như chit-chat, guardrail, entertainment, comfort, advice, crisis — tùy phiên bản code.
+`services/agent_service` triển khai **phân loại intent** (`intent_classifier`) và **StateGraph** LangGraph trong `graph/workflow.py`: các node **`chit_chat`**, **`guardrail`**, **`entertainment_expert`**, **`comfort`**, **`advice`**, **`crisis`**.
 
-## 5.2 Luồng điển hình (khái niệm)
+## 5.2 Luồng trong `workflow.py`
 
-1. Tin nhắn user vào **core** (`chat`).
-2. Core gọi **intent / workflow** trong `graph/` (workflow, state, nodes).
-3. Có thể dùng **retrieval** (RAG) — fan wiki, Reddit, v.v. tùy module LLM (xem `services/agent_service/llm/`).
-4. Phản hồi trả về client (chunked cho UI Visual Novel).
+1. `START` → **`classifier`** (`classification_node`) — intent hybrid.
+2. → **`emotion`** (`emotion_node`).
+3. → **`route_intent`** — chọn node theo `intent` (và ưu tiên crisis nếu `emotion == crisis`):
 
-## 5.3 Cấu hình LLM
+| Intent (classifier) | Node |
+|---------------------|------|
+| `greeting_chitchat` | `chit_chat` |
+| `out_of_domain` | `guardrail` |
+| `entertainment_knowledge` | `entertainment_expert` |
+| `psychology_venting` | `comfort` |
+| `psychology_advice_seeking` | `advice` |
+| `crisis_alert` | `crisis` |
 
-- Biến môi trường như `GROQ_API_KEY` và các key khác theo `config` / client trong `services/agent_service/llm/`.
+4. Mỗi node → `END`. Phản hồi trả về **core** → client. Việc **chia khối hiển thị** là trách nhiệm **frontend** (`splitIntoSemanticBlocks`), không phải output “chunk” cố định từ graph.
 
-## 5.4 Tài liệu sâu hơn
+## 5.3 RAG / retrieval
 
-- Đọc trực tiếp `services/agent_service/graph/workflow.py`, `state.py`, `agents.py` khi chỉnh hành vi agent.
-- Thay đổi prompt / retrieval: cân nhắc benchmark và dataset nội bộ (thư mục `scripts/` có thể không nằm trong Git — xem `.gitignore`).
+- Có thể dùng retrieval trong các node / module LLM (xem `services/agent_service/llm/`, Chroma khi cấu hình).
+
+## 5.4 Cấu hình LLM
+
+- `services/agent_service/llm/client.py`: ưu tiên **OpenAI** (`OPENAI_API_KEY`, mặc định model `gpt-4o` nếu không set `OPENAI_MODEL`); fallback **Groq** (`GROQ_API_KEY`, `LLM_PROVIDER=groq`).
+
+## 5.5 Tài liệu sâu hơn
+
+- `workflow.py`, `state.py`, `agents.py` khi chỉnh hành vi từng node.

@@ -1,33 +1,42 @@
 # VirFriendo
 
-Ứng dụng chat **AI companion** phong cách nhân vật anime, giao diện **Visual Novel** (VN): thoại theo chunk, hiệu ứng karaoke, cooldown, skip/advance. Backend **FastAPI** + **LangGraph** (intent, đa agent, RAG), dữ liệu **PostgreSQL**, **Redis**, **ChromaDB**.
+Ứng dụng chat **AI companion** giao diện lấy cảm hứng từ **Visual Novel** (layout, thoại dạng narrative, portrait). Backend **FastAPI** + **LangGraph** trong cùng một tiến trình Python; dữ liệu **PostgreSQL**, **Redis**, **ChromaDB** (RAG khi cấu hình).
 
 ---
 
 ## Tài liệu (đọc theo mục lục)
 
-Toàn bộ tài liệu kỹ thuật nằm trong [`docs/`](./docs/README.md) — đánh số giống cách tổ chức repo platform (mục lục + từng chủ đề).
+Toàn bộ tài liệu kỹ thuật nằm trong [`docs/`](./docs/README.md).
 
 | # | File | Nội dung |
 |---|------|----------|
 | — | [`docs/README.md`](./docs/README.md) | **Mục lục** và gợi ý lộ trình đọc |
-| 01 | [`docs/01-architecture.md`](./docs/01-architecture.md) | Kiến trúc, sơ đồ, boundary `core` / `agent_service` |
+| 01 | [`docs/01-architecture.md`](./docs/01-architecture.md) | Kiến trúc, luồng chat UI + backend |
 | 02 | [`docs/02-local-development.md`](./docs/02-local-development.md) | Cài đặt local, `.env`, Docker Compose, cổng |
 | 03 | [`docs/03-data-and-storage.md`](./docs/03-data-and-storage.md) | PostgreSQL, Redis, ChromaDB |
 | 04 | [`docs/04-api-overview.md`](./docs/04-api-overview.md) | REST, `/health`, WebSocket `/chat/ws` |
-| 05 | [`docs/05-agent-pipeline.md`](./docs/05-agent-pipeline.md) | LangGraph, RAG (tổng quan) |
-| 06 | [`docs/06-roadmap-infra.md`](./docs/06-roadmap-infra.md) | **Roadmap hạ tầng** (Docker → CI → K8s → cloud) |
+| 05 | [`docs/05-agent-pipeline.md`](./docs/05-agent-pipeline.md) | LangGraph, intent → node |
+| 06 | [`docs/06-roadmap-infra.md`](./docs/06-roadmap-infra.md) | Roadmap hạ tầng |
 | 07 | [`docs/07-security-and-secrets.md`](./docs/07-security-and-secrets.md) | JWT, CORS, production |
 | 08 | [`docs/08-troubleshooting.md`](./docs/08-troubleshooting.md) | WS, DB, FAQ |
 
 ---
 
-## Tính năng (tóm tắt)
+## Tính năng (theo code hiện tại)
 
-- **Chat kiểu VN:** Hội thoại chunk, karaoke từng chữ, cooldown trước đoạn đầu, click để skip/advance.
-- **Backend:** Auth + Chat API (REST + WebSocket), LangGraph với các nhánh agent (ví dụ chit_chat, guardrail, entertainment_expert, comfort, advice, crisis — theo code trong `services/agent_service`).
-- **Mở rộng:** RAG giải trí (anime/manga/game/phim), mini-game, mood/diary (theo module đã bật).
-- **Vận hành:** Ưu tiên GPT‑4o class + RAG + guardrails; không bắt buộc fine-tune để chạy demo/production nhỏ.
+**Frontend (`frontend/src/pages/Chat.tsx`, components liên quan)**
+
+- **Thoại bot:** Nội dung assistant được **cắt thành các khối ngữ nghĩa** (`splitIntoSemanticBlocks`: đoạn văn, câu gộp theo ngưỡng độ dài và heuristics đổi chủ đề), render **Markdown** qua `ChatMarkdown`. **Không** có hiệu ứng “karaoke từng ký tự” trong bubble chat.
+- **Stream:** Ưu tiên **WebSocket** (`stream_start` / token / `stream_end`); khi đang stream, dòng cuối hiển thị **con trỏ nhấp nháy** (`vn-cursor-blink`). Hết stream hoặc fallback **REST** nếu WS không dùng được.
+- **Tương tác khối:** Mỗi khối thoại là vùng có thể **click** → mở **popup** đọc nội dung khối đó (không phải cơ chế “next line” kiểu engine VN cổ điển).
+- **Cổng vào chat (`ChatEntryGate`):** Có component **tiêu đề câu hỏi** tách từng ký tự với animation stagger (`KaraokeQuestion`) — đây là chỗ **duy nhất** trong UI dùng kiểu “karaoke letter” theo code.
+- **Khác:** Sidebar bond (hearts), `avatar_action` đổi style vòng portrait; hub **game** trong chat: Chess, Caro, Tetris, Snake, Ringrealms (RTS nhúng); **diary** qua API khi dùng tab tương ứng.
+
+**Backend (`services/core` + `services/agent_service`)**
+
+- **Auth** + **Chat** (REST + WebSocket `/chat/ws`).
+- **LangGraph** (`workflow.py`): `classifier` → `emotion` → một trong các node **`chit_chat`**, **`guardrail`**, **`entertainment_expert`**, **`comfort`**, **`advice`**, **`crisis`** (theo intent map trong `route_intent`).
+- **LLM** (`llm/client.py`): mặc định ưu tiên **OpenAI** (`OPENAI_API_KEY`, model mặc định `gpt-4o` nếu không set `OPENAI_MODEL`); có thể chuyển **Groq** qua `LLM_PROVIDER=groq` và `GROQ_API_KEY`. RAG / retrieval nằm trong `agent_service/llm/` (Chroma khi bật).
 
 ---
 
@@ -43,7 +52,7 @@ flowchart LR
   LangGraph --> Chroma
 ```
 
-Chi tiết và sơ đồ đầy đủ: [`docs/01-architecture.md`](./docs/01-architecture.md).
+Chi tiết: [`docs/01-architecture.md`](./docs/01-architecture.md).
 
 ---
 
@@ -63,7 +72,7 @@ Chi tiết và sơ đồ đầy đủ: [`docs/01-architecture.md`](./docs/01-arc
 └── README.md
 ```
 
-`scripts/`, `tests/`, `integrations/` có thể được giữ local-only hoặc nhánh riêng — xem [`.gitignore`](./.gitignore).
+`scripts/`, `tests/`, `integrations/` có thể local-only — xem [`.gitignore`](./.gitignore).
 
 ---
 
@@ -73,7 +82,7 @@ Chi tiết và sơ đồ đầy đủ: [`docs/01-architecture.md`](./docs/01-arc
 - Node.js **18+** (frontend)
 - **Docker** + Docker Compose (PostgreSQL, Redis, ChromaDB)
 
-Tạo file **`.env`** ở thư mục gốc (không commit; không có template trong repo). Chi tiết biến: [`docs/02-local-development.md`](./docs/02-local-development.md) và `services/core/config.py`.
+Tạo file **`.env`** ở thư mục gốc (không commit; không có template trong repo). Chi tiết: [`docs/02-local-development.md`](./docs/02-local-development.md) và `services/core/config.py`.
 
 ---
 
@@ -105,13 +114,13 @@ npm run dev
 - UI: **http://localhost:5173**
 - API: **http://localhost:8000** — OpenAPI `/docs` khi bật (môi trường dev).
 
-**WebSocket chat:** `ws://localhost:8000/chat/ws?token=...` — trong dev, frontend gọi thẳng API (port 8000), không proxy WS qua Vite — xem [`docs/04-api-overview.md`](./docs/04-api-overview.md) và [`docs/08-troubleshooting.md`](./docs/08-troubleshooting.md).
+**WebSocket:** `ws://localhost:8000/chat/ws?token=...` — trong dev, frontend gọi thẳng API (port 8000), không proxy WS qua Vite — [`docs/04-api-overview.md`](./docs/04-api-overview.md), [`docs/08-troubleshooting.md`](./docs/08-troubleshooting.md).
 
 ---
 
 ## Roadmap hạ tầng (DevOps)
 
-Lộ trình mục tiêu (Dockerfile, CI, K8s, Terraform, observability) được mô tả trong [**`docs/06-roadmap-infra.md`**](./docs/06-roadmap-infra.md). Trạng thái từng bước được đánh dấu trong file đó; baseline hiện tại là **local + Compose cho DB**.
+[`docs/06-roadmap-infra.md`](./docs/06-roadmap-infra.md).
 
 ---
 
