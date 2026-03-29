@@ -1,6 +1,6 @@
 /**
- * Full-screen loading: parchment + progress (no WebGL / Blender pipeline).
- * Optional static mascot image in `public/` (e.g. owlbear-cub.png).
+ * Full-screen loading: parchment + CSS progress only (no WebGL / FBX / GLB).
+ * Thời gian tối thiểu overlay: `LOADING_MIN_MS` (đồng bộ App lazy + auth).
  */
 import { type CSSProperties } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -37,15 +37,8 @@ export default function ConnectingVirFriendo() {
       <div className="vf-connect-parchment">
         <p className="vf-connect-title">Your story is loading</p>
         <p className="vf-connect-tagline">Hang tight — the next scene is almost ready.</p>
-        <div className="vf-connect-stage" aria-hidden>
-          <img
-            className="vf-connect-mascot"
-            src="/owlbear-cub.png"
-            alt=""
-            width={220}
-            height={220}
-            decoding="async"
-          />
+        <div className="vf-connect-stage vf-connect-stage--css" aria-hidden>
+          <div className="vf-connect-css-spinner" />
         </div>
         <div className="vf-connect-progress" aria-hidden>
           <div className="vf-connect-progress__fill" />

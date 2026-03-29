@@ -149,18 +149,6 @@ def _is_plot_synopsis_query(user_query: str) -> bool:
     return any(m in low for m in markers)
 
 
-def _is_lore_motivation_query(user_query: str) -> bool:
-    """Why did X / sacrifice / goal — needs wiki + fanwiki + web, not reddit-only."""
-    low = (user_query or "").lower()
-    # Avoid overly common English tokens ("reason", "become") that fire on unrelated chat.
-    markers = (
-        "why", "tại sao", "motive", "motivation", "goal", "mục đích",
-        "purpose", "lý do", "động cơ", "sacrifice", "hi sinh", "tự vật",
-        "villain", "antagonist", "quái vật", "lịch sử",
-    )
-    return any(m in low for m in markers)
-
-
 _RECOVERY_AFTER_JUDGE_REJECT_HINT = """
 
 [BẮT BUỘC — phục hồi sau reviewer]
@@ -519,19 +507,6 @@ def _build_preference_fallback_system(
     )
 
 
-def _compose_user_prompt_for_model(user_query: str, conversation_context: str) -> str:
-    uq = (user_query or "").strip()
-    cc = (conversation_context or "").strip()
-    if not cc:
-        return uq
-    return (
-        "Ngữ cảnh hội thoại gần đây (để nối ý; không thay thế phần Tham khảo trong system):\n"
-        + cc
-        + "\n\n---\n\nNhiệm vụ: trả lời câu hỏi / yêu cầu hiện tại:\n"
-        + uq
-    )
-
-
 async def run_entertainment_pipeline(
     *,
     user_query: str,
@@ -540,17 +515,15 @@ async def run_entertainment_pipeline(
     grounded_rules: str,
     no_source_reply: str,
     no_relevant_reply: str,
-    conversation_context: str = "",
 ) -> str:
     retriever_mode = (os.environ.get("RETRIEVER_MODE") or "tavily_only").strip().lower()
     preference_query = _is_preference_query(user_query)
     plot_synopsis_query = _is_plot_synopsis_query(user_query)
-    lore_motivation_query = _is_lore_motivation_query(user_query)
     # For community preference questions, force a community-first toolset even if mode=tavily_only.
     # This avoids false "no source" when user explicitly asks what fandom/community prefers.
     if preference_query:
         allowed_tools = ["reddit", "community", "fanwiki", "wiki", "tavily"]
-    elif plot_synopsis_query or lore_motivation_query:
+    elif plot_synopsis_query:
         allowed_tools = ["anilist", "wiki", "fanwiki", "reddit", "community", "tavily"]
     else:
         allowed_tools = None
@@ -562,18 +535,12 @@ async def run_entertainment_pipeline(
     )
     logger.info("entertainment_expert telemetry trace={}", trace)
 
-    # If first pass only yields weak/sparse evidence, run a second pass with tavily/wiki — not
-    # reddit+community only (snippets often miss surnames; hybrid needs factual fallback).
+    # If first pass only yields weak/sparse evidence, force a quick community pass.
     if (retriever_mode == "hybrid" or preference_query) and len(sources) < 2:
-        more_allowed = (
-            ["reddit", "community", "fanwiki", "wiki", "tavily"]
-            if preference_query
-            else ["reddit", "community", "tavily", "wiki", "fanwiki"]
-        )
         more_sources, more_trace = await agentic_retrieve(
             user_query,
-            allowed_tools=more_allowed,
-            max_steps=3,
+            allowed_tools=["reddit", "community"],
+            max_steps=2,
         )
         if more_sources:
             sources = _dedup_merge_sources(sources, more_sources)
@@ -628,8 +595,6 @@ async def run_entertainment_pipeline(
         community_system=community_system,
         grounded_rules=grounded_rules,
     )
-
-    user_prompt = _compose_user_prompt_for_model(user_query, conversation_context)
 
     draft = _strip_meta((await generate(system, user_prompt)) or "")
     if plot_synopsis_query and (not (draft or "").strip() or _is_refusal(draft)):

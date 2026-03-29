@@ -46,7 +46,7 @@ Nhãn:
 
 Ưu tiên phân loại:
 1) Nếu có tín hiệu tự hại/tự tử -> crisis_alert (ưu tiên cao nhất).
-2) Nếu nhắc tác phẩm/nhân vật/lore/review/tóm tắt trong anime-manga-game-phim -> entertainment_knowledge (kể cả câu ngắn kiểu follow-up). Nếu câu rõ ràng là hỏi thuật toán/lập trình thì KHÔNG dùng nhánh này (dùng out_of_domain).
+2) Nếu nhắc tác phẩm/nhân vật/lore/review/tóm tắt trong anime-manga-game-phim -> entertainment_knowledge (kể cả câu ngắn kiểu follow-up).
 3) Nếu vừa có venting vừa xin cách xử lý -> psychology_advice_seeking.
 4) Nếu chỉ than thở, chưa xin giải pháp -> psychology_venting.
 
@@ -249,11 +249,6 @@ class IntentClassifier:
         if intent_model == "crisis_alert" or intent_llm == "crisis_alert":
             return "crisis_alert"
         if intent_model == intent_llm:
-            return intent_model
-        # Keyword says OOD (code/math/weather) but LLM says entertainment — LLM is often wrong when
-        # classification text accidentally includes prior chat (e.g. BG3) + short follow-up.
-        if intent_model == "out_of_domain" and intent_llm == "entertainment_knowledge":
-            logger.debug("Intent hybrid: model={} llm={} -> trust keyword OOD", intent_model, intent_llm)
             return intent_model
         # Keyword matched entertainment but LLM thinks out_of_domain — trust keyword.
         # It's safer to search and find nothing than to wrongly reject an entertainment query.

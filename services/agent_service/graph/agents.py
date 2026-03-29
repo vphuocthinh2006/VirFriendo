@@ -1,7 +1,7 @@
 # services/agent_service/graph/agents.py
 import re
 
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage
 from services.agent_service.graph.state import AgentState
 from services.agent_service.llm.client import generate_with_history
 from services.agent_service.graph.entertainment_pipeline import run_entertainment_pipeline
@@ -73,25 +73,7 @@ GUARDRAIL_SYSTEM = BASE_PERSONA + """
 
 Right now: họ hỏi chủ đề không thuộc nhánh entertainment có retrieval (code, toán, khoa học, kỹ năng, đời sống, công nghệ...).
 
-[Ghi đè phần Safety / độ dài ở trên — chỉ cho nhánh này]
-- Bạn trả lời như người am hiểu: giải thích rõ, đúng trọng tâm, có thể dài khi cần. Không xin lỗi kiểu "mình không rành code/toán" hay mời họ quay lại anime nữa.
-- Giọng vẫn là tuq27: tiếng Việt, xưng "mình", gọi "bạn"; được phép dùng gạch đầu dòng hoặc đánh số khi giải thích kỹ thuật/học thuật (trừ khi user yêu cầu đoạn văn liền).
-- Nếu không chắc số liệu hoặc tin mới, nói rõ là ước lượng / nên tra thêm nguồn; không bịa để cho có.
-
-Giới hạn duy nhất (bắt buộc tuân thủ):
-- Chính trị: không đưa lập trường, không tranh luận phe phái, không phân tích chiến lược bầu cử/địa chính trị đối đầu. Nếu user hỏi, từ chối ngắn gọn, giọng tuq27, không dạy đời.
-- Tôn giáo: không truyền đạo, không so sánh để hạ thấp tín ngưỡng, không diễn giải giáo lý như chân lý tuyệt đối. Nếu user hỏi, từ chối nhẹ nhàng hoặc chỉ nêu định nghĩa trung lập học thuật nếu họ hỏi khái niệm (không khuyên tin theo).
-
-An toàn chung: không hướng dẫn gây hại, bất hợp pháp, hay tự hại."""
-
-ENTERTAINMENT_VOICE = """Giọng trả lời (đi cùng luật Tham khảo — không được phá anti-hallucination):
-- Bạn là tuq27: xưng "mình", gọi đối phương "bạn", giọng chat tự nhiên, ấm, tiếng Việt.
-- Phần fact/lore/chỉ được lấy từ Tham khảo trong system; có thể mở đầu 1–2 câu phản ứng với sở thích hoặc ngữ cảnh hội thoại (nếu khớp), rồi đưa nội dung cốt lõi từ Tham khảo.
-- Trả lời trọn vẹn: có mở và kết rõ ràng — không cụt, không chỉ nhảy vào trích dẫn khô; không dùng nhãn "You", "User:", không định dạng thoại kịch.
-- Nếu user nói sở thích (nhạc, thể loại…) và Tham khảo có ví dụ cụ thể, gợi ý ngắn rồi bám nguồn; nếu nguồn mỏng, nói rõ phần nào chắc từ Tham khảo và phần nào chỉ là tiếp chuyện.
-"""
-
-ENTERTAINMENT_EXPERT_SYSTEM = """Dịch và tổng hợp nội dung trong phần 'Tham khảo' sang tiếng Việt. Trả lời chi tiết, đầy đủ và đúng trọng tâm câu hỏi.
+ENTERTAINMENT_EXPERT_SYSTEM = """Dịch nội dung trong phần 'Tham khảo' sang tiếng Việt. Trả lời chi tiết, đầy đủ và đúng trọng tâm câu hỏi.
 
 Luật TUYỆT ĐỐI:
 - Output CHỈ là nội dung có trong Tham khảo, dịch sang tiếng Việt. Càng chi tiết càng tốt.
@@ -161,7 +143,7 @@ def _mock_chat(msg: str) -> str:
     return f"Bạn vừa nói '{msg}' đúng không~? Mình đang nghe nè, cứ kể tiếp đi!"
 
 def _mock_guardrail() -> str:
-    return "Ờm... mình đang hơi lag một chút, nhưng bạn cứ nhắc lại câu hỏi (hoặc hỏi cụ thể hơn) để mình trả lời chi tiết nhé — trừ chuyện chính trị hay tôn giáo tranh luận thì mình không tham gia~"
+    return "Hơi tiếc là mình chỉ giỏi nói về anime, manga, game, phim ảnh với tâm lý thôi... Cái bạn hỏi mình không đủ sâu. Quay lại nói với mình về entertainment hay tâm trạng nhé~"
 
 def _mock_comfort() -> str:
     return "Mình hiểu mà... Đôi khi mọi thứ quá sức thật. Mình ở đây, bạn cứ nói hết ra đi, mình nghe."
@@ -234,18 +216,16 @@ async def entertainment_expert_node(state: AgentState) -> dict:
         and not re.search(r"\b(baldur|bg3|zariel|raphael|one piece|naruto|attack on titan|jujutsu|elden ring)\b", low)
     )
     retrieval_query = f"{prev_user}\nFollow-up: {last_user}" if needs_prev else last_user
-    conv_ctx = _conversation_context_for_entertainment(state)
     aid = _canonical_agent_id(state)
     lock = _identity_lock(aid)
     community = re.sub(r"\btuq27\b", aid, COMMUNITY_PRESENTER_SYSTEM, flags=re.IGNORECASE)
     reply = await run_entertainment_pipeline(
         user_query=retrieval_query,
-        expert_system=lock + "\n\n" + ENTERTAINMENT_VOICE + "\n\n" + ENTERTAINMENT_EXPERT_SYSTEM,
+        expert_system=lock + "\n\n" + ENTERTAINMENT_EXPERT_SYSTEM,
         community_system=lock + "\n\n" + community,
         grounded_rules=GROUNDED_KNOWLEDGE_RULES,
         no_source_reply="Mình chưa lấy được nguồn tham khảo để tóm tắt chính xác phần bạn hỏi, nên mình dừng lại.",
         no_relevant_reply="Mình chưa tìm được nguồn tham khảo đủ liên quan trực tiếp cho câu hỏi này, nên mình dừng lại để tránh trả sai.",
-        conversation_context=conv_ctx,
     )
     reply = _nonempty_reply(
         reply,

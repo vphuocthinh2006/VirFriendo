@@ -84,32 +84,20 @@ def _fanwiki_snippet_usable(text: str) -> bool:
 
 
 def _keyword_domain_candidates(query: str) -> List[str]:
+    """Chỉ gợi ý khi user nói rõ IP; còn lại để LLM _llm_domain_candidates quyết định."""
     low = (query or "").lower()
-    out: List[str] = []
-    if any(k in low for k in ["honkai", "star rail", "hsr", "hoyoverse", "acheron", "kafka", "mihoyo"]):
-        out.append("honkai-star-rail")
-    if any(k in low for k in ["baldur", "bg3", "astarion", "gale", "shadowheart"]):
-        out.append("baldursgate")
-    if any(k in low for k in ["elden ring", "melina", "radahn"]):
-        out.append("eldenring")
-    if any(k in low for k in ["one piece", "luffy", "zoro"]):
-        out.append("onepiece")
-    if any(k in low for k in ["jujutsu", "gojo", "sukuna"]):
-        out.append("jujutsu-kaisen")
-    if any(k in low for k in ["naruto", "sasuke", "kakashi"]):
-        out.append("naruto")
-    # de-dup
-    seen = set()
-    return [d for d in out if not (d in seen or seen.add(d))]
+    if any(k in low for k in ["baldur", "bg3", "baldur's gate"]):
+        return ["baldursgate"]
+    return []
 
 
-FANWIKI_DOMAIN_SYSTEM = """You convert user query into likely Fandom wiki subdomains.
+FANWIKI_DOMAIN_SYSTEM = """You infer which Fandom.com wiki subdomains best match the user's question.
 Return strict JSON only:
 {"domains":["subdomain1","subdomain2","subdomain3"]}
 Rules:
-- Use lowercase letters, numbers, hyphen only.
-- Prefer known franchise domains (for Baldur's Gate 3 -> baldursgate).
-- Max 3 domains.
+- Lowercase, hyphenated subdomain only (e.g. eldenring, one-piece, baldursgate).
+- Pick domains for the work/franchise the user is actually asking about — do not assume an IP they did not imply.
+- Max 3 domains. If unsure, return fewer domains that still plausibly match.
 """
 
 

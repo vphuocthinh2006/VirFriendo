@@ -16,19 +16,19 @@ import SnakeGame from '../games/snake/SnakeGame'
 
 const CHARACTER_NAME = 'tuq27'
 const CHARACTER_SUBTITLE = 'ur dearest friend'
-const GAME_OPTIONS = ['Chess', 'Caro', 'Tetris', 'Snake', 'Ancient RTS'] as const
+const GAME_OPTIONS = ['Chess', 'Caro', 'Tetris', 'Snake', 'Ringrealms'] as const
 type GameOption = (typeof GAME_OPTIONS)[number]
 
 const GAME_GRID_ITEMS: readonly {
   option: GameOption
   label: string
-  art: 'chess' | 'caro' | 'tetris' | 'snake' | 'zeroad'
+  art: 'chess' | 'caro' | 'tetris' | 'snake' | 'ringrealms'
 }[] = [
   { option: 'Chess', label: 'CHESS', art: 'chess' },
   { option: 'Caro', label: 'CARO', art: 'caro' },
   { option: 'Tetris', label: 'TETRIS', art: 'tetris' },
   { option: 'Snake', label: 'SNAKE', art: 'snake' },
-  { option: 'Ancient RTS', label: 'ANCIENT RTS', art: 'zeroad' },
+  { option: 'Ringrealms', label: 'RINGREALMS', art: 'ringrealms' },
 ]
 
 /** `game` query param (chat entry gate) → tab Game option */
@@ -37,7 +37,8 @@ const GATE_GAME_ID_TO_OPTION: Record<string, GameOption> = {
   caro: 'Caro',
   tetris: 'Tetris',
   snake: 'Snake',
-  zeroad: 'Ancient RTS',
+  ringrealms: 'Ringrealms',
+  zeroad: 'Ringrealms',
 }
 
 /** Bot ELO range in the UI — fixed 350–1250 (matches backend). */
@@ -2057,7 +2058,7 @@ export default function Chat() {
                   <TetrisGame onExit={() => setActiveGame(null)} />
                 ) : activeGame === 'Snake' ? (
                   <SnakeGame onExit={() => setActiveGame(null)} />
-                ) : activeGame === 'Ancient RTS' ? (
+                ) : activeGame === 'Ringrealms' ? (
                   <AncientRtsGame onExit={() => setActiveGame(null)} />
                 ) : activeGame ? (
                   <div className="flex flex-col flex-1 min-h-[200px] items-center justify-center gap-4 px-2">

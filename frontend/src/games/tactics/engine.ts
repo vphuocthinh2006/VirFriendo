@@ -162,11 +162,11 @@ export function enemyBestAction(state: GameState): GameAction | null {
       for (const p of state.units.filter((x) => x.team === 'player' && x.hp > 0)) {
         if (canAttack(moved, p)) best = Math.max(best, 25 + Math.min(DMG, p.hp) * 4)
       }
-      const closer = -Math.min(
-        ...state.units
-          .filter((x) => x.team === 'player' && x.hp > 0)
-          .map((x) => chebyshev({ row: m.row, col: m.col }, x)),
-      )
+      const pAlive = state.units.filter((x) => x.team === 'player' && x.hp > 0)
+      const closer =
+        pAlive.length === 0
+          ? 0
+          : -Math.min(...pAlive.map((x) => chebyshev({ row: m.row, col: m.col }, x)))
       candidates.push({
         score: best + closer * 0.3,
         action: { type: 'move', unitId: u.id, toRow: m.row, toCol: m.col },
@@ -179,7 +179,7 @@ export function enemyBestAction(state: GameState): GameAction | null {
   return candidates[0].action
 }
 
-/** Apply an enemy move or attack (same rules; team check in apply for player only — need enemy variant). */
+/** Apply an enemy move or attack. */
 export function applyEnemyAction(state: GameState, action: GameAction): GameState {
   if (state.phase !== 'playing') return state
   if (action.type === 'move') {

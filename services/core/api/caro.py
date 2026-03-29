@@ -36,7 +36,6 @@ def _other(p: int) -> int:
 
 
 def _winner_at(board: list[list[int]], n: int, k: int) -> int | None:
-    """Trả về 1, 2 nếu có người thắng; None nếu chưa kết thúc; 0 nếu hòa (đầy bàn)."""
     for r in range(n):
         for c in range(n):
             v = board[r][c]
@@ -77,7 +76,6 @@ def _max_run_from(board: list[list[int]], n: int, r: int, c: int, player: int) -
 
 
 def _line_strength(board: list[list[int]], n: int, k: int, r: int, c: int, player: int) -> int:
-    """Điểm nước giả định đặt (r,c) cho player: tổng mạnh theo 4 hướng (đếm chuỗi)."""
     if board[r][c] != 0:
         return -10**9
     board[r][c] = player
@@ -177,8 +175,10 @@ class CaroReviewResponse(BaseModel):
 
 
 def _user_wins(session: CaroSession, winner: int | None) -> str | None:
-    if winner is None or winner == 0:
-        return "draw" if winner == 0 else None
+    if winner is None:
+        return None
+    if winner == 0:
+        return "draw"
     up = session.user_piece
     if winner == up:
         return "user"
@@ -188,61 +188,54 @@ def _user_wins(session: CaroSession, winner: int | None) -> str | None:
 def _serialize_caro(session: CaroSession) -> dict[str, Any]:
     n = session.n
     w = _winner_at(session.board, n, session.k)
-    status = "finished" if w is not None else "active"
-    bot = _other(session.user_piece)
-    next_p = session.user_piece if (len(session.moves) % 2 == 0) else bot
-    if status == "finished":
-        next_p = session.user_piece
 
     def cell(v: int) -> str | None:
         if v == 0:
             return None
         return "x" if v == 1 else "o"
 
+    bot = _other(session.user_piece)
+    user_turn = _is_user_turn(session)
     return {
         "session_id": session.session_id,
-        "status": status,
+        "status": "finished" if w is not None else "active",
         "n": n,
         "k": session.k,
         "user_stone": "x" if session.user_piece == 1 else "o",
         "bot_stone": "o" if session.user_piece == 1 else "x",
-        "next_stone": "x" if next_p == 1 else "o",
-        "turn": "user" if (status == "active" and _is_user_turn(session)) else ("bot" if status == "active" else "none"),
+        "turn": "none"
+        if w is not None
+        else ("user" if user_turn else "bot"),
         "board": [[cell(session.board[r][c]) for c in range(n)] for r in range(n)],
         "winner": _user_wins(session, w),
-        "result": "draw" if w == 0 else ("x" if w == 1 else "o") if w else None,
+        "result": "draw" if w == 0 else (("x" if w == 1 else "o") if w else None),
         "moves_count": len(session.moves),
         "moves_log": list(session.moves),
     }
 
 
 def _is_user_turn(session: CaroSession) -> bool:
-    bot = _other(session.user_piece)
-    x_first = True
-    if x_first:
-        first = 1
-    else:
-        first = 1
+    """X đi trước (1), O sau (2)."""
     ply = len(session.moves)
-    if ply == 0:
-        to_move = 1
-    else:
-        to_move = 1 if ply % 2 == 0 else 2
+    to_move = 1 if ply % 2 == 0 else 2
     return to_move == session.user_piece
 
 
 def _review_stats_caro(session: CaroSession) -> dict[str, Any]:
     user = session.user_piece
-    bot = _other(user)
     user_moves = [m for m in session.moves if m.get("side") == "user"]
     bot_moves = [m for m in session.moves if m.get("side") == "bot"]
     w = _winner_at(session.board, session.n, session.k)
     winner = _user_wins(session, w)
 
     best_run_user = 0
-    for m in user_moves:
-        r, c = int(m["row"]), int(m["col"])
-        best_run_user = max(best_run_user, _max_run_from(session.board, session.n, r, c, user))
+    for r in range(session.n):
+        for c in range(session.n):
+            if session.board[r][c] == user:
+                best_run_user = max(
+                    best_run_user,
+                    _max_run_from(session.board, session.n, r, c, user),
+                )
 
     opening_center = False
     if user_moves:
@@ -311,7 +304,7 @@ async def caro_new(request: CaroNewRequest, current_user_id: str = Depends(get_c
         )
     k = request.win_length if request.win_length is not None else _default_win_length(n)
     if k < 3 or k > n:
-        raise HTTPException(status_code=400, detail=f"win_length phải từ 3 đến {n}")
+        raise HTTPException(status_code=400, detail=f"win_length phải từ 3 đến {n} (lưới {n}×{n})")
 
     up = 1 if request.user_stone == "x" else 2
     sid = str(uuid4())
@@ -324,14 +317,11 @@ async def caro_new(request: CaroNewRequest, current_user_id: str = Depends(get_c
         board=[[0] * n for _ in range(n)],
     )
     _CARO_SESSIONS[sid] = session
-    # X đi trước; nếu user chọn O thì bot (X) mở quân.
-    if not _is_user_turn(session):
-        bot = _other(session.user_piece)
-        br, bc = _pick_bot_move(session.board, n, k, bot, session.user_piece)
-        session.board[br][bc] = bot
-        session.moves.append(
-            {"side": "bot", "row": br, "col": bc, "stone": "x" if bot == 1 else "o"}
-        )
+    # X đi trước: nếu user cầm O thì bot đánh nước đầu
+    if up == 2:
+        br, bc = _pick_bot_move(session.board, n, k, 1, 2)
+        session.board[br][bc] = 1
+        session.moves.append({"side": "bot", "row": br, "col": bc, "stone": "x"})
     return _serialize_caro(session)
 
 

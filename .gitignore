@@ -30,6 +30,7 @@ pip-delete-this-directory.txt
 
 # Environments
 .env
+.env.example
 .venv
 env/
 venv/
@@ -89,10 +90,9 @@ test_register.py
 Thumbs.db
 ehthumbs.db
 
-# --- Local-only (benchmarks, internal docs, ad-hoc scripts) ---
+# --- Local-only (benchmarks, ad-hoc scripts) ---
 tests/
 .pytest_cache/
-/docs/
 /scripts/
 /pytest.ini
 /run.ps1

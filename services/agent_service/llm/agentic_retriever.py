@@ -1,4 +1,3 @@
-import asyncio
 import json
 import os
 import re
@@ -14,6 +13,7 @@ from services.agent_service.llm.fanwiki_search import fanwiki_search
 from services.agent_service.llm.reddit_search import reddit_search
 from services.agent_service.llm.community_search import community_search
 from services.agent_service.llm.web_search import tavily_search
+from services.agent_service.llm.retrieval_auditor import audit_search_results
 
 
 TOOL_REGISTRY = {
@@ -42,31 +42,12 @@ _GENERIC_QUERY_TERMS = {
     "game", "story", "plot", "lore", "info", "information",
 }
 _ENTITY_FRANCHISE_HINTS = {
-    # Chỉ nhân vật gắn chặt BG3 — KHÔNG thêm "raphael" (dễ nhầm Honkai / nhạc).
     "zariel": "Baldur's Gate 3",
     "cazador": "Baldur's Gate 3",
     "astarion": "Baldur's Gate 3",
     "dark urge": "Baldur's Gate 3",
     "durge": "Baldur's Gate 3",
 }
-
-
-def _franchise_hint_from_query(user_query: str) -> str:
-    """Gợi ý franchise để rewrite — tránh Raphael + Final Act -> BG3."""
-    low = (user_query or "").lower()
-    if any(k in low for k in ["honkai", "star rail", "hsr", "hoyoverse", "mihoyo"]):
-        return "Honkai Star Rail"
-    if "raphael" in low and "final act" in low:
-        return "Honkai Star Rail"
-    if any(k in low for k in ["baldur", "bg3", "baldur's gate", "dark urge", "astarion", "shadowheart", "laezel", "minthara"]):
-        return "Baldur's Gate 3"
-    if "raphael" in low and any(k in low for k in ["baldur", "bg3", "cambion", "house of hope", "moonrise"]):
-        return "Baldur's Gate 3"
-    for e in _extract_entities(user_query):
-        h = _ENTITY_FRANCHISE_HINTS.get(e.lower())
-        if h:
-            return h
-    return ""
 
 _REWRITE_CACHE: Dict[str, Tuple[float, Dict[str, str]]] = {}
 _CIRCUIT_STATE: Dict[str, Dict[str, float]] = {}
@@ -105,13 +86,12 @@ Return strict JSON only:
   "character_story":"..."
 }
 Rules:
-- Keep named entities/franchise terms.
+- Keep named entities/franchise terms the user actually mentioned.
 - Remove filler/chitchat.
 - Each query should be 2-10 terms.
 - Never return the raw user sentence.
 - For character/lore asks, character_story should include "character backstory".
-- "Raphael" + "Final Act" / Honkai / Star Rail / HSR => Honkai Star Rail (NOT Baldur's Gate).
-- Do NOT assume Baldur's Gate 3 unless the user names BG3, Baldur, or typical BG3 companions/locations.
+- Do NOT assume a specific game/anime/IP unless the user clearly named it.
 """
 
 
@@ -256,23 +236,9 @@ def _fallback_semantic_pack(user_query: str) -> Dict[str, str]:
     }
 
 
-def _allow_tavily_first_hybrid(user_query: str, domain: str) -> bool:
-    """Domain general / voice-nhạc: cho Tavily ngay bước 1 — tránh fanwiki lệch IP."""
-    if domain == "general":
-        return True
-    low = (user_query or "").lower()
-    return any(
-        k in low
-        for k in (
-            "voice actor",
-            "seiyuu",
-            "nhạc",
-            "soundtrack",
-            "theme song",
-            "music",
-            "final act",
-        )
-    )
+def _allow_tavily_first_hybrid(_user_query: str, domain: str) -> bool:
+    """General: Tavily trước — web rộng; IP cụ thể để LLM auditor + fanwiki sau."""
+    return domain == "general"
 
 
 def _detect_domain(user_query: str) -> str:
@@ -282,12 +248,6 @@ def _detect_domain(user_query: str) -> str:
         "fandom", "cộng đồng", "thích hơn", "ưa hơn", "consensus", "preference",
     ]):
         return "review"
-    # Named IPs / franchises often omitted in short follow-ups (e.g. "Eren Yeager sacrifice reason").
-    if any(k in low for k in [
-        "attack on titan", "shingeki", "eren yeager", "mikasa", "armin arlert", "levi ackerman",
-        "scout regiment", "rumbling",
-    ]):
-        return "anime"
     if any(k in low for k in ["anime", "manga", "anilist", "chapter", "season", "arc", "light novel"]):
         return "anime"
     if any(k in low for k in ["voice actor", "seiyuu", "nhạc", "soundtrack", "ost ", "music", "theme song"]):
@@ -329,28 +289,10 @@ def _hybrid_domain_tools(domain: str) -> List[str]:
     return ["wiki", "fanwiki", "community", "reddit", "anilist", "tavily"]
 
 
-def _is_preference_style_query(low_q: str) -> bool:
-    return any(
-        k in low_q
-        for k in [
-            "fandom",
-            "cộng đồng",
-            "thích hơn",
-            "ưa hơn",
-            "preference",
-            "opinion",
-        ]
-    )
-
-
-def _is_relevant(
-    user_query: str,
-    item: Dict[str, str],
-    *,
-    tool: str = "",
-) -> bool:
-    """Keep results unless clearly empty. Prefer search ranking over brittle keyword stacks."""
-    low_q = (user_query or "").lower()
+def _is_relevant(user_query: str, item: Dict[str, str]) -> bool:
+    kws = _query_keywords(user_query)
+    if not kws:
+        return True
     hay = " ".join(
         [
             (item.get("title") or ""),
@@ -361,36 +303,29 @@ def _is_relevant(
     ).lower()
     if not hay.strip():
         return False
-
-    kws = _query_keywords(user_query)
-
-    # Preference / "what does fandom think" — still need topical guardrails.
-    if _is_preference_style_query(low_q):
-        if not kws:
-            return True
-        hits = sum(1 for k in kws if k in hay)
-        if hits <= 0:
+    hits = sum(1 for k in kws if k in hay)
+    if hits <= 0:
+        return False
+    named_like = [k for k in kws if len(k) >= 5]
+    if named_like and not any(k in hay for k in named_like):
+        return False
+    low_q = (user_query or "").lower()
+    if ("nhân vật" in low_q or "character" in low_q or "cốt truyện" in low_q or "story" in low_q):
+        anchors = [k for k in kws if len(k) >= 5 and k not in _GENERIC_QUERY_TERMS]
+        if anchors and not any(a in hay for a in anchors):
             return False
+    # Preference queries need stronger topical match to avoid random "fandom" noise.
+    if any(k in low_q for k in ["fandom", "cộng đồng", "thích hơn", "ưa hơn", "preference", "opinion"]):
         if "dark urge" in low_q:
+            # For "Dark Urge vs origin/Tav" asks, accept either side marker.
             durge_origin_markers = ["dark urge", "durge", "tav", "custom origin", "origin character"]
             if not any(m in hay for m in durge_origin_markers):
                 return False
+        # For BG3-like asks, require at least one franchise marker.
         if any(k in low_q for k in ["baldur", "bg3", "dark urge", "astarion", "raphael", "zariel"]):
             if not any(m in hay for m in ["baldur", "bg3", "dark urge", "astarion", "raphael", "zariel"]):
                 return False
-        return True
-
-    if not kws:
-        return True
-
-    if any(k in hay for k in kws):
-        return True
-
-    # No substring keyword hit: still trust ranked search output (overview-style), not drop all.
-    t = (tool or "").strip().lower()
-    if t in FACTUAL_SOURCES | CONTEXT_SOURCES and len(hay) >= 20:
-        return True
-    return False
+    return True
 
 
 def _has_anchor_evidence(user_query: str, sources: List[Dict[str, str]]) -> bool:
@@ -400,14 +335,9 @@ def _has_anchor_evidence(user_query: str, sources: List[Dict[str, str]]) -> bool
     kws = _query_keywords(user_query)
     anchors = [k for k in kws if len(k) >= 5 and k not in _GENERIC_QUERY_TERMS]
     if not anchors:
-        anchors = [k for k in kws if len(k) == 4 and k not in _GENERIC_QUERY_TERMS]
-    if not anchors:
         return True
     joined = " ".join(((s.get("title") or "") + " " + (s.get("snippet") or "")).lower() for s in sources[:25])
-    if any(a in joined for a in anchors):
-        return True
-    # Overview-style: multi-source bundle is acceptable; downstream judge checks grounding.
-    return len(sources) >= 2
+    return any(a in joined for a in anchors)
 
 
 def _evidence_quality(sources: List[Dict[str, str]]) -> Dict[str, int]:
@@ -420,12 +350,8 @@ def _enough_evidence(user_query: str, sources: List[Dict[str, str]]) -> bool:
     if not _has_anchor_evidence(user_query, sources):
         return False
     q = _evidence_quality(sources)
-    # AI-overview style: one solid web/encyclopedia hit is enough; or cross-source mix.
-    if q["factual"] >= 1:
-        return True
-    if len(sources) >= 2 and q["context"] >= 1:
-        return True
-    return q["context"] >= 2
+    # Require either 2 factual, or 1 factual + 1 context.
+    return q["factual"] >= 2 or (q["factual"] >= 1 and q["context"] >= 1)
 
 
 def _requires_authoritative_factual(user_query: str, domain: str) -> bool:
@@ -556,111 +482,6 @@ def _record_tool_success(tool: str) -> None:
     state["fails"] = 0.0
 
 
-def _overview_parallel_enabled() -> bool:
-    return (os.environ.get("RETRIEVER_OVERVIEW_PARALLEL", "true") or "").strip().lower() in (
-        "1",
-        "true",
-        "yes",
-        "on",
-    )
-
-
-def _overview_parallel_tool_order(domain: str, allowed: List[str]) -> List[str]:
-    """Multi-engine order (web + encyclopedia + specialist), like AI overview breadth."""
-    if domain == "review":
-        seq = ["reddit", "community", "tavily", "fanwiki", "wiki", "anilist"]
-    elif domain == "anime":
-        seq = ["tavily", "wiki", "anilist", "fanwiki", "reddit", "community"]
-    elif domain == "character":
-        seq = ["tavily", "fanwiki", "wiki", "reddit", "community", "anilist"]
-    else:
-        seq = ["tavily", "wiki", "fanwiki", "reddit", "community", "anilist"]
-    seen: set[str] = set()
-    out: List[str] = []
-    for t in seq:
-        if t in allowed and t not in seen and t in TOOL_REGISTRY:
-            seen.add(t)
-            out.append(t)
-    for t in allowed:
-        if t not in seen and t in TOOL_REGISTRY:
-            seen.add(t)
-            out.append(t)
-    return out[:4]
-
-
-async def _overview_parallel_fetch(
-    user_query: str,
-    *,
-    allowed: List[str],
-    semantic_pack: Dict[str, str],
-    domain: str,
-    seen_urls: set,
-) -> Tuple[List[Dict[str, str]], List[Dict[str, Any]], bool, bool]:
-    """Parallel fetch across several search backends; merge with URL dedup. Returns (sources, steps, tavily_used, tried_non_tavily)."""
-    tools = _overview_parallel_tool_order(domain, allowed)
-    if len(tools) < 2:
-        return [], [], False, False
-
-    async def _call(tool: str) -> Tuple[str, List[Dict[str, str]], str]:
-        try:
-            out = await TOOL_REGISTRY[tool](_choose_query_for_tool(user_query, tool, semantic_pack))
-            _record_tool_success(tool)
-            return tool, list(out) if out else [], ""
-        except Exception as e:
-            _record_tool_failure(tool)
-            logger.warning("overview_parallel tool {} failed: {}", tool, e)
-            return tool, [], str(e)
-
-    gathered = await asyncio.gather(*[_call(t) for t in tools])
-    merged: List[Dict[str, str]] = []
-    steps: List[Dict[str, Any]] = []
-    tavily_used = False
-    tried_non_tavily = False
-    sub = 0
-    for tool, results, err in gathered:
-        sub += 1
-        if tool == "tavily":
-            tavily_used = True
-        q = _choose_query_for_tool(user_query, tool, semantic_pack)
-        filtered = 0
-        added = 0
-        for r in results:
-            if not _is_relevant(user_query, r, tool=tool):
-                filtered += 1
-                continue
-            url = (r.get("url") or "").strip()
-            if url and url in seen_urls:
-                filtered += 1
-                continue
-            if url:
-                seen_urls.add(url)
-            if not r.get("source"):
-                r["source"] = tool
-            merged.append(r)
-            added += 1
-        if results and tool != "tavily":
-            tried_non_tavily = True
-        quality = _evidence_quality(merged)
-        steps.append(
-            {
-                "step": 0,
-                "substep": sub,
-                "action": "parallel_overview",
-                "tool": tool,
-                "query": q,
-                "reason": "parallel_overview_bootstrap",
-                "results": len(results),
-                "filtered_count": filtered,
-                "added": added,
-                "total": len(merged),
-                "factual_count": quality["factual"],
-                "context_count": quality["context"],
-                "error": err,
-            }
-        )
-    return merged, steps, tavily_used, tried_non_tavily
-
-
 async def agentic_retrieve(
     user_query: str,
     *,
@@ -703,38 +524,6 @@ async def agentic_retrieve(
         semantic_pack.get("community", ""),
         semantic_pack.get("character_story", ""),
     )
-
-    # AI-overview style: hit several major search backends in parallel first, then let the planner refine.
-    if mode == "hybrid" and _overview_parallel_enabled() and len(allowed) >= 2:
-        pb_merged, pb_steps, pb_tavily, pb_non_tavily = await _overview_parallel_fetch(
-            user_query,
-            allowed=allowed,
-            semantic_pack=semantic_pack,
-            domain=domain,
-            seen_urls=seen_urls,
-        )
-        for s in pb_steps:
-            steps.append(s)
-        sources.extend(pb_merged)
-        if pb_tavily:
-            tavily_used = True
-        if pb_non_tavily:
-            tried_non_tavily = True
-        if _enough_evidence_for_mode(user_query, sources, mode, domain):
-            trace = {
-                "steps": steps,
-                "finished": True,
-                "reason": "enough_evidence_after_overview",
-                "domain": domain,
-                "mode": mode,
-                "allowed_tools": allowed,
-            }
-            logger.info(
-                "retriever.telemetry final_reason={} evidence={}",
-                "enough_evidence_after_overview",
-                _evidence_quality(sources),
-            )
-            return sources, trace
 
     for step_idx in range(1, max_steps + 1):
         planner_input = (
@@ -795,10 +584,31 @@ async def agentic_retrieve(
             logger.warning("agentic_retrieve tool {} failed: {}", tool, e)
             results = []
 
+        if results and tool in ("tavily", "fanwiki"):
+            results, refined_audit, aud_reason = await audit_search_results(user_query, results, tool=tool)
+            logger.info(
+                "retrieval_auditor tool={} kept={} refined={!r} reason={}",
+                tool,
+                len(results),
+                refined_audit,
+                aud_reason,
+            )
+            if tool == "tavily" and not results and refined_audit and tavily_audit_retries < 1:
+                tavily_audit_retries += 1
+                try:
+                    results = await TOOL_REGISTRY["tavily"](refined_audit)
+                    _record_tool_success("tavily")
+                    results, _, _ = await audit_search_results(user_query, results, tool="tavily")
+                    logger.info("retrieval_auditor tavily_retry_pass kept={}", len(results))
+                except Exception as e:
+                    _record_tool_failure("tavily")
+                    logger.warning("retrieval_auditor tavily retry failed: {}", e)
+                    results = []
+
         added = 0
         filtered = 0
         for r in results:
-            if not _is_relevant(user_query, r, tool=tool):
+            if not _is_relevant(user_query, r):
                 filtered += 1
                 continue
             url = (r.get("url") or "").strip()
@@ -857,10 +667,23 @@ async def agentic_retrieve(
             logger.warning("agentic_retrieve tool tavily failed: {}", e)
             results = []
 
+        if results:
+            results, refined_fb, aud_fb = await audit_search_results(user_query, results, tool="tavily")
+            logger.info("retrieval_auditor hybrid_fallback kept={} refined={!r} {}", len(results), refined_fb, aud_fb)
+            if not results and refined_fb and tavily_audit_retries < 1:
+                tavily_audit_retries += 1
+                try:
+                    results = await TOOL_REGISTRY["tavily"](refined_fb)
+                    _record_tool_success("tavily")
+                    results, _, _ = await audit_search_results(user_query, results, tool="tavily")
+                except Exception as e:
+                    logger.warning("retrieval_auditor hybrid_fallback retry failed: {}", e)
+                    results = []
+
         added = 0
         filtered = 0
         for r in results:
-            if not _is_relevant(user_query, r, tool="tavily"):
+            if not _is_relevant(user_query, r):
                 filtered += 1
                 continue
             url = (r.get("url") or "").strip()

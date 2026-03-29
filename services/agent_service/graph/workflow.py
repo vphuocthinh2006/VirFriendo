@@ -35,7 +35,6 @@ async def classification_node(state: AgentState) -> dict:
     low = (last_message or "").strip().lower()
     use_prev = (
         bool(prev_user)
-        and not _technical_followup_suppresses_context(last_message)
         and (
             any(k in low for k in ["nếu so sánh", "ý là", "thế còn", "còn nếu", "vậy còn", "so với", "so sánh"])
             or len(low.split()) <= 8

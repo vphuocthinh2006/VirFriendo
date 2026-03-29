@@ -1,4 +1,16 @@
-const API_BASE = import.meta.env.VITE_API_URL || ''
+/** Dev defaults to :8000 so the API (and chat WS) do not go through Vite’s proxy. */
+function resolveApiBase(): string {
+  const v = typeof import.meta.env.VITE_API_URL === 'string' ? import.meta.env.VITE_API_URL.trim() : ''
+  if (v !== '') {
+    // Common mistake: pointing at the Vite dev server instead of FastAPI
+    if (import.meta.env.DEV && /:5173\b/.test(v)) return 'http://localhost:8000'
+    return v
+  }
+  if (import.meta.env.DEV) return 'http://localhost:8000'
+  return ''
+}
+
+const API_BASE = resolveApiBase()
 
 function getToken(): string | null {
   return localStorage.getItem('access_token')
@@ -41,7 +53,9 @@ export function createChatWs(onMessage: (msg: WsMessage) => void, onClose?: () =
   const token = getToken()
   if (!token) return null
 
-  const httpBase = API_BASE || window.location.origin
+  // Never fall back to Vite’s origin (5173) for chat WS — that hits the broken proxy.
+  const httpBase =
+    API_BASE || (import.meta.env.DEV ? 'http://localhost:8000' : window.location.origin)
   const wsBase = httpBase.replace(/^http/, 'ws')
   const url = `${wsBase}/chat/ws?token=${encodeURIComponent(token)}`
 
@@ -51,7 +65,18 @@ export function createChatWs(onMessage: (msg: WsMessage) => void, onClose?: () =
       onMessage(JSON.parse(ev.data))
     } catch { /* ignore malformed */ }
   }
-  ws.onclose = () => onClose?.()
+  ws.onclose = (ev) => {
+    if (import.meta.env.DEV) {
+      const hint =
+        ev.code === 1006
+          ? ' (abnormal — often refused, invalid JWT, or API not on this port)'
+          : ev.code === 4001 || ev.reason?.includes('token')
+            ? ' (log out and log in again if SECRET_KEY changed or token expired)'
+            : ''
+      console.warn(`[chat WS] closed code=${ev.code} reason=${ev.reason || '(none)'}${hint}`)
+    }
+    onClose?.()
+  }
   ws.onerror = () => onClose?.()
   return ws
 }
@@ -162,6 +187,65 @@ export type ChessReviewResponse = {
   }
 }
 
+// --- Caro (gomoku-style) ---
+export type CaroStateResponse = {
+  session_id: string
+  status: 'active' | 'finished'
+  n: number
+  k: number
+  user_stone: 'x' | 'o'
+  bot_stone: 'x' | 'o'
+  turn: 'user' | 'bot' | 'none'
+  board: (string | null)[][]
+  winner: 'user' | 'bot' | 'draw' | null
+  result: string | null
+  moves_count: number
+  moves_log: Array<{ side: string; row: number; col: number; stone?: string }>
+}
+
+export type CaroReviewResponse = {
+  session_id: string
+  status: string
+  review_text: string
+  stats: Record<string, unknown>
+}
+
+export async function caroNew(gridSize: number, userStone: 'x' | 'o', winLength?: number) {
+  const body: Record<string, unknown> = { grid_size: gridSize, user_stone: userStone }
+  if (winLength != null && winLength > 0) body.win_length = winLength
+  const res = await fetch(`${API_BASE}/game/caro/new`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(body),
+  })
+  return handleResponse<CaroStateResponse>(res)
+}
+
+export async function caroMove(sessionId: string, row: number, col: number) {
+  const res = await fetch(`${API_BASE}/game/caro/move`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ session_id: sessionId, row, col }),
+  })
+  return handleResponse<CaroStateResponse>(res)
+}
+
+export async function caroState(sessionId: string) {
+  const res = await fetch(`${API_BASE}/game/caro/state/${sessionId}`, {
+    headers: headers(),
+  })
+  return handleResponse<CaroStateResponse>(res)
+}
+
+export async function caroReview(sessionId: string) {
+  const res = await fetch(`${API_BASE}/game/caro/review`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ session_id: sessionId }),
+  })
+  return handleResponse<CaroReviewResponse>(res)
+}
+
 export async function chessNew(userColor: 'white' | 'black', botElo = 800) {
   const res = await fetch(`${API_BASE}/game/chess/new`, {
     method: 'POST',
@@ -196,78 +280,6 @@ export async function chessReview(sessionId: string) {
   return handleResponse<ChessReviewResponse>(res)
 }
 
-// --- Caro / Gomoku ---
-export type CaroStateResponse = {
-  session_id: string
-  status: 'active' | 'finished'
-  n: number
-  k: number
-  user_stone: 'x' | 'o'
-  bot_stone: 'x' | 'o'
-  next_stone: 'x' | 'o'
-  turn: 'user' | 'bot' | 'none'
-  board: (string | null)[][]
-  winner: 'user' | 'bot' | 'draw' | null
-  result: string | null
-  moves_count: number
-  moves_log: Array<{ side: string; row: number; col: number; stone?: string }>
-}
-
-export type CaroReviewResponse = {
-  session_id: string
-  status: string
-  review_text: string
-  stats: {
-    grid_n: number
-    win_k: number
-    user_moves: number
-    bot_moves: number
-    total_moves: number
-    winner: string | null
-    result: string
-    user_best_run: number
-    opening_near_center: boolean
-    move_sequence: Array<{ ply: number; side: string; row: number; col: number }>
-    move_sequence_text?: string
-  }
-}
-
-export async function caroNew(gridSize: number, userStone: 'x' | 'o', winLength?: number) {
-  const body: Record<string, unknown> = { grid_size: gridSize, user_stone: userStone }
-  if (winLength != null) body.win_length = winLength
-  const res = await fetch(`${API_BASE}/game/caro/new`, {
-    method: 'POST',
-    headers: headers(),
-    body: JSON.stringify(body),
-  })
-  return handleResponse<CaroStateResponse>(res)
-}
-
-export async function caroState(sessionId: string) {
-  const res = await fetch(`${API_BASE}/game/caro/state/${encodeURIComponent(sessionId)}`, {
-    headers: headers(),
-  })
-  return handleResponse<CaroStateResponse>(res)
-}
-
-export async function caroMove(sessionId: string, row: number, col: number) {
-  const res = await fetch(`${API_BASE}/game/caro/move`, {
-    method: 'POST',
-    headers: headers(),
-    body: JSON.stringify({ session_id: sessionId, row, col }),
-  })
-  return handleResponse<CaroStateResponse>(res)
-}
-
-export async function caroReview(sessionId: string) {
-  const res = await fetch(`${API_BASE}/game/caro/review`, {
-    method: 'POST',
-    headers: headers(),
-    body: JSON.stringify({ session_id: sessionId }),
-  })
-  return handleResponse<CaroReviewResponse>(res)
-}
-
 export type ChessBotInfo = {
   engine: string
   stockfish_configured: boolean
@@ -296,57 +308,6 @@ export async function chessBotInfo() {
 export async function gamePlatforms() {
   const res = await fetch(`${API_BASE}/game/platforms`, { headers: headers() })
   return handleResponse<GamePlatformsResponse>(res)
-}
-
-// --- External game (Godot / generic JSON state + actions) ---
-export type ExternalGameEmotion = 'aggressive' | 'cautious' | 'neutral'
-
-export type ExternalGameDecideResponse = {
-  action: string
-  source: 'rules' | 'llm' | 'fallback'
-}
-
-export async function externalGameDecide(body: {
-  game_id: string
-  state: Record<string, unknown>
-  actions: string[]
-  emotion?: ExternalGameEmotion
-  use_llm?: boolean
-}): Promise<ExternalGameDecideResponse> {
-  const res = await fetch(`${API_BASE}/game/external/decide`, {
-    method: 'POST',
-    headers: headers(),
-    body: JSON.stringify({
-      game_id: body.game_id,
-      state: body.state,
-      actions: body.actions,
-      emotion: body.emotion ?? 'neutral',
-      use_llm: body.use_llm ?? false,
-    }),
-  })
-  return handleResponse<ExternalGameDecideResponse>(res)
-}
-
-export async function externalGameDemoLog(body: {
-  game_id: string
-  state: Record<string, unknown>
-  action: string
-  meta?: Record<string, unknown>
-}): Promise<void> {
-  const res = await fetch(`${API_BASE}/game/external/demo-log`, {
-    method: 'POST',
-    headers: headers(),
-    body: JSON.stringify({
-      game_id: body.game_id,
-      state: body.state,
-      action: body.action,
-      meta: body.meta ?? {},
-    }),
-  })
-  if (!res.ok) {
-    const detail = (await res.json().catch(() => ({})))?.detail ?? res.statusText
-    throw new Error(typeof detail === 'string' ? detail : JSON.stringify(detail))
-  }
 }
 
 // --- Auth ---

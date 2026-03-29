@@ -23,7 +23,6 @@ Quy tắc:
 - Nếu references HOÀN TOÀN TRỐNG hoặc không liên quan chút nào, verdict=reject.
 - Nếu references có ÍT NHẤT một đoạn synopsis/summary/description liên quan đến chủ đề user hỏi, verdict=accept — vì đó chính là dữ liệu hợp lệ, dù ngắn.
 - Draft phải trả lời ĐÚNG trọng tâm câu hỏi của user. Nếu user hỏi A mà draft nói lan sang B dù đều có trong nguồn, verdict=reject.
-- Draft phải là đoạn tiếng Việt hoàn chỉnh (có chủ đề rõ), không được chỉ là nhãn kiểu "You", "User:", không được mở đầu như kịch bản chat thô.
 - Nếu draft chứa khẳng định chắc chắn (always, chắc chắn, chắc chắn rằng, chắc kèo, tuyệt đối) nhưng references không đủ mạnh để kết luận chắc chắn, verdict=reject hoặc hạ confidence rất thấp.
 - Với câu hỏi kiểu preference/opinion cộng đồng (ví dụ: "fandom thích X hay Y hơn"):
   - verdict=accept nếu references có các ý kiến/nhận xét cộng đồng liên quan (Reddit/community), dù không có câu kết luận trực tiếp "X > Y".

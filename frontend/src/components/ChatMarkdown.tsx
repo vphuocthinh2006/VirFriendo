@@ -4,16 +4,6 @@ import type { Components } from 'react-markdown'
 
 export type ChatMarkdownVariant = 'user' | 'narrative' | 'popup'
 
-/** Block javascript:/data: URLs in untrusted markdown (XSS). */
-function safeHref(href: string | undefined): string | undefined {
-  if (!href) return undefined
-  const t = href.trim().toLowerCase()
-  if (t.startsWith('javascript:') || t.startsWith('data:') || t.startsWith('vbscript:')) {
-    return undefined
-  }
-  return href
-}
-
 function mdComponents(variant: ChatMarkdownVariant): Components {
   const isNarrative = variant === 'narrative'
   return {
@@ -30,21 +20,17 @@ function mdComponents(variant: ChatMarkdownVariant): Components {
     h3: ({ children }) => <h3 className="vf-chat-md__h">{children}</h3>,
     h4: ({ children }) => <h4 className="vf-chat-md__h vf-chat-md__h--sm">{children}</h4>,
     blockquote: ({ children }) => <blockquote className="vf-chat-md__quote">{children}</blockquote>,
-    a: ({ href, children }) => {
-      const h = safeHref(href)
-      if (!h) return <span className="vf-chat-md__a vf-chat-md__a--blocked">{children}</span>
-      return (
-        <a
-          href={h}
-          className="vf-chat-md__a"
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {children}
-        </a>
-      )
-    },
+    a: ({ href, children }) => (
+      <a
+        href={href}
+        className="vf-chat-md__a"
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </a>
+    ),
     hr: () => <hr className="vf-chat-md__hr" />,
     code: ({ className, children, ...props }) => {
       const inline = !className

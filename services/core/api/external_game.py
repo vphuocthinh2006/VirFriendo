@@ -59,20 +59,16 @@ class DemoLogRequest(BaseModel):
     meta: dict[str, Any] | None = None
 
 
-class DemoLogResponse(BaseModel):
-    ok: bool = True
-
-
-@router.post("/demo-log", response_model=DemoLogResponse)
+@router.post("/demo-log", status_code=204)
 async def external_demo_log(
     body: DemoLogRequest,
     current_user_id: str = Depends(get_current_user_id),
-) -> DemoLogResponse:
+) -> None:
     """Append one (state, action) row for future behavioral cloning — file under data/raw (gitignored)."""
+    _ = current_user_id
     flag = (os.environ.get("EXTERNAL_GAME_DEMO_LOG", "1") or "1").strip().lower()
     if flag in ("0", "false", "no", "off"):
         return
-    _ = current_user_id
     path = _demo_log_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     line = json.dumps(
@@ -89,4 +85,3 @@ async def external_demo_log(
             f.write(line + "\n")
     except OSError as e:
         raise HTTPException(status_code=500, detail=f"demo log write failed: {e}") from e
-    return DemoLogResponse()

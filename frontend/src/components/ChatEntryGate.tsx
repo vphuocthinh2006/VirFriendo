@@ -47,7 +47,7 @@ type Props = {
   agentDisplayName: string
   onQuickstart: () => void
   onCharacterComplete: (data: CharacterFormData) => void
-  /** Chọn game từ cổng → vào chat tab Game với game tương ứng (kèm entry=quickstart). */
+  /** Deep-link into /chat with ?tab=game&game=… after picking a title */
   onPickGame?: (gameId: string) => void
 }
 
@@ -180,11 +180,11 @@ export default function ChatEntryGate({ agentDisplayName, onQuickstart, onCharac
                   <button
                     type="button"
                     className="chat-entry-game-tile-btn"
-                    onClick={() => onPickGame?.(g.id)}
                     disabled={!onPickGame}
+                    onClick={() => onPickGame?.(g.id)}
                   >
                     <div className="chat-entry-game-img-wrap">
-                      <img src={g.imageUrl} alt="" className="chat-entry-game-img" loading="lazy" />
+                      <div className={`vf-game-card__art vf-game-card__art--${g.id} chat-entry-game-thumb`} aria-hidden />
                     </div>
                     <span className="chat-entry-game-name">{g.name}</span>
                   </button>
