@@ -7,6 +7,10 @@
 #        AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION (vd. ap-southeast-1)
 #
 # Image: <account>.dkr.ecr.<region>.amazonaws.com/virfriendo-api:<tag>
+#
+# Lỗi "Dockerfile: no such file" hoặc label revision = 6e01f32… : bạn đang **Re-run**
+# job của run **cũ** (trước commit có Dockerfile). Không dùng "Re-run failed jobs" cho run đó.
+# Cách đúng: Actions → **ECR publish** → **Run workflow** → branch **main**; hoặc push commit mới lên main.
 
 name: ECR publish
 
@@ -28,6 +32,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Check Dockerfile exists (avoid re-run on pre-Docker commits)
+        run: |
+          if [ ! -f Dockerfile ]; then
+            echo "::error::Commit ${{ github.sha }} has no root Dockerfile. Do not re-run old workflow runs. Use Actions → Run workflow → main, or push to main (need commit 6391a01 or later)."
+            exit 1
+          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -61,6 +72,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Check frontend Dockerfile exists
+        run: |
+          if [ ! -f frontend/Dockerfile ]; then
+            echo "::error::Commit ${{ github.sha }} has no frontend/Dockerfile. Re-run on current main only."
+            exit 1
+          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
