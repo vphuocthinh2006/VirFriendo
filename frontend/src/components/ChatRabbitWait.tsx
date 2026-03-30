@@ -1,15 +1,27 @@
 /**
  * Full-pane loading: rabbit runs a circular path while the backend searches / streams.
+ * `variant="inline"` — compact composer row (see `.vf-chat-rabbit-inline` in index.css).
  */
-export default function ChatRabbitWait({ phase }: { phase: 'search' | 'writing' }) {
+export default function ChatRabbitWait({
+  phase,
+  variant = 'overlay',
+}: {
+  phase: 'search' | 'writing'
+  variant?: 'overlay' | 'inline'
+}) {
   const label =
     phase === 'search'
       ? 'Đang tìm kiếm & chuẩn bị…'
       : 'Đang viết câu trả lời…'
 
+  const rootClass =
+    variant === 'inline'
+      ? 'vf-chat-rabbit-inline vf-chat-rabbit-inline--only'
+      : 'vf-chat-rabbit-overlay'
+
   return (
     <div
-      className="vf-chat-rabbit-overlay"
+      className={rootClass}
       role="status"
       aria-live="polite"
       aria-busy="true"
@@ -36,7 +48,11 @@ export default function ChatRabbitWait({ phase }: { phase: 'search' | 'writing' 
             </div>
           </div>
         </div>
-        <p className="vf-chat-rabbit-label">{label}</p>
+        {variant === 'inline' ? (
+          <span className="sr-only">{label}</span>
+        ) : (
+          <p className="vf-chat-rabbit-label">{label}</p>
+        )}
       </div>
     </div>
   )

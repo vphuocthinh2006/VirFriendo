@@ -203,11 +203,26 @@ export type CaroStateResponse = {
   moves_log: Array<{ side: string; row: number; col: number; stone?: string }>
 }
 
+/** Mirrors `services/core/api/caro.py` `_review_stats_caro` (+ optional `move_sequence_text`). */
+export type CaroReviewStats = {
+  grid_n: number
+  win_k: number
+  user_moves: number
+  bot_moves: number
+  total_moves: number
+  winner: string | null
+  result: string | null
+  user_best_run: number
+  opening_near_center: boolean
+  move_sequence: Array<{ ply: number; side?: string; row?: number; col?: number }>
+  move_sequence_text?: string
+}
+
 export type CaroReviewResponse = {
   session_id: string
   status: string
   review_text: string
-  stats: Record<string, unknown>
+  stats: CaroReviewStats
 }
 
 export async function caroNew(gridSize: number, userStone: 'x' | 'o', winLength?: number) {
