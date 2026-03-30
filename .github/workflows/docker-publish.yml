@@ -1,0 +1,81 @@
+# Build & push lên GitHub Container Registry (GHCR) — chạy tay khi cần.
+# Push tự động lên AWS: dùng workflow `ecr-publish.yml`.
+
+name: Docker publish (GHCR)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image base (lowercase for GHCR)
+        id: base
+        run: |
+          echo "image=${REGISTRY}/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')-api" >> "$GITHUB_OUTPUT"
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.base.outputs.image }}
+          tags: |
+            type=sha,prefix=,format=short
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+            type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image base (lowercase for GHCR)
+        id: base
+        run: |
+          echo "image=${REGISTRY}/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')-web" >> "$GITHUB_OUTPUT"
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.base.outputs.image }}
+          tags: |
+            type=sha,prefix=,format=short
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+            type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_API_URL=http://localhost:8000

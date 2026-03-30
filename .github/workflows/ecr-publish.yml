@@ -1,0 +1,101 @@
+# Build & push lên Amazon ECR (API + web).
+#
+# Chuẩn bị AWS:
+#   1) Tạo 2 repository ECR (cùng region), ví dụ: virfriendo-api, virfriendo-web
+#   2) IAM user (hoặc OIDC — xem docs/09-aws-ecr-ecs.md) có quyền ecr:GetAuthorizationToken + ecr:BatchCheckLayerAvailability + ecr:PutImage + ...
+#   3) GitHub repo → Settings → Secrets and variables → Actions:
+#        AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION (vd. ap-southeast-1)
+#
+# Image: <account>.dkr.ecr.<region>.amazonaws.com/virfriendo-api:<tag>
+
+name: ECR publish
+
+on:
+  push:
+    branches: [main, master]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ECR_REPOSITORY_API: virfriendo-api
+  ECR_REPOSITORY_WEB: virfriendo-web
+
+jobs:
+  push-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_API }}
+          tags: |
+            type=sha,prefix=,format=short
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+            type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  push-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Vite public API URL (Repository variable VITE_PUBLIC_API_URL, hoặc mặc định localhost)
+        id: vite
+        shell: bash
+        run: |
+          V="${{ vars.VITE_PUBLIC_API_URL }}"
+          if [ -z "$V" ]; then V="http://localhost:8000"; fi
+          echo "url=$V" >> "$GITHUB_OUTPUT"
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_WEB }}
+          tags: |
+            type=sha,prefix=,format=short
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+            type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_API_URL=${{ steps.vite.outputs.url }}
