@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     # development | staging | production — production enforces stronger SECRET_KEY
     APP_ENV: str = "development"
     DEBUG: bool = False
-    DATABASE_URL: str  # Required: set in .env e.g. postgresql+asyncpg://user:pass@localhost:5432/anime_companion
+    DATABASE_URL: str  # .env — localhost for host uvicorn; host.docker.internal for docker run; database@5432 in compose
 
     # Security
     SECRET_KEY: str  # Required: generate with `openssl rand -hex 32`
@@ -21,7 +21,11 @@ class Settings(BaseSettings):
 
     # Comma-separated origins — never use * with credentials in browser.
     # Dev default: Vite. Production: set to your real site(s), e.g. https://app.example.com
-    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173"
+    CORS_ORIGINS: str = (
+        "http://localhost:5173,http://127.0.0.1:5173,"
+        "http://localhost:8080,http://127.0.0.1:8080,"
+        "http://localhost:8081,http://127.0.0.1:8081"
+    )
 
     # production: comma-separated hostnames (no scheme). Empty = middleware skipped.
     TRUSTED_HOSTS: str = ""
@@ -31,6 +35,9 @@ class Settings(BaseSettings):
 
     # Optional: Quickstart personality buffer + summary (chat entry mode)
     REDIS_URL: str | None = None
+
+    # Optional: Chroma HTTP API (retrieval / future RAG). Compose: http://chromadb:8000
+    CHROMA_SERVER_URL: str | None = None
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

@@ -1,3 +1,5 @@
+name: virfriendo
+
 services:
   database:
     image: postgres:16-alpine
@@ -10,6 +12,12 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 5s
+      retries: 15
+      start_period: 5s
 
   redis:
     image: redis:7-alpine
@@ -18,6 +26,12 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+      start_period: 3s
 
   chromadb:
     image: chromadb/chroma:latest
@@ -27,8 +41,51 @@ services:
     volumes:
       - chroma_data:/chroma/chroma
 
+  api:
+    build: .
+    container_name: virfriendo_api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379/0
+      CHROMA_SERVER_URL: http://chromadb:8000
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      chromadb:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)\"",
+        ]
+      interval: 15s
+      timeout: 8s
+      retries: 5
+      start_period: 90s
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Trình duyệt gọi API trên máy host (:8000). CORS mặc định gồm :8081 (UI Docker).
+        VITE_API_URL: http://localhost:8000
+    container_name: virfriendo_web
+    ports:
+      # 8080 thường bị Windows (vd. AgentService) chiếm — dùng 8081
+      - "8081:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   redis_data:
   chroma_data:
-

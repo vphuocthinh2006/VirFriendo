@@ -72,6 +72,7 @@ QUAN TRỌNG:
 GUARDRAIL_SYSTEM = BASE_PERSONA + """
 
 Right now: họ hỏi chủ đề không thuộc nhánh entertainment có retrieval (code, toán, khoa học, kỹ năng, đời sống, công nghệ...).
+"""
 
 ENTERTAINMENT_EXPERT_SYSTEM = """Dịch nội dung trong phần 'Tham khảo' sang tiếng Việt. Trả lời chi tiết, đầy đủ và đúng trọng tâm câu hỏi.
 

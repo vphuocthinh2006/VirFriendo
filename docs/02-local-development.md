@@ -31,22 +31,27 @@ pip install -r requirements.txt
 | Biến | Mặc định / ghi chú |
 |------|-------------------|
 | `APP_ENV` | `development` — `production` bật kiểm tra `SECRET_KEY` chặt hơn |
-| `CORS_ORIGINS` | Danh sách origin có dấu phẩy, ví dụ `http://localhost:5173` |
+| `CORS_ORIGINS` | Mặc định trong code gồm `:5173` (Vite) và `:8081` (UI Docker Compose; kèm `:8080` nếu cần); thêm origin production khi cần |
 | `TRUSTED_HOSTS` | Production: hostname được phép (không gồm scheme) |
 | `GROQ_API_KEY` | Tuỳ chọn — LLM qua Groq nếu cấu hình |
-| `REDIS_URL` | Tuỳ chọn — buffer/quickstart personality nếu dùng |
+| `REDIS_URL` | Tuỳ chọn — buffer/quickstart personality; Compose gán `redis://redis:6379/0` cho service `api` |
+| `CHROMA_SERVER_URL` | Tuỳ chọn — HTTP Chroma; Compose gán `http://chromadb:8000` cho `api` |
 
 Không commit file `.env`.
 
-## 2.4 Hạ tầng dữ liệu (Docker Compose)
+## 2.4 Docker Compose (stack đầy đủ — Pha 1)
 
-Chỉ các service Postgres, Redis, ChromaDB (xem `docker-compose.yml`):
+File `docker-compose.yml` gồm `database`, `redis`, `chromadb`, `api` (build `Dockerfile` gốc), `web` (build `frontend/Dockerfile`, nginx phục vụ static). Cần `.env` với `POSTGRES_*`, `SECRET_KEY`, và `DATABASE_URL` hợp lệ (Compose vẫn override `DATABASE_URL` / `REDIS_URL` / `CHROMA_SERVER_URL` cho container `api`).
 
 ```bash
-docker compose up -d
+docker compose up --build -d
 ```
 
-Biến cho Postgres thường đặt trong `.env`: `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` — khớp với `DATABASE_URL`.
+- API: `http://localhost:8000` (kể cả `/health`, `/docs`)
+- UI tĩnh (build Vite, `VITE_API_URL=http://localhost:8000`): `http://localhost:8081` (tránh xung đột cổng 8080 trên Windows)
+- Chroma (host): `http://localhost:8003`
+
+Chỉ chạy DB + Redis + Chroma (không build API/web): `docker compose up -d database redis chromadb`.
 
 ## 2.5 Chạy API
 

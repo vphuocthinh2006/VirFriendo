@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 from typing import Any, Literal
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel, Field
 
 from services.core.external_game_ai import Emotion, decide_action
@@ -59,16 +59,16 @@ class DemoLogRequest(BaseModel):
     meta: dict[str, Any] | None = None
 
 
-@router.post("/demo-log", status_code=204)
+@router.post("/demo-log", status_code=204, response_class=Response)
 async def external_demo_log(
     body: DemoLogRequest,
     current_user_id: str = Depends(get_current_user_id),
-) -> None:
+) -> Response:
     """Append one (state, action) row for future behavioral cloning — file under data/raw (gitignored)."""
     _ = current_user_id
     flag = (os.environ.get("EXTERNAL_GAME_DEMO_LOG", "1") or "1").strip().lower()
     if flag in ("0", "false", "no", "off"):
-        return
+        return Response(status_code=204)
     path = _demo_log_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     line = json.dumps(
@@ -85,3 +85,4 @@ async def external_demo_log(
             f.write(line + "\n")
     except OSError as e:
         raise HTTPException(status_code=500, detail=f"demo log write failed: {e}") from e
+    return Response(status_code=204)

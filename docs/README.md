@@ -12,13 +12,15 @@ Mục lục theo thứ tự đọc gợi ý. Các file đánh số giúp đối 
 | 06 | [Roadmap hạ tầng](./06-roadmap-infra.md) | Pha local → container → CI/CD → cloud (mục tiêu) |
 | 07 | [Bảo mật & bí mật](./07-security-and-secrets.md) | JWT, CORS, production checks |
 | 08 | [Xử lý sự cố](./08-troubleshooting.md) | WS, DB, dev thường gặp |
+| 09 | [AWS ECR & deploy](./09-aws-ecr-ecs.md) | ECR, secrets GitHub, ECS / App Runner / EC2 |
+| 10 | [Chạy app trên AWS — chuẩn bị](./10-aws-run-app-prep.md) | RDS, `DATABASE_URL`, Secrets Manager, checklist trước ECS |
 
 ---
 
 ## Người đọc mục tiêu
 
 - **Contributor / backend:** 01 → 02 → 04 → 05  
-- **DevOps / platform:** 01 → 06 → 07 → 02  
+- **DevOps / platform:** 01 → 06 → 09 → 07 → 02  
 - **Frontend:** 02 → 04 (REST + WS)
 
 ---
