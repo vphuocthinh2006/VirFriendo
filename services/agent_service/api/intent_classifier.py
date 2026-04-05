@@ -26,14 +26,14 @@ VALID_INTENTS: set[str] = {
 DEFAULT_INTENT: IntentType = "greeting_chitchat"
 
 SYSTEM_PROMPT = (
-    "You are an intent classifier for a mental wellness anime companion chatbot. "
+    "You are an intent classifier for VirFriendo, a mental wellness companion chatbot. "
     "Given a user message, output exactly one intent label and nothing else.\n"
     "Valid labels: greeting_chitchat, out_of_domain, entertainment_knowledge, "
     "psychology_venting, psychology_advice_seeking, crisis_alert"
 )
 
 # Prompt cho LLM second-opinion: phân tích intent (dùng trong hybrid)
-INTENT_LLM_SYSTEM = """Bạn là bộ phân loại ý định (intent) cho chatbot bạn ảo anime.
+INTENT_LLM_SYSTEM = """Bạn là bộ phân loại ý định (intent) cho VirFriendo — chatbot bạn đồng hành (tone ấm, có thể phong cách anime).
 Nhiệm vụ: đọc tin nhắn người dùng và chọn ĐÚNG MỘT nhãn dưới đây, trả lời CHỈ bằng nhãn đó, không thêm gì.
 
 Nhãn:

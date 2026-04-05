@@ -7,7 +7,7 @@ _WEAK_SECRET_SUBSTR = ("change-me", "changeme", "secret", "password", "test", "d
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "AI Anime Companion"
+    PROJECT_NAME: str = "VirFriendo"
     VERSION: str = "0.1.0"
     # development | staging | production — production enforces stronger SECRET_KEY
     APP_ENV: str = "development"
@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
 
     # Comma-separated origins — never use * with credentials in browser.
-    # Dev default: Vite. Production: set to your real site(s), e.g. https://app.example.com
+    # Dev default: Vite. Production: e.g. https://virfriendo.win,https://www.virfriendo.win
     CORS_ORIGINS: str = (
         "http://localhost:5173,http://127.0.0.1:5173,"
         "http://localhost:8080,http://127.0.0.1:8080,"

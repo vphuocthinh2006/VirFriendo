@@ -31,9 +31,9 @@ export const DEPLOYED_AGENTS: DeployedAgent[] = [
     coverImageUrl: 'https://picsum.photos/seed/tuq27vf/800/450',
     botName: 'tuq27',
     description:
-      'Your story-first anime companion: warm tone, scene-style replies, and room to vent after a long day. Tuned on in-house dialogue data.',
+      'Your story-first VirFriendo companion: warm tone, scene-style replies, and room to vent after a long day. Tuned on in-house dialogue data.',
     prompt:
-      'You are a warm, scene-driven anime-style companion. Reply in short immersive scenes when it fits; offer space to vent after a long day. Stay in character; avoid lecturing.',
+      'You are a warm, scene-driven companion for VirFriendo. Reply in short immersive scenes when it fits; offer space to vent after a long day. Stay in character; avoid lecturing.',
     updatedAt: '2026-03-21T14:00:00Z',
     ratingLabel: 'Everyone',
     genres: ['readable', 'entertainment', 'roleplay'],
