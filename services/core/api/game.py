@@ -13,7 +13,9 @@ from pydantic import BaseModel, Field
 from services.agent_service.llm.client import generate
 from services.core.security import get_current_user_id
 
-router = APIRouter(prefix="/game", tags=["Game"])
+# Prefix `/games` (not `/game/chess`) so URL paths never contain the substring `me/c`
+# (some proxies/WAF/extensions corrupt that to break `/game/chess/*` → `/gahess/*`).
+router = APIRouter(prefix="/games", tags=["Game"])
 
 _PIECE_VALUES: dict[int, int] = {
     chess.PAWN: 1,
@@ -278,6 +280,52 @@ def _get_session_or_404(session_id: str, user_uuid: UUID) -> ChessSession:
     if not sess or sess.user_id != user_uuid:
         raise HTTPException(status_code=404, detail="Không tìm thấy chess session")
     return sess
+
+
+def _chess_bot_info_dict() -> dict[str, Any]:
+    sf = bool(_engine_path())
+    return {
+        "engine": "Stockfish" if sf else "material_fallback",
+        "stockfish_configured": sf,
+        "elo_range": {"min": 600, "max": 2600},
+        "play": {str(i): f"Mức {i} (think ~{min(0.08 + i * 0.04, 0.6):.2f}s)" for i in range(1, 11)},
+        "note": (
+            "Bot cờ chạy trên server. Nếu biến STOCKFISH_PATH trỏ tới engine UCI thì dùng Stockfish; "
+            "không thì nước bot theo heuristic đơn giản."
+        ),
+    }
+
+
+def _game_platforms_dict() -> dict[str, Any]:
+    return {
+        "integrations": [
+            {
+                "id": "chesscom_pub",
+                "kind": "public_stats",
+                "description": "Chess.com Published Data API (profile/stats).",
+                "docs": "https://www.chess.com/news/view/published-data-api",
+            },
+            {
+                "id": "lichess",
+                "kind": "public_api",
+                "description": "Lichess HTTP API (user, puzzle daily).",
+                "docs": "https://lichess.org/api",
+            },
+        ],
+        "local_bot": _chess_bot_info_dict(),
+    }
+
+
+@router.get("/chess/bot")
+async def chess_bot_info(current_user_id: str = Depends(get_current_user_id)):
+    """Metadata for local chess bot (used by Chat game panel)."""
+    return _chess_bot_info_dict()
+
+
+@router.get("/platforms")
+async def game_platforms_info(current_user_id: str = Depends(get_current_user_id)):
+    """Integrations list + local bot metadata."""
+    return _game_platforms_dict()
 
 
 @router.post("/chess/new")

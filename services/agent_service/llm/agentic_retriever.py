@@ -489,6 +489,13 @@ async def agentic_retrieve(
     max_steps: int = 4,
 ) -> Tuple[List[Dict[str, str]], Dict[str, Any]]:
     mode = (os.environ.get("RETRIEVER_MODE") or "tavily_only").strip().lower()
+    # tavily_only with no key → empty Tavily every time → no grounded answers. Fall back to hybrid (wiki, etc.).
+    if mode == "tavily_only" and not (os.environ.get("TAVILY_API_KEY") or "").strip():
+        logger.warning(
+            "retriever: RETRIEVER_MODE=tavily_only but TAVILY_API_KEY is empty — using hybrid "
+            "(wiki/anilist/fanwiki/…); set TAVILY_API_KEY or RETRIEVER_MODE=hybrid explicitly"
+        )
+        mode = "hybrid"
     domain = _detect_domain(user_query)
     default_tools = _mode_default_tools(mode)
     routed_tools = _hybrid_domain_tools(domain) if mode == "hybrid" else _domain_tools(domain)
@@ -514,6 +521,7 @@ async def agentic_retrieve(
     last_tool = ""
     tried_non_tavily = False
     tavily_used = False
+    tavily_audit_retries = 0
     semantic_pack = await _semantic_query_pack(user_query)
     logger.info(
         "retriever.telemetry query_rewrite domain={} mode={} concise={} factual={} community={} character_story={}",

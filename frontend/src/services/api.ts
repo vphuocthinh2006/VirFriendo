@@ -228,7 +228,7 @@ export type CaroReviewResponse = {
 export async function caroNew(gridSize: number, userStone: 'x' | 'o', winLength?: number) {
   const body: Record<string, unknown> = { grid_size: gridSize, user_stone: userStone }
   if (winLength != null && winLength > 0) body.win_length = winLength
-  const res = await fetch(`${API_BASE}/game/caro/new`, {
+  const res = await fetch(`${API_BASE}/games/caro/new`, {
     method: 'POST',
     headers: headers(),
     body: JSON.stringify(body),
@@ -237,7 +237,7 @@ export async function caroNew(gridSize: number, userStone: 'x' | 'o', winLength?
 }
 
 export async function caroMove(sessionId: string, row: number, col: number) {
-  const res = await fetch(`${API_BASE}/game/caro/move`, {
+  const res = await fetch(`${API_BASE}/games/caro/move`, {
     method: 'POST',
     headers: headers(),
     body: JSON.stringify({ session_id: sessionId, row, col }),
@@ -246,14 +246,14 @@ export async function caroMove(sessionId: string, row: number, col: number) {
 }
 
 export async function caroState(sessionId: string) {
-  const res = await fetch(`${API_BASE}/game/caro/state/${sessionId}`, {
+  const res = await fetch(`${API_BASE}/games/caro/state/${sessionId}`, {
     headers: headers(),
   })
   return handleResponse<CaroStateResponse>(res)
 }
 
 export async function caroReview(sessionId: string) {
-  const res = await fetch(`${API_BASE}/game/caro/review`, {
+  const res = await fetch(`${API_BASE}/games/caro/review`, {
     method: 'POST',
     headers: headers(),
     body: JSON.stringify({ session_id: sessionId }),
@@ -262,7 +262,7 @@ export async function caroReview(sessionId: string) {
 }
 
 export async function chessNew(userColor: 'white' | 'black', botElo = 800) {
-  const res = await fetch(`${API_BASE}/game/chess/new`, {
+  const res = await fetch(`${API_BASE}/games/chess/new`, {
     method: 'POST',
     headers: headers(),
     body: JSON.stringify({ user_color: userColor, bot_elo: botElo }),
@@ -271,14 +271,14 @@ export async function chessNew(userColor: 'white' | 'black', botElo = 800) {
 }
 
 export async function chessState(sessionId: string) {
-  const res = await fetch(`${API_BASE}/game/chess/state/${sessionId}`, {
+  const res = await fetch(`${API_BASE}/games/chess/state/${sessionId}`, {
     headers: headers(),
   })
   return handleResponse<ChessStateResponse>(res)
 }
 
 export async function chessMove(sessionId: string, moveUci: string) {
-  const res = await fetch(`${API_BASE}/game/chess/move`, {
+  const res = await fetch(`${API_BASE}/games/chess/move`, {
     method: 'POST',
     headers: headers(),
     body: JSON.stringify({ session_id: sessionId, move_uci: moveUci }),
@@ -287,7 +287,7 @@ export async function chessMove(sessionId: string, moveUci: string) {
 }
 
 export async function chessReview(sessionId: string) {
-  const res = await fetch(`${API_BASE}/game/chess/review`, {
+  const res = await fetch(`${API_BASE}/games/chess/review`, {
     method: 'POST',
     headers: headers(),
     body: JSON.stringify({ session_id: sessionId }),
@@ -316,12 +316,12 @@ export type GamePlatformsResponse = {
 }
 
 export async function chessBotInfo() {
-  const res = await fetch(`${API_BASE}/game/chess/bot`, { headers: headers() })
+  const res = await fetch(`${API_BASE}/games/chess/bot`, { headers: headers() })
   return handleResponse<ChessBotInfo>(res)
 }
 
 export async function gamePlatforms() {
-  const res = await fetch(`${API_BASE}/game/platforms`, { headers: headers() })
+  const res = await fetch(`${API_BASE}/games/platforms`, { headers: headers() })
   return handleResponse<GamePlatformsResponse>(res)
 }
 
