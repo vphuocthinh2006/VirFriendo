@@ -56,8 +56,8 @@ function ensureGsiInitialized(clientId: string): boolean {
 }
 
 /**
- * Mounts the official GSI widget off-screen; use the returned styled CTA + `triggerGoogleSignIn`
- * so “Continue with Google” matches `aid-cta-primary` / `aid-cta-google` typography.
+ * Renders the real GSI button in an overlay (see `.aid-google-gsi-overlay`) so the user’s click
+ * hits Google’s widget directly — programmatic `.click()` on a hidden button is unreliable.
  */
 export function useGoogleSignIn() {
   const navigate = useNavigate()
@@ -139,7 +139,7 @@ export function useGoogleSignIn() {
       type: 'standard',
       theme: 'outline',
       size: 'large',
-      width: 320,
+      width: 400,
       text: 'continue_with',
       shape: 'rectangular',
       logo_alignment: 'left',

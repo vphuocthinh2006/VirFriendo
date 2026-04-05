@@ -17,7 +17,6 @@ export default function Login() {
     loading: googleLoading,
     error: googleError,
     googleMountRef,
-    triggerGoogleSignIn,
   } = useGoogleSignIn()
 
   async function handleSubmit(e: React.FormEvent) {
@@ -38,18 +37,20 @@ export default function Login() {
     <AuthPageShell title="Sign in" subtitle="Welcome back to VirFriendo">
       <div className="aid-auth-stack">
         <div className="aid-google-auth-wrap aid-auth-google-full">
-          <div ref={googleMountRef} className="aid-google-gsi-offscreen" aria-hidden />
-          <button
-            type="button"
-            className={`aid-cta-google aid-auth-google-full${!googleReady ? ' aid-google-styled-cta--pending' : ''}`}
-            onClick={() => void triggerGoogleSignIn()}
-            disabled={!googleReady || googleLoading}
+          <div
+            className={`aid-cta-google aid-auth-google-full aid-google-gsi-decoy${!googleReady ? ' aid-google-styled-cta--pending' : ''}`}
+            aria-hidden
           >
             <span className="aid-cta-label aid-cta-label--row">
               <GoogleGlyph />
               {googleLoading ? 'CONNECTING…' : 'CONTINUE WITH GOOGLE'}
             </span>
-          </button>
+          </div>
+          <div
+            ref={googleMountRef}
+            className={`aid-google-gsi-overlay${!googleReady || googleLoading ? ' aid-google-gsi-overlay--blocked' : ''}`}
+            aria-hidden
+          />
         </div>
         {googleLoading ? <p className="aid-auth-msg">Signing in with Google…</p> : null}
         {googleError ? <p className="aid-auth-msg aid-auth-msg--error">{googleError}</p> : null}

@@ -171,15 +171,37 @@ body {
   width: 100%;
 }
 
-.aid-google-gsi-offscreen {
+/* Real GSI button sits on top; user clicks hit Google directly (programmatic .click() on hidden btn is unreliable). */
+.aid-google-gsi-overlay {
   position: absolute;
-  left: -9999px;
-  top: 0;
-  width: 320px;
-  height: 48px;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 50px;
   overflow: hidden;
-  opacity: 0;
+  opacity: 0.02;
+  cursor: pointer;
+}
+
+.aid-google-gsi-overlay > div {
+  flex-shrink: 0;
+}
+
+.aid-google-gsi-overlay--blocked {
   pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0;
+}
+
+/* Visual “Continue with Google” — decoration only; clicks go to .aid-google-gsi-overlay */
+.aid-google-gsi-decoy {
+  position: relative;
+  z-index: 0;
+  pointer-events: none;
+  width: 100%;
 }
 
 .aid-google-styled-cta--pending {

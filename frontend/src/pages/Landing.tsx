@@ -47,7 +47,6 @@ export default function Landing() {
     loading: googleLoading,
     error: googleError,
     googleMountRef,
-    triggerGoogleSignIn,
   } = useGoogleSignIn()
 
   useEffect(() => {
@@ -115,18 +114,20 @@ export default function Landing() {
               </div>
               <div className="aid-actions mt-3 aid-actions--google-host">
                 <div className="aid-google-auth-wrap">
-                  <div ref={googleMountRef} className="aid-google-gsi-offscreen" aria-hidden />
-                  <button
-                    type="button"
-                    className={`aid-cta-google${!googleReady ? ' aid-google-styled-cta--pending' : ''}`}
-                    onClick={() => void triggerGoogleSignIn()}
-                    disabled={!googleReady || googleLoading}
+                  <div
+                    className={`aid-cta-google aid-google-gsi-decoy${!googleReady ? ' aid-google-styled-cta--pending' : ''}`}
+                    aria-hidden
                   >
                     <span className="aid-cta-label aid-cta-label--row">
                       <GoogleGlyph />
                       {googleLoading ? 'CONNECTING…' : 'CONTINUE WITH GOOGLE'}
                     </span>
-                  </button>
+                  </div>
+                  <div
+                    ref={googleMountRef}
+                    className={`aid-google-gsi-overlay${!googleReady || googleLoading ? ' aid-google-gsi-overlay--blocked' : ''}`}
+                    aria-hidden
+                  />
                 </div>
               </div>
               {googleLoading ? (
