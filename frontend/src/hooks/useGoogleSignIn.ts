@@ -39,7 +39,8 @@ function ensureGsiInitialized(clientId: string): boolean {
       client_id: clientId,
       locale: 'en',
       auto_select: false,
-      use_fedcm_for_prompt: true,
+      // FedCM changes/blocks the classic account-picker UX; programmatic click + hidden button works more reliably with this off.
+      use_fedcm_for_prompt: false,
       callback: (resp: GsiCredentialResponse) => {
         const cred = resp?.credential
         if (!cred) {
@@ -153,8 +154,12 @@ export function useGoogleSignIn() {
   const triggerGoogleSignIn = useCallback(() => {
     const mount = gsiMountRef.current
     if (!mount) return
-    const inner = mount.querySelector<HTMLElement>('[role="button"]')
-    inner?.click()
+    const inner =
+      mount.querySelector<HTMLElement>('[role="button"]') ??
+      mount.querySelector<HTMLElement>('div[tabindex="0"]')
+    if (!inner) return
+    inner.focus()
+    inner.click()
   }, [])
 
   const clientIdPresent = !!(import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim()
