@@ -596,10 +596,10 @@ async def run_entertainment_pipeline(
         grounded_rules=grounded_rules,
     )
 
-    draft = _strip_meta((await generate(system, user_prompt)) or "")
+    draft = _strip_meta((await generate(system, user_query)) or "")
     if plot_synopsis_query and (not (draft or "").strip() or _is_refusal(draft)):
         draft = _strip_meta(
-            (await generate(system + _PLOT_SYNOPSIS_RETRY_HINT, user_prompt)) or ""
+            (await generate(system + _PLOT_SYNOPSIS_RETRY_HINT, user_query)) or ""
         )
         logger.info("entertainment_expert plot_retry after refusal/empty len={}", len(draft or ""))
 
@@ -609,7 +609,7 @@ async def run_entertainment_pipeline(
             "- Trả lời 5–10 câu tiếng Việt chỉ bằng cách diễn giải/tóm từ các đoạn Tham khảo.\n"
             "- TUYỆT ĐỐI KHÔNG viết kiểu \"không tìm được nguồn\", \"dừng lại\", \"không đủ tham khảo\".\n"
         )
-        draft = _strip_meta((await generate(system + force_hint, user_prompt)) or "")
+        draft = _strip_meta((await generate(system + force_hint, user_query)) or "")
         logger.info("entertainment_expert refusal_retry len={}", len(draft or ""))
 
     ok = False
@@ -619,7 +619,7 @@ async def run_entertainment_pipeline(
         ok = False
     else:
         ok, conf, reason, fixed = await judge_answer(
-            user_prompt,
+            user_query,
             src_text,
             draft,
             fail_open=preference_mode or plot_synopsis_query or substantial,
@@ -638,11 +638,11 @@ async def run_entertainment_pipeline(
 
     if not ok and substantial and not preference_mode:
         draft_rec = _strip_meta(
-            (await generate(system + _RECOVERY_AFTER_JUDGE_REJECT_HINT, user_prompt)) or ""
+            (await generate(system + _RECOVERY_AFTER_JUDGE_REJECT_HINT, user_query)) or ""
         )
         if draft_rec and not _STRICT_NO_SOURCE_RE.search(draft_rec) and not _is_refusal(draft_rec):
             ok_r, conf_r, reason_r, fixed_r = await judge_answer(
-                user_prompt,
+                user_query,
                 src_text,
                 draft_rec,
                 fail_open=plot_synopsis_query or substantial,
@@ -674,7 +674,7 @@ async def run_entertainment_pipeline(
             expert_system=expert_system,
             grounded_rules=grounded_rules,
         )
-        pref_draft = _strip_meta((await generate(pref_system, user_prompt)) or "")
+        pref_draft = _strip_meta((await generate(pref_system, user_query)) or "")
         if pref_draft and not _STRICT_NO_SOURCE_RE.search(pref_draft) and not _is_refusal(pref_draft):
             logger.info("entertainment_expert telemetry final_reason=preference_fallback")
             return pref_draft

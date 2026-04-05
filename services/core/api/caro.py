@@ -16,7 +16,8 @@ from pydantic import BaseModel, Field
 from services.agent_service.llm.client import generate
 from services.core.security import get_current_user_id
 
-router = APIRouter(prefix="/game/caro", tags=["Caro"])
+# See `/games` chess router: avoid `me/c` inside `/game/caro` paths.
+router = APIRouter(prefix="/games/caro", tags=["Caro"])
 
 CARO_GRID_MIN = 3
 CARO_GRID_MAX = 15
