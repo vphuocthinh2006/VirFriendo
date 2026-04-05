@@ -18,6 +18,7 @@ export default function Register() {
     loading: googleLoading,
     error: googleError,
     googleMountRef,
+    triggerGoogleSignIn,
   } = useGoogleSignIn()
 
   async function handleSubmit(e: React.FormEvent) {
@@ -51,6 +52,11 @@ export default function Register() {
             ref={googleMountRef}
             className={`aid-google-gsi-overlay${!googleReady || googleLoading ? ' aid-google-gsi-overlay--blocked' : ''}`}
             aria-hidden
+            onClick={() => {
+              if (googleReady && !googleLoading) {
+                triggerGoogleSignIn();
+              }
+            }}
           />
         </div>
         {googleLoading ? <p className="aid-auth-msg">Signing in with Google…</p> : null}

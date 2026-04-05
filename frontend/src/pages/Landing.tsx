@@ -47,6 +47,7 @@ export default function Landing() {
     loading: googleLoading,
     error: googleError,
     googleMountRef,
+    triggerGoogleSignIn,
   } = useGoogleSignIn()
 
   useEffect(() => {
@@ -127,6 +128,11 @@ export default function Landing() {
                     ref={googleMountRef}
                     className={`aid-google-gsi-overlay${!googleReady || googleLoading ? ' aid-google-gsi-overlay--blocked' : ''}`}
                     aria-hidden
+                    onClick={() => {
+                      if (googleReady && !googleLoading) {
+                        triggerGoogleSignIn();
+                      }
+                    }}
                   />
                 </div>
               </div>
