@@ -601,11 +601,6 @@ export default function Chat() {
 
   const displayName = agentMeta?.botName ?? CHARACTER_NAME
 
-  const descParagraphs = useMemo(() => {
-    const raw = (agentMeta?.description ?? '').trim() || CHARACTER_SUBTITLE
-    return raw.split(/\n\n+/).map((p) => p.trim()).filter(Boolean)
-  }, [agentMeta])
-
   useEffect(() => {
     if (!authLoading && !isAuth) navigate('/login', { replace: true })
   }, [isAuth, authLoading, navigate])
@@ -1185,14 +1180,6 @@ export default function Chat() {
                 <div className="vf-chat-model-vtuber">
                   <IconAvatar className="vf-chat-model-icon" />
                 </div>
-                <p className="vf-chat-model-hint">VTuber slot · waist-up</p>
-              </div>
-              <div className="vf-chat-panel vf-chat-panel--desc">
-                {descParagraphs.map((para, i) => (
-                  <p key={i} className="vf-chat-desc-para">
-                    {para}
-                  </p>
-                ))}
               </div>
             </div>
           </div>
@@ -2006,7 +1993,7 @@ export default function Chat() {
                                           <span className={m.side === 'user' ? 'text-teal-200/95' : 'text-amber-200/90'}>
                                             {m.side === 'user' ? 'You' : 'Opponent'}
                                           </span>
-                                          <span className="text-[color:rgba(200,180,140,0.55)]"> · </span>
+                                          <span className="text-[color:rgba(100,116,139,0.65)]"> · </span>
                                           row {m.row + 1}, col {m.col + 1}
                                         </li>
                                       ))}

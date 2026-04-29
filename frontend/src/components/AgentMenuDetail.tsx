@@ -335,7 +335,7 @@ export default function AgentMenuDetail({ agent }: Props) {
               </li>
             </ul>
             <p className="ad-agent-detail__meta-foot">
-              Dates follow this app’s catalog (VirFriendo). Plays and likes update from the server when available.
+              Dates follow this app’s catalog (Pally). Plays and likes update from the server when available.
             </p>
           </aside>
         </div>

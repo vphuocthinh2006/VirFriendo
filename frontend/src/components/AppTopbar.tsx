@@ -98,7 +98,7 @@ export default function AppTopbar() {
       <div className="aid-app-topbar">
         <div className="aid-app-topbar-left">
           <Link to="/" className="aid-brand aid-topbar-brand-link">
-            VIRFRIENDØ
+            PALLY
           </Link>
           <nav className="aid-app-nav" aria-label="Main">
             <NavLink to="/" className={navLinkClass} end>

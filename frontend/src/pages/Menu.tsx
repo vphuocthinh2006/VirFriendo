@@ -90,19 +90,19 @@ export default function Menu() {
         <div className="ad-page-footer__inner">
           <div className="ad-page-footer__row">
             <div className="ad-page-footer__team">
-              <span className="ad-page-footer__label">Team TUQ</span>
+              <span className="ad-page-footer__label">Bộ Tứ Random BS Go</span>
               <span className="ad-page-footer__names">
                 Le Ngo Thanh Toan · Nguyen Tan Phuc Thinh · Vo Phuoc Thinh · Lien Phuc Thinh
               </span>
             </div>
             <div className="ad-page-footer__links">
-              <Link to="/">VirFriendo</Link>
+              <Link to="/">Pally</Link>
               <span aria-hidden>·</span>
               <Link to={LANDING_CONTACT}>Contact</Link>
             </div>
           </div>
           <div className="ad-page-footer__legal">
-            <p>© {new Date().getFullYear()} VirFriendo · Team TUQ</p>
+            <p>© {new Date().getFullYear()} Pally · Bộ Tứ Random BS Go</p>
             <div className="ad-page-footer__legal-links">
               <Link to={LANDING_UPDATES}>Changelog</Link>
               <Link to={LANDING_CONTACT}>Contact</Link>

@@ -5,8 +5,8 @@ import GoogleGlyph from '../components/GoogleGlyph'
 import LandingTopbar from '../components/LandingTopbar'
 import { LANDING_CONTACT, LANDING_SIGN_IN, LANDING_SIGN_UP, LANDING_UPDATES } from '../landingRoutes'
 
-const KICKER = 'AI'
-const TITLE = 'VIRFRIENDØ'
+const KICKER = 'AI Platform'
+const TITLE = 'Pally'
 /** Kicker 2 chữ + title: chỉ số --s 0..12 cho delay scratch */
 function ScratchKicker() {
   return (
@@ -37,6 +37,120 @@ function ScratchTitle() {
 }
 
 const SCROLL_HINT_DISMISS_RATIO = 0.28
+
+function CloudShape() {
+  return (
+    <svg viewBox="0 0 120 50" className="aid-cloud-svg" aria-hidden>
+      <ellipse cx="28" cy="32" rx="20" ry="14" fill="#ffffff" />
+      <ellipse cx="50" cy="24" rx="22" ry="16" fill="#ffffff" />
+      <ellipse cx="72" cy="28" rx="20" ry="14" fill="#ffffff" />
+      <ellipse cx="92" cy="34" rx="16" ry="12" fill="#ffffff" />
+      <ellipse cx="60" cy="38" rx="40" ry="8" fill="#ffffff" opacity="0.7" />
+    </svg>
+  )
+}
+
+function SnowPile() {
+  return (
+    <svg viewBox="0 0 140 50" className="aid-snowpile-svg" aria-hidden>
+      <defs>
+        <linearGradient id="aidSnowPile" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="60%" stopColor="#e0ecff" />
+          <stop offset="100%" stopColor="#bfdbfe" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M4 46 Q18 28 36 30 Q52 14 72 22 Q92 12 110 24 Q126 28 134 38 Q138 42 136 46 Z"
+        fill="url(#aidSnowPile)"
+        stroke="rgba(59,130,246,0.25)"
+        strokeWidth="1"
+      />
+      <ellipse cx="50" cy="32" rx="6" ry="2" fill="#ffffff" opacity="0.85" />
+      <ellipse cx="92" cy="30" rx="5" ry="1.8" fill="#ffffff" opacity="0.8" />
+      <ellipse cx="120" cy="36" rx="4" ry="1.5" fill="#ffffff" opacity="0.7" />
+    </svg>
+  )
+}
+
+function LofiCat() {
+  return (
+    <svg viewBox="0 0 110 70" className="aid-cat-svg" aria-hidden>
+      <path
+        d="M14 46 Q4 40 8 28 Q10 22 14 22"
+        stroke="#a8b3c4"
+        strokeWidth="6"
+        strokeLinecap="round"
+        fill="none"
+        className="aid-cat-tail"
+      />
+      <ellipse cx="58" cy="48" rx="30" ry="13" fill="#c8d2e0" />
+      <ellipse cx="58" cy="52" rx="24" ry="8" fill="#f0e8dc" />
+      <rect x="36" y="54" width="6" height="13" rx="3" fill="#a8b3c4" className="aid-cat-leg aid-cat-leg-1" />
+      <rect x="48" y="55" width="6" height="12" rx="3" fill="#a8b3c4" className="aid-cat-leg aid-cat-leg-2" />
+      <rect x="68" y="55" width="6" height="12" rx="3" fill="#a8b3c4" className="aid-cat-leg aid-cat-leg-3" />
+      <rect x="80" y="54" width="6" height="13" rx="3" fill="#a8b3c4" className="aid-cat-leg aid-cat-leg-4" />
+      <circle cx="86" cy="38" r="14" fill="#c8d2e0" />
+      <path d="M76 28 L74 18 L84 26 Z" fill="#a8b3c4" />
+      <path d="M96 28 L98 18 L88 26 Z" fill="#a8b3c4" />
+      <path d="M77 26 L78 22 L82 26 Z" fill="#f5b8c4" />
+      <path d="M95 26 L94 22 L90 26 Z" fill="#f5b8c4" />
+      <ellipse cx="80" cy="40" rx="1.6" ry="1.8" fill="#1e3a5f" />
+      <ellipse cx="92" cy="40" rx="1.6" ry="1.8" fill="#1e3a5f" />
+      <circle cx="80.5" cy="39.5" r="0.5" fill="#ffffff" />
+      <circle cx="92.5" cy="39.5" r="0.5" fill="#ffffff" />
+      <path d="M85 43 L87 43 L86 45 Z" fill="#f5b8c4" />
+      <path d="M86 45 Q84 47.5 82 47" stroke="#1e3a5f" strokeWidth="0.7" fill="none" strokeLinecap="round" />
+      <path d="M86 45 Q88 47.5 90 47" stroke="#1e3a5f" strokeWidth="0.7" fill="none" strokeLinecap="round" />
+      <line x1="72" y1="43" x2="80" y2="43.5" stroke="#a8b3c4" strokeWidth="0.4" />
+      <line x1="72" y1="45" x2="80" y2="45" stroke="#a8b3c4" strokeWidth="0.4" />
+      <line x1="92" y1="43.5" x2="100" y2="43" stroke="#a8b3c4" strokeWidth="0.4" />
+      <line x1="92" y1="45" x2="100" y2="45" stroke="#a8b3c4" strokeWidth="0.4" />
+    </svg>
+  )
+}
+
+const SNOWFLAKES = Array.from({ length: 18 }, (_, i) => {
+  const left = (i * 5.7) % 100
+  const delay = (i * 0.6) % 7
+  const dur = 7 + ((i * 1.1) % 5)
+  const drift = ((i * 11) % 36) - 18
+  const size = 3 + ((i * 1.3) % 3)
+  const opacity = 0.6 + ((i * 0.05) % 0.3)
+  return { left, delay, dur, drift, size, opacity }
+})
+
+function CatSnowScene() {
+  return (
+    <div className="aid-cat-scene" aria-hidden>
+      <div className="aid-cloud aid-cloud-1"><CloudShape /></div>
+      <div className="aid-cloud aid-cloud-2"><CloudShape /></div>
+      <div className="aid-cloud aid-cloud-3"><CloudShape /></div>
+      <div className="aid-cloud aid-cloud-4"><CloudShape /></div>
+      <div className="aid-cloud aid-cloud-5"><CloudShape /></div>
+      <div className="aid-snow-layer">
+        {SNOWFLAKES.map((f, i) => (
+          <span
+            key={i}
+            className="aid-snowflake"
+            style={{
+              left: `${f.left}%`,
+              width: `${f.size}px`,
+              height: `${f.size}px`,
+              animationDelay: `${f.delay}s`,
+              animationDuration: `${f.dur}s`,
+              opacity: f.opacity,
+              ['--drift' as string]: `${f.drift}px`,
+            } as CSSProperties}
+          />
+        ))}
+      </div>
+      <div className="aid-ground" />
+      <div className="aid-snowpile"><SnowPile /></div>
+      <div className="aid-cat"><LofiCat /></div>
+    </div>
+  )
+}
 
 export default function Landing() {
   const whatSectionRef = useRef<HTMLElement>(null)
@@ -92,6 +206,7 @@ export default function Landing() {
           <div className="aid-particle-field" aria-hidden />
           <div className="aid-hero-noise" aria-hidden />
           <div className="aid-hero-vignette" aria-hidden />
+          <CatSnowScene />
           <section className="aid-hero-content">
             <div className="aid-hero-panel">
               <div className="aid-hero-mid">
@@ -103,7 +218,7 @@ export default function Landing() {
 
               <div className="aid-landing-fade">
               <p className="aid-subtitle">
-                A platform where the tuq developers create their own reality
+                just a place to test our model
               </p>
               <div className="aid-actions">
                 <Link to={LANDING_SIGN_UP} className="aid-cta-primary">
@@ -230,14 +345,14 @@ export default function Landing() {
           <div className="aid-footer-stack">
             <div className="aid-footer-bar">
               <div className="aid-footer-team">
-                <span className="aid-footer-team-label">Team TUQ</span>
+                <span className="aid-footer-team-label">Bộ Tứ Random BS Go</span>
                 <span className="aid-footer-names">
                   Le Ngo Thanh Toan · Nguyen Tan Phuc Thinh · Vo Phuoc Thinh · Lien Phuc Thinh
                 </span>
               </div>
               <div className="aid-footer-actions">
                 <a href="#top" className="aid-footer-inline-link">
-                  VirFriendo
+                  Pally
                 </a>
                 <span className="aid-footer-sep" aria-hidden>
                   |
@@ -249,7 +364,7 @@ export default function Landing() {
             </div>
             <div className="aid-footer-bottom">
               <p className="aid-footer-copy">
-                © {new Date().getFullYear()} VirFriendo · Team TUQ. All rights reserved.
+                © {new Date().getFullYear()} Pally · Bộ Tứ Random BS Go. All rights reserved.
               </p>
               <div className="aid-footer-legal" aria-label="Legal and resources">
                 <Link to={LANDING_UPDATES} className="aid-footer-legal-link">

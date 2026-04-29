@@ -1015,7 +1015,7 @@ export class AncientRtsEngine {
 
     ctx.fillStyle = 'rgba(15, 12, 8, 0.82)'
     ctx.fillRect(4, 4, MAP_W * TILE - 8, 38)
-    ctx.fillStyle = 'rgba(232, 197, 71, 0.95)'
+    ctx.fillStyle = 'rgba(96, 165, 250, 0.95)'
     ctx.font = 'bold 10px system-ui, sans-serif'
     ctx.textAlign = 'left'
     ctx.textBaseline = 'middle'

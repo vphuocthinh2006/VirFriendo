@@ -35,7 +35,7 @@ export default function Login() {
   }
 
   return (
-    <AuthPageShell title="Sign in" subtitle="Welcome back to VirFriendo">
+    <AuthPageShell title="Sign in" subtitle="Welcome back to Pally">
       <div className="aid-auth-stack">
         <div className="aid-google-auth-wrap aid-auth-google-full">
           <div

@@ -43,7 +43,7 @@ export default function ConnectingVirFriendo() {
         <div className="vf-connect-progress" aria-hidden>
           <div className="vf-connect-progress__fill" />
         </div>
-        <p className="vf-connect-caption">VirFriendo</p>
+        <p className="vf-connect-caption">Pally</p>
       </div>
     </div>
   )

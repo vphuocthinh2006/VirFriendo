@@ -97,3 +97,6 @@ tests/
 /pytest.ini
 /run.ps1
 ml/*.jsonl
+
+# Claude Code workspace
+.claude/

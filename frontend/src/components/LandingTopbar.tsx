@@ -1,16 +1,19 @@
 import { Link, useLocation } from 'react-router-dom'
 import { LANDING_UPDATES } from '../landingRoutes'
+import { useAuth } from '../hooks/useAuth'
 
 export default function LandingTopbar() {
   const { pathname } = useLocation()
+  const { isAuth, loading } = useAuth()
   const onHome = pathname === '/'
   const onUpdates = pathname === LANDING_UPDATES
+  const onMenu = pathname === '/menu'
 
   return (
     <header className="aid-topbar">
       <div className="aid-top-left">
         <Link to="/" className="aid-brand aid-topbar-brand-link">
-          VIRFRIENDØ
+          PALLY
         </Link>
         <Link
           to="/"
@@ -50,6 +53,28 @@ export default function LandingTopbar() {
           </svg>
           Updates
         </Link>
+        {!loading && isAuth && (
+          <Link
+            to="/menu"
+            className={`aid-nav-link${onMenu ? ' aid-nav-link-active' : ''}`}
+          >
+            <svg
+              className="aid-nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+            Menu
+          </Link>
+        )}
       </div>
     </header>
   )

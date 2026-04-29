@@ -41,7 +41,7 @@ export default function ChatRabbitWait({
                 <ellipse cx="42" cy="14" rx="5" ry="12" fill="#f5ebe0" transform="rotate(18 42 14)" />
                 <ellipse cx="26" cy="22" rx="3" ry="4" fill="#1a1510" />
                 <ellipse cx="38" cy="22" rx="3" ry="4" fill="#1a1510" />
-                <ellipse cx="32" cy="28" rx="4" ry="2.5" fill="#c9a227" />
+                <ellipse cx="32" cy="28" rx="4" ry="2.5" fill="#3b82f6" />
                 <circle cx="28" cy="36" r="4" fill="#f0e6d8" />
                 <circle cx="36" cy="36" r="4" fill="#f0e6d8" />
               </svg>
