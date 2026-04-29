@@ -15,7 +15,6 @@ import TetrisGame from '../games/tetris/TetrisGame'
 import SnakeGame from '../games/snake/SnakeGame'
 
 const CHARACTER_NAME = 'tuq27'
-const CHARACTER_SUBTITLE = 'ur dearest friend'
 const GAME_OPTIONS = ['Chess', 'Caro', 'Tetris', 'Snake', 'Ringrealms'] as const
 type GameOption = (typeof GAME_OPTIONS)[number]
 
