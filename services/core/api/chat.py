@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, HTTPException, Request, WebSocket, WebSocketDisconnect, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, func
 from uuid import UUID
@@ -6,7 +6,10 @@ from datetime import datetime
 import asyncio
 import json
 import re
+import base64
+import os
 from typing import Any, Mapping
+from pathlib import Path
 
 from services.core.database import get_db, AsyncSessionLocal
 from services.core.models import Conversation, Message, UserMemory, UserAgentRelationship
@@ -590,6 +593,20 @@ async def ack_fun_fact(
 
 
 # ---------------------------------------------------------------------------
+# TEST ENDPOINT - Voice & Vision Features
+# ---------------------------------------------------------------------------
+
+@router.get("/test-voice-vision")
+async def test_voice_vision_endpoint():
+    """Test endpoint to verify voice and vision features are loaded."""
+    return {
+        "status": "ok",
+        "message": "Voice and vision endpoints are loaded!",
+        "endpoints": ["/chat/transcribe", "/chat/analyze-media"]
+    }
+
+
+# ---------------------------------------------------------------------------
 # WebSocket streaming: /chat/ws
 # ---------------------------------------------------------------------------
 
@@ -602,8 +619,8 @@ def _verify_ws_token(token: str) -> str | None:
         return None
 
 
-STREAM_CHUNK_WORDS = 3
-STREAM_DELAY_S = 0.04
+STREAM_CHUNK_WORDS = 5
+STREAM_DELAY_S = 0.08
 
 
 @router.websocket("/ws")
@@ -765,3 +782,822 @@ async def _process_ws_message(
     if session.get("entry_mode") == "quickstart" and session.get("agent_id"):
         await append_user_line_and_maybe_summarize(str(user_uuid), session["agent_id"], content)
 
+
+# ---------------------------------------------------------------------------
+# Voice Transcription (Speech-to-Text) - Groq Whisper
+# ---------------------------------------------------------------------------
+
+class TranscribeResponse(BaseModel):
+    text: str
+    language: str | None = None
+
+
+@router.post("/transcribe", response_model=TranscribeResponse)
+async def transcribe_audio(
+    file: UploadFile = File(...),
+    current_user_id: str = Depends(get_current_user_id),
+):
+    """
+    Transcribe audio to text using Deepgram Nova-3 (primary) → Groq Whisper (fallback).
+    Supports: mp3, mp4, mpeg, mpga, m4a, wav, webm
+    Max file size: 25MB
+    """
+    logger.info(f"[TRANSCRIBE] Request from user {current_user_id}")
+    logger.info(f"[TRANSCRIBE] Filename: {file.filename}, Content-Type: {file.content_type}")
+
+    allowed_extensions = [".mp3", ".mp4", ".mpeg", ".mpga", ".m4a", ".wav", ".webm"]
+    file_ext = Path(file.filename or "").suffix.lower()
+
+    if file_ext not in allowed_extensions:
+        raise HTTPException(status_code=400, detail=f"Unsupported file type. Allowed: {', '.join(allowed_extensions)}")
+
+    content = await file.read()
+    logger.info(f"[TRANSCRIBE] File size: {len(content)/1024:.2f} KB")
+
+    if len(content) > 25 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large. Max size: 25MB")
+
+    deepgram_key = os.environ.get("DEEPGRAM_API_KEY", "").strip()
+    groq_key = os.environ.get("GROQ_API_KEY", "").strip()
+
+    # --- Primary: Deepgram Nova-3 (fast, accurate, multilingual) ---
+    if deepgram_key:
+        try:
+            logger.info("[TRANSCRIBE] Attempting Deepgram Nova-3...")
+            from deepgram import DeepgramClient, PrerecordedOptions
+            dg = DeepgramClient(deepgram_key)
+            options = PrerecordedOptions(
+                model="nova-3",
+                language="vi",
+                smart_format=True,
+                punctuate=True,
+            )
+            mime = file.content_type or "audio/webm"
+            payload = {"buffer": content, "mimetype": mime}
+            response = dg.listen.rest.v("1").transcribe_file(payload, options)
+            result_text = response.results.channels[0].alternatives[0].transcript
+            logger.info(f"[TRANSCRIBE] ✅ Deepgram SUCCESS: '{result_text[:100]}'")
+            return TranscribeResponse(text=result_text, language="vi")
+        except ImportError:
+            logger.warning("[TRANSCRIBE] deepgram-sdk not installed, falling back to Groq")
+        except Exception as e:
+            logger.error(f"[TRANSCRIBE] Deepgram failed: {e}, falling back to Groq")
+
+    # --- Fallback: Groq Whisper ---
+    if groq_key:
+        try:
+            logger.info("[TRANSCRIBE] Attempting Groq Whisper fallback...")
+            from groq import Groq
+            from io import BytesIO
+            client = Groq(api_key=groq_key)
+            audio_file = BytesIO(content)
+            audio_file.name = file.filename or "audio.webm"
+            transcription = client.audio.transcriptions.create(
+                model="whisper-large-v3",
+                file=audio_file,
+                language="vi",
+                response_format="json"
+            )
+            result_text = transcription.text
+            logger.info(f"[TRANSCRIBE] ✅ Groq fallback SUCCESS: '{result_text[:100]}'")
+            return TranscribeResponse(text=result_text, language="vi")
+        except Exception as e:
+            logger.error(f"[TRANSCRIBE] Groq fallback failed: {e}")
+            raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
+
+    raise HTTPException(status_code=500, detail="No transcription service available. Set DEEPGRAM_API_KEY or GROQ_API_KEY")
+    
+    logger.error("[TRANSCRIBE] No transcription service available")
+    raise HTTPException(
+        status_code=500,
+        detail="No transcription service available. Set GROQ_API_KEY or OPENAI_API_KEY"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Image/Video Analysis - Vision Models
+# ---------------------------------------------------------------------------
+
+class MediaAnalysisResponse(BaseModel):
+    conversation_id: str
+    reply: str
+    detected_intent: str | None = None
+    detected_emotion: str | None = None
+    avatar_action: str | None = None
+    user_message_count: int | None = None
+    relationship_level: int | None = None
+    relationship_level_up: bool = False
+    new_relationship_level: int | None = None
+
+
+@router.post("/analyze-media", response_model=MediaAnalysisResponse)
+async def analyze_media(
+    file: UploadFile = File(...),
+    message: str = Form(""),
+    conversation_id: str | None = Form(None),
+    agent_id: str | None = Form(None),
+    entry_mode: str | None = Form(None),
+    persona: str | None = Form(None),
+    character_name: str | None = Form(None),
+    gender: str | None = Form(None),
+    current_user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Analyze image/video/YouTube URL using vision models and web scraping.
+    Supports: 
+    - Images: jpg, jpeg, png, gif, webp (max 20MB)
+    - Videos: mp4, mov, avi, webm (max 50MB) 
+    - YouTube URLs in message field
+    - Web URLs in message field
+    """
+    logger.info(f"analyze_media called: file={file.filename}, message={message[:100] if message else 'empty'}")
+    
+    # Check if message contains YouTube URL
+    youtube_pattern = r'(https?://)?(www\.)?(youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]{11})'
+    youtube_match = re.search(youtube_pattern, message) if message else None
+    
+    # Check if message contains web URL
+    url_pattern = r'https?://[^\s]+'
+    url_match = re.search(url_pattern, message) if message else None
+    
+    # If YouTube URL detected
+    if youtube_match:
+        logger.info(f"YouTube URL detected: {youtube_match.group(0)}")
+        return await _analyze_youtube(
+            youtube_match.group(0), message, conversation_id, 
+            agent_id, entry_mode, persona, character_name, gender,
+            current_user_id, db
+        )
+    
+    # If web URL detected (not YouTube)
+    if url_match and not youtube_match:
+        logger.info(f"Web URL detected: {url_match.group(0)}")
+        return await _analyze_web_url(
+            url_match.group(0), message, conversation_id,
+            agent_id, entry_mode, persona, character_name, gender,
+            current_user_id, db
+        )
+    
+    # Validate file type for images/videos
+    allowed_image_extensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
+    allowed_video_extensions = [".mp4", ".mov", ".avi", ".webm"]
+    allowed_extensions = allowed_image_extensions + allowed_video_extensions
+    
+    file_ext = Path(file.filename or "").suffix.lower()
+    logger.info(f"File extension: {file_ext}")
+    
+    if file_ext not in allowed_extensions:
+        logger.error(f"Unsupported file type: {file_ext}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file type. Allowed: {', '.join(allowed_extensions)}"
+        )
+    
+    # Read and encode image/video
+    content = await file.read()
+    logger.info(f"File size: {len(content)} bytes")
+    
+    # Check file size
+    is_video = file_ext in [".mp4", ".mov", ".avi", ".webm"]
+    max_size = 50 * 1024 * 1024 if is_video else 20 * 1024 * 1024
+    
+    if len(content) > max_size:
+        max_mb = 50 if is_video else 20
+        logger.error(f"File too large: {len(content)} bytes > {max_size} bytes")
+        raise HTTPException(status_code=400, detail=f"File too large. Max size: {max_mb}MB")
+    
+    base64_content = base64.b64encode(content).decode('utf-8')
+    
+    # Determine MIME type
+    mime_type = "image/jpeg"
+    if file_ext in [".png"]:
+        mime_type = "image/png"
+    elif file_ext in [".gif"]:
+        mime_type = "image/gif"
+    elif file_ext in [".webp"]:
+        mime_type = "image/webp"
+    elif file_ext in [".mp4"]:
+        mime_type = "video/mp4"
+    elif file_ext in [".mov"]:
+        mime_type = "video/quicktime"
+    elif file_ext in [".avi"]:
+        mime_type = "video/x-msvideo"
+    elif file_ext in [".webm"]:
+        mime_type = "video/webm"
+    
+    logger.info(f"MIME type: {mime_type}")
+
+    # Build session/persona context
+    user_uuid = UUID(current_user_id)
+    session = {
+        "entry_mode": (entry_mode or "").strip().lower(),
+        "agent_id": (agent_id or "").strip(),
+        "persona": (persona or "").strip(),
+        "character_name": (character_name or "").strip(),
+        "gender": (gender or "").strip(),
+    }
+    aid = _session_agent_id(session)
+    vision_prompt = message or ("Bạn thấy gì trong video này?" if is_video else "Bạn thấy gì trong ảnh này?")
+
+    # Get vision analysis - Gemini 1.5 Pro (primary) → GPT-4o (fallback)
+    gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    openai_key = os.environ.get("OPENAI_API_KEY", "").strip()
+
+    if not gemini_key and not openai_key:
+        raise HTTPException(status_code=500, detail="Vision analysis requires GEMINI_API_KEY or OPENAI_API_KEY")
+
+    vision_system = f"""Bạn là {aid}, một cô gái anime thân thiện. Xưng "mình", gọi đối phương "bạn".
+
+NHIỆM VỤ: Phân tích {'video' if is_video else 'ảnh'} và trả lời bằng tiếng Việt.
+
+QUAN TRỌNG về nhận diện:
+- Nếu thấy NHÂN VẬT từ phim/show/game/manga/anime quen thuộc, hãy ĐOÁN MẠNH DẠN tên + nguồn — đừng từ chối hay nói "không thể xác định". Đoán dựa trên đặc điểm: kiểu tóc, trang phục, biểu tượng (vd. mặt cười đỏ → Red John từ The Mentalist; tai mèo + tóc đỏ → có thể là Anya/anime nào đó...).
+- Đối với người thật/diễn viên: nếu nhận ra (Simon Baker, Tom Cruise...) cứ tự nhiên đoán theo trí nhớ phổ biến.
+- Nếu vẫn không chắc: liệt kê các đặc điểm hình ảnh nổi bật (màu tóc, trang phục, biểu tượng, phong cách nghệ thuật) để có thể tra trên Google.
+
+Trả lời CHI TIẾT bao gồm:
+1. Nhận diện người/nhân vật + nguồn nếu có
+2. Vật thể, hành động, bối cảnh
+3. Phong cách nghệ thuật + màu sắc chủ đạo
+
+Trả lời TỰ NHIÊN như chat, KHÔNG bullet points, KHÔNG giọng trợ lý AI.
+
+CUỐI câu trả lời, BẮT BUỘC thêm 2 dòng RIÊNG BIỆT theo format CHÍNH XÁC:
+SEARCH_QUERY: <2-6 từ tiếng Anh để tra Google. Ưu tiên: "<tên nhân vật> <nguồn>" (vd "Patrick Jane The Mentalist", "Naruto Uzumaki anime"). Nếu không đoán được nhân vật, vẫn PHẢI cho query mô tả: "<đặc điểm chính> <phong cách>" (vd "blonde curly hair man red smiley face fanart", "anime girl pink hair school uniform"). KHÔNG BAO GIỜ để NONE.>
+SUBJECT_TAG: <tên nhân vật + nguồn ngắn gọn nếu nhận diện, ví dụ "Patrick Jane (The Mentalist)". Nếu không, để "ảnh chung">"""
+
+    raw_vision = ""
+
+    # --- Primary: Gemini 1.5 Pro Vision ---
+    if gemini_key:
+        try:
+            logger.info("[VISION] Attempting Gemini 1.5 Pro...")
+            import google.generativeai as genai
+            genai.configure(api_key=gemini_key)
+            model = genai.GenerativeModel(
+                model_name="gemini-1.5-pro",
+                system_instruction=vision_system,
+            )
+            import PIL.Image
+            from io import BytesIO
+            img = PIL.Image.open(BytesIO(content))
+            response = model.generate_content(
+                [vision_prompt, img],
+                generation_config={"max_output_tokens": 900, "temperature": 0.7},
+            )
+            raw_vision = response.text or ""
+            logger.info(f"[VISION] ✅ Gemini SUCCESS: {raw_vision[:80]}")
+        except ImportError:
+            logger.warning("[VISION] google-generativeai not installed, falling back to GPT-4o")
+        except Exception as e:
+            logger.error(f"[VISION] Gemini failed: {e}, falling back to GPT-4o")
+
+    # --- Fallback: GPT-4o ---
+    if not raw_vision and openai_key:
+        try:
+            logger.info("[VISION] Attempting GPT-4o fallback...")
+            from openai import OpenAI
+            oai = OpenAI(api_key=openai_key)
+            response = oai.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": vision_system},
+                    {"role": "user", "content": [
+                        {"type": "text", "text": vision_prompt},
+                        {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{base64_content}", "detail": "high"}},
+                    ]},
+                ],
+                max_tokens=900,
+                temperature=0.7,
+            )
+            raw_vision = response.choices[0].message.content or ""
+            logger.info(f"[VISION] ✅ GPT-4o fallback SUCCESS")
+        except Exception as e:
+            logger.error(f"[VISION] GPT-4o fallback failed: {e}")
+            raise HTTPException(status_code=500, detail=f"Vision analysis failed: {str(e)}")
+
+    if not raw_vision:
+        raise HTTPException(status_code=500, detail="Vision analysis failed: no response from any provider")
+
+    # Extract SEARCH_QUERY + SUBJECT_TAG, strip them from user-facing reply
+    search_query: str = ""
+    subject_tag: str = ""
+    cleaned_lines: list[str] = []
+    for line in raw_vision.splitlines():
+        stripped = line.strip()
+        up = stripped.upper()
+        if up.startswith("SEARCH_QUERY:"):
+            q = stripped.split(":", 1)[1].strip().strip('"').strip("'")
+            if q and q.upper() != "NONE":
+                search_query = q
+            continue
+        if up.startswith("SUBJECT_TAG:"):
+            t = stripped.split(":", 1)[1].strip().strip('"').strip("'")
+            if t and t.lower() not in ("none", "ảnh chung"):
+                subject_tag = t
+            continue
+        cleaned_lines.append(line)
+    vision_reply = "\n".join(cleaned_lines).strip()
+
+    logger.info(f"Vision pass done. search_query={search_query!r} subject_tag={subject_tag!r}")
+
+    # PASS 2: reverse-image-search via Tavily on the extracted subject
+    if search_query and not is_video:
+        try:
+            from services.agent_service.llm.web_search import tavily_search
+            hits = await tavily_search(search_query, max_results=4)
+            logger.info(f"Tavily hits for {search_query!r}: {len(hits)}")
+            if hits:
+                sources_text = "\n".join(
+                    f"- {h.get('title','')}: {h.get('snippet','')[:240]} ({h.get('url','')})"
+                    for h in hits if h.get('snippet') or h.get('title')
+                )
+                if sources_text.strip():
+                    from services.agent_service.llm.client import generate
+                    enrich_system = (
+                        f"Bạn là {aid}, cô gái anime thân thiện. Xưng 'mình', gọi đối phương 'bạn'. "
+                        "Hãy MỞ RỘNG câu trả lời gốc bằng thông tin từ web (chỉ dùng nếu liên quan): "
+                        "thêm 1-3 câu nói về danh tính nhân vật/chủ thể, nguồn gốc, sự thật thú vị. "
+                        "Giữ giọng chat tự nhiên tiếng Việt, KHÔNG bullet, KHÔNG dán link. "
+                        "Tránh lặp lại nguyên văn câu trả lời gốc."
+                    )
+                    enrich_user = (
+                        f"CÂU TRẢ LỜI GỐC (phân tích ảnh):\n{vision_reply}\n\n"
+                        f"THÔNG TIN TỪ WEB ('{search_query}'):\n{sources_text}\n\n"
+                        "Hãy viết lại câu trả lời tự nhiên hơn, nhẹ nhàng đan xen thông tin web vào. "
+                        "Phần đầu vẫn giữ là phân tích ảnh, sau đó dẫn dắt vào thông tin tìm được."
+                    )
+                    enriched = await generate(enrich_system, enrich_user)
+                    if enriched and len(enriched.strip()) > 40:
+                        vision_reply = enriched.strip()
+                        logger.info("Vision reply enriched with web search context.")
+        except Exception as e:
+            logger.warning(f"Reverse image search enrichment failed: {e}")
+
+    vision_reply = _sanitize_agent_handle_typo(vision_reply, aid)
+    vision_reply = _ensure_assistant_reply(vision_reply)
+    logger.info(f"Vision analysis successful: {vision_reply[:100]}")
+    
+    # Save to conversation
+    media_type = "video" if is_video else "ảnh"
+    conversation = await _get_or_create_conversation(
+        db, user_uuid, 
+        f"[Đã gửi {media_type}] {message}" if message else f"[Đã gửi {media_type}]",
+        conversation_id
+    )
+    
+    # Save user message with media indicator + identified subject (so follow-up turns
+    # know what "nó/this" refers to without re-uploading the image).
+    media_label = f"[Đã gửi {media_type}: {file.filename}"
+    if subject_tag:
+        media_label += f" — chủ thể: {subject_tag}"
+    media_label += "]"
+    user_msg_content = f"{media_label}\n{message}" if message else media_label
+    user_msg = Message(conversation_id=conversation.id, role="user", content=user_msg_content)
+    db.add(user_msg)
+    await db.commit()
+    await db.refresh(user_msg)
+    
+    # Update relationship
+    rel = await _bump_user_agent_relationship(db, user_uuid, session.get("agent_id"))
+    if rel:
+        await db.commit()
+    
+    # Save bot reply
+    bot_msg = Message(
+        conversation_id=conversation.id,
+        role="assistant",
+        content=vision_reply,
+        detected_intent="entertainment_knowledge",
+        detected_emotion="surprised",
+        avatar_action="shocked_face",
+    )
+    db.add(bot_msg)
+    await db.commit()
+    await db.refresh(bot_msg)
+    
+    await _refresh_conversation_title(db, conversation, user_msg_content)
+    
+    if session.get("entry_mode") == "quickstart" and session.get("agent_id"):
+        await append_user_line_and_maybe_summarize(
+            str(user_uuid), 
+            session["agent_id"], 
+            user_msg_content
+        )
+    
+    rel_ex = _relationship_payload(rel) if rel else {}
+    
+    logger.info(f"analyze_media completed successfully")
+    
+    return MediaAnalysisResponse(
+        conversation_id=str(conversation.id),
+        reply=vision_reply,
+        detected_intent="entertainment_knowledge",
+        detected_emotion="surprised",
+        avatar_action="shocked_face",
+        user_message_count=rel_ex.get("user_message_count"),
+        relationship_level=rel_ex.get("relationship_level"),
+        relationship_level_up=bool(rel_ex.get("relationship_level_up")),
+        new_relationship_level=rel_ex.get("new_relationship_level"),
+    )
+
+
+# Helper functions for YouTube and Web URL analysis
+async def _analyze_youtube(
+    youtube_url: str,
+    message: str,
+    conversation_id: str | None,
+    agent_id: str | None,
+    entry_mode: str | None,
+    persona: str | None,
+    character_name: str | None,
+    gender: str | None,
+    current_user_id: str,
+    db: AsyncSession,
+) -> MediaAnalysisResponse:
+    """Analyze YouTube video using transcript and metadata."""
+    logger.info(f"Analyzing YouTube URL: {youtube_url}")
+    
+    try:
+        import httpx
+        from youtube_transcript_api import YouTubeTranscriptApi
+        
+        # Extract video ID
+        video_id_match = re.search(r'(?:v=|youtu\.be/)([a-zA-Z0-9_-]{11})', youtube_url)
+        if not video_id_match:
+            raise HTTPException(status_code=400, detail="Invalid YouTube URL")
+        
+        video_id = video_id_match.group(1)
+        logger.info(f"Video ID: {video_id}")
+        
+        # Get video metadata
+        async with httpx.AsyncClient() as client:
+            oembed_url = f"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={video_id}&format=json"
+            response = await client.get(oembed_url)
+            metadata = response.json() if response.status_code == 200 else {}
+        
+        video_title = metadata.get("title", "Unknown video")
+        video_author = metadata.get("author_name", "Unknown channel")
+        
+        # Get transcript
+        try:
+            transcript_list = YouTubeTranscriptApi.get_transcript(video_id, languages=['vi', 'en'])
+            transcript_text = " ".join([item['text'] for item in transcript_list[:50]])  # First 50 segments
+            transcript_text = transcript_text[:2000]  # Limit to 2000 chars
+        except Exception as e:
+            logger.warning(f"Could not get transcript: {e}")
+            transcript_text = "Không lấy được transcript"
+        
+        # Build analysis prompt
+        user_uuid = UUID(current_user_id)
+        session = {
+            "entry_mode": (entry_mode or "").strip().lower(),
+            "agent_id": (agent_id or "").strip(),
+            "persona": (persona or "").strip(),
+            "character_name": (character_name or "").strip(),
+            "gender": (gender or "").strip(),
+        }
+        aid = _session_agent_id(session)
+        
+        user_question = message.replace(youtube_url, "").strip() or "Tóm tắt video này cho mình"
+        
+        openai_key = os.environ.get("OPENAI_API_KEY", "").strip()
+        if not openai_key:
+            raise HTTPException(status_code=500, detail="OPENAI_API_KEY required")
+        
+        from openai import OpenAI
+        client = OpenAI(api_key=openai_key)
+        
+        analysis_prompt = f"""Video: "{video_title}" by {video_author}
+
+Transcript (đoạn đầu):
+{transcript_text}
+
+Câu hỏi: {user_question}"""
+        
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": f"""Bạn là {aid}, một cô gái anime thân thiện. Xưng "mình", gọi đối phương "bạn".
+Phân tích video YouTube và trả lời bằng tiếng Việt, giọng tự nhiên như chat với bạn.
+Không dùng bullet points, không giọng trợ lý AI."""
+                },
+                {"role": "user", "content": analysis_prompt}
+            ],
+            max_tokens=600,
+            temperature=0.7
+        )
+        
+        analysis_reply = response.choices[0].message.content or ""
+        analysis_reply = _sanitize_agent_handle_typo(analysis_reply, aid)
+        analysis_reply = _ensure_assistant_reply(analysis_reply)
+        
+        # Save to conversation
+        conversation = await _get_or_create_conversation(
+            db, user_uuid,
+            f"[YouTube] {video_title}",
+            conversation_id
+        )
+        
+        user_msg_content = f"[YouTube: {video_title}]\n{youtube_url}\n{user_question}"
+        user_msg = Message(conversation_id=conversation.id, role="user", content=user_msg_content)
+        db.add(user_msg)
+        await db.commit()
+        await db.refresh(user_msg)
+        
+        rel = await _bump_user_agent_relationship(db, user_uuid, session.get("agent_id"))
+        if rel:
+            await db.commit()
+        
+        bot_msg = Message(
+            conversation_id=conversation.id,
+            role="assistant",
+            content=analysis_reply,
+            detected_intent="entertainment_knowledge",
+            detected_emotion="surprised",
+            avatar_action="shocked_face",
+        )
+        db.add(bot_msg)
+        await db.commit()
+        await db.refresh(bot_msg)
+        
+        await _refresh_conversation_title(db, conversation, user_msg_content)
+        
+        if session.get("entry_mode") == "quickstart" and session.get("agent_id"):
+            await append_user_line_and_maybe_summarize(str(user_uuid), session["agent_id"], user_msg_content)
+        
+        rel_ex = _relationship_payload(rel) if rel else {}
+        
+        return MediaAnalysisResponse(
+            conversation_id=str(conversation.id),
+            reply=analysis_reply,
+            detected_intent="entertainment_knowledge",
+            detected_emotion="surprised",
+            avatar_action="shocked_face",
+            user_message_count=rel_ex.get("user_message_count"),
+            relationship_level=rel_ex.get("relationship_level"),
+            relationship_level_up=bool(rel_ex.get("relationship_level_up")),
+            new_relationship_level=rel_ex.get("new_relationship_level"),
+        )
+        
+    except ImportError as e:
+        logger.error(f"Missing package: {e}")
+        raise HTTPException(status_code=500, detail="youtube-transcript-api package required")
+    except Exception as e:
+        logger.error(f"YouTube analysis failed: {e}")
+        raise HTTPException(status_code=500, detail=f"YouTube analysis failed: {str(e)}")
+
+
+async def _analyze_web_url(
+    web_url: str,
+    message: str,
+    conversation_id: str | None,
+    agent_id: str | None,
+    entry_mode: str | None,
+    persona: str | None,
+    character_name: str | None,
+    gender: str | None,
+    current_user_id: str,
+    db: AsyncSession,
+) -> MediaAnalysisResponse:
+    """Analyze web URL by scraping content."""
+    logger.info(f"Analyzing web URL: {web_url}")
+    
+    try:
+        import httpx
+        from bs4 import BeautifulSoup
+        
+        # Fetch web content
+        async with httpx.AsyncClient(follow_redirects=True, timeout=10.0) as client:
+            response = await client.get(web_url, headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            })
+            response.raise_for_status()
+            html_content = response.text
+        
+        # Parse HTML
+        soup = BeautifulSoup(html_content, 'html.parser')
+        
+        # Remove script and style elements
+        for script in soup(["script", "style"]):
+            script.decompose()
+        
+        # Get title
+        title = soup.title.string if soup.title else "Unknown page"
+        
+        # Get main text content
+        text_content = soup.get_text(separator='\n', strip=True)
+        text_content = text_content[:3000]  # Limit to 3000 chars
+        
+        # Build analysis prompt
+        user_uuid = UUID(current_user_id)
+        session = {
+            "entry_mode": (entry_mode or "").strip().lower(),
+            "agent_id": (agent_id or "").strip(),
+            "persona": (persona or "").strip(),
+            "character_name": (character_name or "").strip(),
+            "gender": (gender or "").strip(),
+        }
+        aid = _session_agent_id(session)
+        
+        user_question = message.replace(web_url, "").strip() or "Tóm tắt nội dung trang web này"
+        
+        openai_key = os.environ.get("OPENAI_API_KEY", "").strip()
+        if not openai_key:
+            raise HTTPException(status_code=500, detail="OPENAI_API_KEY required")
+        
+        from openai import OpenAI
+        client = OpenAI(api_key=openai_key)
+        
+        analysis_prompt = f"""Trang web: "{title}"
+URL: {web_url}
+
+Nội dung (đoạn đầu):
+{text_content}
+
+Câu hỏi: {user_question}"""
+        
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": f"""Bạn là {aid}, một cô gái anime thân thiện. Xưng "mình", gọi đối phương "bạn".
+Phân tích nội dung web và trả lời bằng tiếng Việt, giọng tự nhiên như chat với bạn.
+Không dùng bullet points, không giọng trợ lý AI."""
+                },
+                {"role": "user", "content": analysis_prompt}
+            ],
+            max_tokens=600,
+            temperature=0.7
+        )
+        
+        analysis_reply = response.choices[0].message.content or ""
+        analysis_reply = _sanitize_agent_handle_typo(analysis_reply, aid)
+        analysis_reply = _ensure_assistant_reply(analysis_reply)
+        
+        # Save to conversation
+        conversation = await _get_or_create_conversation(
+            db, user_uuid,
+            f"[Web] {title}",
+            conversation_id
+        )
+        
+        user_msg_content = f"[Web: {title}]\n{web_url}\n{user_question}"
+        user_msg = Message(conversation_id=conversation.id, role="user", content=user_msg_content)
+        db.add(user_msg)
+        await db.commit()
+        await db.refresh(user_msg)
+        
+        rel = await _bump_user_agent_relationship(db, user_uuid, session.get("agent_id"))
+        if rel:
+            await db.commit()
+        
+        bot_msg = Message(
+            conversation_id=conversation.id,
+            role="assistant",
+            content=analysis_reply,
+            detected_intent="entertainment_knowledge",
+            detected_emotion="surprised",
+            avatar_action="shocked_face",
+        )
+        db.add(bot_msg)
+        await db.commit()
+        await db.refresh(bot_msg)
+        
+        await _refresh_conversation_title(db, conversation, user_msg_content)
+        
+        if session.get("entry_mode") == "quickstart" and session.get("agent_id"):
+            await append_user_line_and_maybe_summarize(str(user_uuid), session["agent_id"], user_msg_content)
+        
+        rel_ex = _relationship_payload(rel) if rel else {}
+        
+        return MediaAnalysisResponse(
+            conversation_id=str(conversation.id),
+            reply=analysis_reply,
+            detected_intent="entertainment_knowledge",
+            detected_emotion="surprised",
+            avatar_action="shocked_face",
+            user_message_count=rel_ex.get("user_message_count"),
+            relationship_level=rel_ex.get("relationship_level"),
+            relationship_level_up=bool(rel_ex.get("relationship_level_up")),
+            new_relationship_level=rel_ex.get("new_relationship_level"),
+        )
+        
+    except ImportError as e:
+        logger.error(f"Missing package: {e}")
+        raise HTTPException(status_code=500, detail="beautifulsoup4 and httpx packages required")
+    except Exception as e:
+        logger.error(f"Web scraping failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Web scraping failed: {str(e)}")
+
+
+
+# ============================================================
+# Generative image (Replicate flux-kontext-pro)
+# ============================================================
+class ImagineRequest(BaseModel):
+    prompt: str
+    conversation_id: str | None = None
+    aspect_ratio: str = "1:1"  # "1:1", "16:9", "9:16", "4:3", "3:4"
+
+
+class ImagineResponse(BaseModel):
+    conversation_id: str
+    image_url: str
+    prompt: str
+
+
+@router.post("/imagine", response_model=ImagineResponse)
+async def imagine(
+    payload: ImagineRequest,
+    current_user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Text-to-image via Replicate (FLUX Kontext Pro by default).
+    Saves user prompt + assistant image-message into the conversation history.
+    """
+    prompt = (payload.prompt or "").strip()
+    if not prompt:
+        raise HTTPException(status_code=400, detail="prompt is required")
+    if len(prompt) > 1500:
+        raise HTTPException(status_code=400, detail="prompt too long (max 1500 chars)")
+
+    token = (os.environ.get("REPLICATE_API_TOKEN") or "").strip()
+    if not token:
+        raise HTTPException(status_code=500, detail="REPLICATE_API_TOKEN not configured")
+
+    model_ref = (os.environ.get("REPLICATE_IMAGE_MODEL") or "black-forest-labs/flux-kontext-pro").strip()
+
+    try:
+        import replicate
+    except ImportError:
+        raise HTTPException(status_code=500, detail="replicate package not installed (pip install replicate)")
+
+    try:
+        # Run is sync — wrap in to_thread so we don't block the event loop.
+        def _run():
+            return replicate.Client(api_token=token).run(  # type: ignore[attr-defined]
+                model_ref,
+                input={
+                    "prompt": prompt,
+                    "aspect_ratio": payload.aspect_ratio,
+                    "output_format": "webp",
+                    "safety_tolerance": 2,
+                },
+            )
+
+        output = await asyncio.to_thread(_run)
+    except Exception as e:
+        logger.warning(f"Replicate run failed: {e}")
+        raise HTTPException(status_code=502, detail=f"Image generation failed: {e}")
+
+    # Replicate output may be a string URL, a list of URLs, or a FileOutput object.
+    image_url: str = ""
+    if isinstance(output, str):
+        image_url = output
+    elif isinstance(output, list) and output:
+        first = output[0]
+        image_url = str(first) if first else ""
+    elif output is not None:
+        # FileOutput-like has __str__ that returns URL.
+        image_url = str(output)
+    if not image_url or not image_url.startswith("http"):
+        raise HTTPException(status_code=502, detail="Replicate returned no image URL")
+
+    # Persist into conversation history (user prompt + assistant image bubble).
+    user_uuid = UUID(current_user_id)
+    conversation = await _get_or_create_conversation(
+        db, user_uuid, f"/imagine {prompt[:80]}", payload.conversation_id
+    )
+    user_msg = Message(
+        conversation_id=conversation.id,
+        role="user",
+        content=f"/imagine {prompt}",
+    )
+    db.add(user_msg)
+    await db.commit()
+
+    bot_content = f"[Đã tạo ảnh từ prompt: {prompt}]\n{image_url}"
+    bot_msg = Message(
+        conversation_id=conversation.id,
+        role="assistant",
+        content=bot_content,
+        detected_intent="image_generation",
+        detected_emotion="surprised",
+        avatar_action="happy_face",
+    )
+    db.add(bot_msg)
+    await db.commit()
+
+    await _refresh_conversation_title(db, conversation, f"/imagine {prompt[:60]}")
+
+    return ImagineResponse(
+        conversation_id=str(conversation.id),
+        image_url=image_url,
+        prompt=prompt,
+    )

@@ -10,24 +10,65 @@ import { useAuth } from '../hooks/useAuth'
 import * as api from '../services/api'
 import type { MessageItem } from '../types/chat'
 import type { ConversationSummary } from '../types/chat'
-import AncientRtsGame from '../games/ancientRts/AncientRtsGame'
 import TetrisGame from '../games/tetris/TetrisGame'
 import SnakeGame from '../games/snake/SnakeGame'
 
-const CHARACTER_NAME = 'tuq27'
-const GAME_OPTIONS = ['Chess', 'Caro', 'Tetris', 'Snake', 'Ringrealms'] as const
+
+const SLASH_COMMANDS: { cmd: string; desc: string }[] = [
+  { cmd: 'imagine', desc: 'Generate an image (e.g. /imagine a cat in space)' },
+  { cmd: 'continue', desc: 'Ask the AI to continue the last reply' },
+  { cmd: 'regen', desc: 'Regenerate the last AI reply' },
+  { cmd: 'clear', desc: 'Clear the current conversation' },
+  { cmd: 'narrate', desc: 'Switch to narrative-style reply' },
+  { cmd: 'ooc', desc: 'Out-of-character note (not RP)' },
+  { cmd: 'mood happy', desc: 'Set companion mood: happy' },
+  { cmd: 'mood sad', desc: 'Set companion mood: sad' },
+  { cmd: 'mood idle', desc: 'Set companion mood: idle' },
+]
+
+/** Parse YouTube URL → videoId / playlist listId. Accepts watch?v= and playlist?list= forms. */
+function parseYouTubeUrl(url: string): { videoId?: string; listId?: string } {
+  if (!url) return {}
+  try {
+    const trimmed = url.trim()
+    // Bare 11-char video id
+    if (/^[A-Za-z0-9_-]{11}$/.test(trimmed)) return { videoId: trimmed }
+    const u = new URL(trimmed.startsWith('http') ? trimmed : 'https://' + trimmed)
+    const v = u.searchParams.get('v') || undefined
+    const list = u.searchParams.get('list') || undefined
+    // youtu.be/ID
+    if (!v && u.hostname.includes('youtu.be')) {
+      const id = u.pathname.replace(/^\//, '').split('/')[0]
+      if (id && /^[A-Za-z0-9_-]{11}$/.test(id)) return { videoId: id, listId: list }
+    }
+    return { videoId: v, listId: list }
+  } catch {
+    return {}
+  }
+}
+
+const SUGGESTED_REPLIES: string[] = []
+
+function CozyChatBg() {
+  return (
+    <div className="vf-cozy-bg" aria-hidden>
+      <div className="vf-cozy-window" />
+    </div>
+  )
+}
+
+const GAME_OPTIONS = ['Chess', 'Caro', 'Tetris', 'Snake'] as const
 type GameOption = (typeof GAME_OPTIONS)[number]
 
 const GAME_GRID_ITEMS: readonly {
   option: GameOption
   label: string
-  art: 'chess' | 'caro' | 'tetris' | 'snake' | 'ringrealms'
+  art: 'chess' | 'caro' | 'tetris' | 'snake'
 }[] = [
   { option: 'Chess', label: 'CHESS', art: 'chess' },
   { option: 'Caro', label: 'CARO', art: 'caro' },
   { option: 'Tetris', label: 'TETRIS', art: 'tetris' },
   { option: 'Snake', label: 'SNAKE', art: 'snake' },
-  { option: 'Ringrealms', label: 'RINGREALMS', art: 'ringrealms' },
 ]
 
 /** `game` query param (chat entry gate) → tab Game option */
@@ -36,8 +77,6 @@ const GATE_GAME_ID_TO_OPTION: Record<string, GameOption> = {
   caro: 'Caro',
   tetris: 'Tetris',
   snake: 'Snake',
-  ringrealms: 'Ringrealms',
-  zeroad: 'Ringrealms',
 }
 
 /** Bot ELO range in the UI — fixed 350–1250 (matches backend). */
@@ -432,32 +471,6 @@ function IconBotCorner({ className = 'w-8 h-8' }: { className?: string }) {
   )
 }
 
-const RELATIONSHIP_HEART_SLOTS = 5
-
-function RelationshipHeartIcon({ filled, size = 22 }: { filled: boolean; size?: number }) {
-  return (
-    <svg
-      className={filled ? 'vf-chat-rheart vf-chat-rheart--on' : 'vf-chat-rheart vf-chat-rheart--off'}
-      viewBox="0 0 24 24"
-      width={size}
-      height={size}
-      aria-hidden
-    >
-      <path
-        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-        fill={filled ? 'currentColor' : 'none'}
-        stroke={filled ? 'none' : 'currentColor'}
-        strokeWidth={filled ? 0 : 1.45}
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function heartsFilledFromLevel(level: number): number {
-  return Math.min(Math.max(level, 0), RELATIONSHIP_HEART_SLOTS)
-}
-
 function memoryKindForUpdates(mtype: string): 'feature' | 'fix' | 'update' | 'docs' {
   const t = (mtype || '').toLowerCase()
   if (t.includes('goal') || t.includes('pref')) return 'feature'
@@ -469,12 +482,6 @@ function memoryKindForUpdates(mtype: string): 'feature' | 'fix' | 'update' | 'do
 function memoryKindLabel(mtype: string): string {
   const t = (mtype || '').trim() || 'memory'
   return t.length > 24 ? `${t.slice(0, 24)}…` : t.toUpperCase()
-}
-
-function messagesUntilNextLevel(count: number): number {
-  if (count === 0) return 1000
-  const r = count % 1000
-  return r === 0 ? 1000 : 1000 - r
 }
 
 export default function Chat() {
@@ -506,22 +513,170 @@ export default function Chat() {
   const [caroSession, setCaroSession] = useState<api.CaroStateResponse | null>(null)
   const [caroLoading, setCaroLoading] = useState(false)
   const [caroReview, setCaroReview] = useState<api.CaroReviewResponse | null>(null)
-  const [chatPanelTab, setChatPanelTab] = useState<'chat' | 'game' | 'memory' | 'diary' | 'relationship'>('chat')
+  const [chatPanelTab, setChatPanelTab] = useState<'chat' | 'game' | 'memory'>('chat')
+  // Phase 2 — FictionLab-inspired settings
+  const [settingsPanelOpen, setSettingsPanelOpen] = useState(false)
+  const [moodPreset, setMoodPreset] = useState<'cozy' | 'cafe' | 'garden' | 'library' | 'beach'>(
+    () => (localStorage.getItem('pally_mood') as 'cozy' | 'cafe' | 'garden' | 'library' | 'beach') || 'cozy',
+  )
+  const [typingSpeedPct, setTypingSpeedPct] = useState<number>(
+    () => Number(localStorage.getItem('pally_typing_pct') || '100'),
+  )
+  const [suggestionsEnabled, setSuggestionsEnabled] = useState<boolean>(
+    () => localStorage.getItem('pally_suggestions') !== '0',
+  )
+  const [slashOpen, setSlashOpen] = useState(false)
+  const [slashFilter, setSlashFilter] = useState('')
+  const [hoverMenuMsgId, setHoverMenuMsgId] = useState<string | null>(null)
+  // Music player state (Spotify-style controls over YouTube IFrame)
+  const DEFAULT_MUSIC_URL = 'https://www.youtube.com/watch?v=jfKfPfyJRdk' // lofi girl live
+  const [musicUrl, setMusicUrl] = useState<string>(
+    () => localStorage.getItem('pally_music_url') || DEFAULT_MUSIC_URL,
+  )
+  const [musicUrlDraft, setMusicUrlDraft] = useState<string>(musicUrl)
+  const [musicPlaying, setMusicPlaying] = useState(false)
+  const [musicLoop, setMusicLoop] = useState<boolean>(
+    () => localStorage.getItem('pally_music_loop') !== '0',
+  )
+  const [musicShuffle, setMusicShuffle] = useState<boolean>(
+    () => localStorage.getItem('pally_music_shuffle') === '1',
+  )
+  const [musicVolume, setMusicVolume] = useState<number>(
+    () => Number(localStorage.getItem('pally_music_volume') || '40'),
+  )
+  const [musicTitle, setMusicTitle] = useState<string>('Loading...')
+  const ytPlayerRef = useRef<unknown>(null)
+  const ytReadyRef = useRef(false)
+  useEffect(() => { localStorage.setItem('pally_mood', moodPreset) }, [moodPreset])
+  useEffect(() => { localStorage.setItem('pally_typing_pct', String(typingSpeedPct)) }, [typingSpeedPct])
+  useEffect(() => { localStorage.setItem('pally_suggestions', suggestionsEnabled ? '1' : '0') }, [suggestionsEnabled])
+  useEffect(() => { localStorage.setItem('pally_music_url', musicUrl) }, [musicUrl])
+  useEffect(() => { localStorage.setItem('pally_music_loop', musicLoop ? '1' : '0') }, [musicLoop])
+  useEffect(() => { localStorage.setItem('pally_music_shuffle', musicShuffle ? '1' : '0') }, [musicShuffle])
+  useEffect(() => { localStorage.setItem('pally_music_volume', String(musicVolume)) }, [musicVolume])
+
+  // YouTube IFrame API loader + player setup
+  useEffect(() => {
+    const w = window as unknown as { YT?: { Player: new (id: string, opts: object) => unknown }, onYouTubeIframeAPIReady?: () => void }
+    const setupPlayer = () => {
+      const target = document.getElementById('pally-yt-player')
+      if (!target) return
+      const { videoId, listId } = parseYouTubeUrl(musicUrl)
+      if (!videoId && !listId) return
+      const playerVars: Record<string, unknown> = { enablejsapi: 1, autoplay: 0 }
+      if (listId) {
+        playerVars.list = listId
+        playerVars.listType = 'playlist'
+      } else if (videoId) {
+        // Loop a single video using the playlist trick.
+        playerVars.loop = 1
+        playerVars.playlist = videoId
+      }
+      if (!w.YT) return
+      try {
+        ytPlayerRef.current = new w.YT.Player('pally-yt-player', {
+          videoId: videoId,
+          width: '0',
+          height: '0',
+          playerVars,
+          events: {
+            onReady: (e: { target: { setVolume: (v: number) => void; setLoop?: (b: boolean) => void; setShuffle?: (b: boolean) => void; getVideoData?: () => { title: string } } }) => {
+              ytReadyRef.current = true
+              e.target.setVolume(musicVolume)
+              if (listId) {
+                try { e.target.setLoop?.(musicLoop) } catch { /* ignore */ }
+                try { e.target.setShuffle?.(musicShuffle) } catch { /* ignore */ }
+              }
+              const data = e.target.getVideoData?.()
+              if (data?.title) setMusicTitle(data.title)
+            },
+            onStateChange: (e: { data: number; target: { getVideoData?: () => { title: string } } }) => {
+              setMusicPlaying(e.data === 1)
+              const data = e.target.getVideoData?.()
+              if (data?.title) setMusicTitle(data.title)
+            },
+          },
+        })
+      } catch { /* ignore */ }
+    }
+    if (w.YT?.Player) {
+      setupPlayer()
+    } else {
+      w.onYouTubeIframeAPIReady = setupPlayer
+      const existing = document.querySelector('script[src*="youtube.com/iframe_api"]')
+      if (!existing) {
+        const tag = document.createElement('script')
+        tag.src = 'https://www.youtube.com/iframe_api'
+        tag.async = true
+        document.body.appendChild(tag)
+      }
+    }
+    // Reload the player content if URL changes after first init
+    return () => {
+      const player = ytPlayerRef.current as { destroy?: () => void } | null
+      try { player?.destroy?.() } catch { /* ignore */ }
+      ytPlayerRef.current = null
+      ytReadyRef.current = false
+    }
+  }, [musicUrl])
+
+  // Music control functions
+  const ytCall = useCallback((method: string, ...args: unknown[]) => {
+    const p = ytPlayerRef.current as Record<string, (...a: unknown[]) => unknown> | null
+    if (!p || !ytReadyRef.current) return
+    try { p[method]?.(...args) } catch { /* ignore */ }
+  }, [])
+  const musicToggle = useCallback(() => {
+    if (musicPlaying) ytCall('pauseVideo')
+    else ytCall('playVideo')
+  }, [musicPlaying, ytCall])
+  const musicNext = useCallback(() => ytCall('nextVideo'), [ytCall])
+  const musicPrev = useCallback(() => ytCall('previousVideo'), [ytCall])
+  const musicSetVolume = useCallback((v: number) => {
+    setMusicVolume(v)
+    ytCall('setVolume', v)
+  }, [ytCall])
+  const musicToggleLoop = useCallback(() => {
+    setMusicLoop((cur) => {
+      const next = !cur
+      ytCall('setLoop', next)
+      return next
+    })
+  }, [ytCall])
+  const musicToggleShuffle = useCallback(() => {
+    setMusicShuffle((cur) => {
+      const next = !cur
+      ytCall('setShuffle', next)
+      return next
+    })
+  }, [ytCall])
   const [memories, setMemories] = useState<api.MemoryItem[]>([])
   const [memoriesLoading, setMemoriesLoading] = useState(false)
-  const [diaryEntries, setDiaryEntries] = useState<api.DiaryEntryRow[]>([])
-  const [diaryDraft, setDiaryDraft] = useState('')
-  const [diarySaving, setDiarySaving] = useState(false)
-  const [diaryLoading, setDiaryLoading] = useState(false)
-  const [diaryError, setDiaryError] = useState('')
-  const [userMessageCount, setUserMessageCount] = useState(0)
-  const [relationshipLevel, setRelationshipLevel] = useState(1)
   const [funFactOpen, setFunFactOpen] = useState(false)
   const [funFactLevel, setFunFactLevel] = useState(1)
   /** Focused assistant sentence (popup) — key `msgId|idx`. */
   const [activeSentenceKey, setActiveSentenceKey] = useState<string | null>(null)
   const [sentencePopup, setSentencePopup] = useState<{ text: string } | null>(null)
+  
+  // Voice recording state
+  const [isRecording, setIsRecording] = useState(false)
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
+  // audio chunks state reserved for upcoming voice feature
+  
+  // Image preview state
+  const [imagePreview, setImagePreview] = useState<{file: File, url: string} | null>(null)
+  
   const messagesScrollRef = useRef<HTMLDivElement>(null)
+
+  // Cleanup mediaRecorder on unmount
+  useEffect(() => {
+    return () => {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop()
+        mediaRecorder.stream.getTracks().forEach(track => track.stop())
+      }
+    }
+  }, [mediaRecorder])
 
   useEffect(() => {
     if (chatPanelTab !== 'game' || activeGame !== 'Chess') return
@@ -598,7 +753,7 @@ export default function Chat() {
 
   const showGate = Boolean(agentId && !entry && agentMeta)
 
-  const displayName = agentMeta?.botName ?? CHARACTER_NAME
+  const displayName = agentMeta?.botName ?? 'Pally'
 
   useEffect(() => {
     if (!authLoading && !isAuth) navigate('/login', { replace: true })
@@ -616,9 +771,9 @@ export default function Chat() {
     const tab = searchParams.get('tab')
     const gameId = searchParams.get('game')
     if (!tab && !gameId) return
-    const validTabs = new Set(['chat', 'game', 'memory', 'diary', 'relationship'])
+    const validTabs = new Set(['chat', 'game', 'memory'])
     if (tab && validTabs.has(tab)) {
-      setChatPanelTab(tab as 'chat' | 'game' | 'memory' | 'diary' | 'relationship')
+      setChatPanelTab(tab as 'chat' | 'game' | 'memory')
     }
     if (gameId && GATE_GAME_ID_TO_OPTION[gameId]) {
       setActiveGame(GATE_GAME_ID_TO_OPTION[gameId])
@@ -653,8 +808,6 @@ export default function Chat() {
     void api
       .getAgentRelationship(agentId)
       .then((r) => {
-        setUserMessageCount(r.user_message_count)
-        setRelationshipLevel(r.relationship_level)
         if (r.pending_fun_fact) {
           setFunFactLevel(r.relationship_level)
           setFunFactOpen(true)
@@ -680,16 +833,6 @@ export default function Chat() {
       .catch(() => setMemories([]))
       .finally(() => setMemoriesLoading(false))
   }, [chatPanelTab, isAuth])
-
-  useEffect(() => {
-    if (chatPanelTab !== 'diary' || !isAuth) return
-    setDiaryLoading(true)
-    void api
-      .getDiaryEntries(agentId)
-      .then(setDiaryEntries)
-      .catch(() => setDiaryEntries([]))
-      .finally(() => setDiaryLoading(false))
-  }, [chatPanelTab, isAuth, agentId])
 
   useEffect(() => {
     if (!historyOpen) return
@@ -761,8 +904,6 @@ export default function Chat() {
       streamBufRef.current = ''
       awaitingFirstTokenRef.current = false
       setStreamingAwaiting(false)
-      if (typeof msg.user_message_count === 'number') setUserMessageCount(msg.user_message_count)
-      if (typeof msg.relationship_level === 'number') setRelationshipLevel(msg.relationship_level)
       if (
         msg.relationship_level_up &&
         typeof msg.new_relationship_level === 'number' &&
@@ -985,8 +1126,32 @@ export default function Chat() {
 
   async function handleSend(e: React.FormEvent) {
     e.preventDefault()
+    
+    // If there's an image preview, send image with text
+    if (imagePreview) {
+      await handleSendImage()
+      return
+    }
+    
     const text = input.trim()
     if (!text || loading) return
+
+    // /imagine slash command — text-to-image via Replicate
+    if (text.toLowerCase().startsWith('/imagine ')) {
+      const prompt = text.slice('/imagine '.length).trim()
+      if (prompt) {
+        await imagineFromPrompt(prompt)
+        return
+      }
+    }
+
+    // Check if input contains URL (YouTube or web)
+    const urlPattern = /https?:\/\/[^\s]+/
+    if (urlPattern.test(text)) {
+      const handled = await handleUrlAnalysis()
+      if (handled) return // URL was processed
+    }
+    
     setInput('')
     setError('')
     awaitingFirstTokenRef.current = false
@@ -1012,8 +1177,6 @@ export default function Chat() {
       try {
         const res = (await api.sendMessage(text, conversationId, chatSession)) as import('../types/chat').ChatResponse
         setConversationId(res.conversation_id)
-        if (typeof res.user_message_count === 'number') setUserMessageCount(res.user_message_count)
-        if (typeof res.relationship_level === 'number') setRelationshipLevel(res.relationship_level)
         if (res.relationship_level_up && res.new_relationship_level && res.new_relationship_level >= 2) {
           setFunFactLevel(res.new_relationship_level)
           setFunFactOpen(true)
@@ -1036,6 +1199,90 @@ export default function Chat() {
     }
   }
 
+  /** Generate an image via Replicate (server-side) and append the resulting image to chat. */
+  async function imagineFromPrompt(prompt: string) {
+    const t = prompt.trim()
+    if (!t || loading) return
+    setError('')
+    // Push user prompt bubble immediately
+    const userMsg: MessageItem = { id: crypto.randomUUID(), role: 'user', content: `/imagine ${t}` }
+    setMessages((prev) => [...prev, userMsg])
+    setInput('')
+    setLoading(true)
+    try {
+      const res = await api.imagineImage(t, conversationId)
+      setConversationId(res.conversation_id)
+      const assistantMsg: MessageItem = {
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: `[Generated image]`,
+        imageData: res.image_url,
+        detected_intent: 'image_generation',
+      }
+      setMessages((prev) => [...prev, assistantMsg])
+      await fetchConversations()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Image generation failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  /** Programmatically send a text turn (for slash commands / regenerate). */
+  async function sendText(text: string, opts?: { skipAddUserMsg?: boolean }) {
+    const t = (text || '').trim()
+    if (!t || loading) return
+    setError('')
+    awaitingFirstTokenRef.current = false
+    setStreamingAwaiting(false)
+    if (!opts?.skipAddUserMsg) {
+      const userMsg: MessageItem = { id: crypto.randomUUID(), role: 'user', content: t }
+      setMessages((prev) => [...prev, userMsg])
+    }
+    setLoading(true)
+    const ws = wsRef.current
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      api.sendWsMessage(ws, t, conversationId, chatSession)
+    } else {
+      connectWs()
+      try {
+        const res = (await api.sendMessage(t, conversationId, chatSession)) as import('../types/chat').ChatResponse
+        setConversationId(res.conversation_id)
+        const assistantMsg: MessageItem = {
+          id: crypto.randomUUID(),
+          role: 'assistant',
+          content: res.reply,
+          detected_intent: res.detected_intent,
+          detected_emotion: res.detected_emotion,
+          avatar_action: res.avatar_action,
+        }
+        setMessages((prev) => [...prev, assistantMsg])
+        await fetchConversations()
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to send message')
+      } finally {
+        setLoading(false)
+      }
+    }
+  }
+
+  /** Regenerate the last assistant reply by removing it and re-sending the previous user message. */
+  async function regenerateLastReply() {
+    if (loading) return
+    // Find last assistant index
+    let lastAssistant = -1
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === 'assistant') { lastAssistant = i; break }
+    }
+    if (lastAssistant < 1) return
+    const prevUser = messages[lastAssistant - 1]
+    if (!prevUser || prevUser.role !== 'user') return
+    const text = prevUser.content
+    // Drop the assistant message; user message stays so we don't duplicate.
+    setMessages((prev) => prev.filter((_, i) => i !== lastAssistant))
+    await sendText(text, { skipAddUserMsg: true })
+  }
+
   function sentenceKey(msgId: string, idx: number) {
     return `${msgId}|${idx}`
   }
@@ -1044,6 +1291,19 @@ export default function Chat() {
     const isLast = index === messages.length - 1
     const streaming = isLast && streamMsgIdRef.current === msg.id
     const text = msg.content || ''
+    // Generated image bubble: imageData on assistant role = display image
+    if (msg.imageData) {
+      return (
+        <div className="vf-chat-imagine-bubble">
+          <img
+            src={msg.imageData}
+            alt="Generated"
+            className="vf-chat-imagine-img"
+            loading="lazy"
+          />
+        </div>
+      )
+    }
     const blocks = splitIntoSemanticBlocks(text)
     if (!text.trim()) {
       return streaming ? (
@@ -1098,23 +1358,224 @@ export default function Chat() {
     setFunFactOpen(false)
   }
 
-  async function saveDiary() {
-    const t = diaryDraft.trim()
-    if (!t) return
-    setDiaryError('')
-    setDiarySaving(true)
-    try {
-      await api.postDiaryEntry(t, agentId ?? undefined)
-      setDiaryDraft('')
-      const list = await api.getDiaryEntries(agentId ?? undefined)
-      setDiaryEntries(list)
-    } catch (e) {
-      setDiaryError(e instanceof Error ? e.message : 'Could not save diary')
-    } finally {
-      setDiarySaving(false)
+  // Voice recording handlers
+  const handleVoiceToggle = async () => {
+    if (isRecording) {
+      // Stop recording
+      if (mediaRecorder) {
+        mediaRecorder.stop()
+      }
+      setIsRecording(false)
+    } else {
+      // Start recording
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        const recorder = new MediaRecorder(stream, {
+          mimeType: 'audio/webm'
+        })
+        
+        const chunks: Blob[] = []
+
+        recorder.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            chunks.push(e.data)
+          }
+        }
+
+        recorder.onstop = async () => {
+          // Stop all tracks
+          stream.getTracks().forEach(track => track.stop())
+          
+          if (chunks.length === 0) {
+            setError('No audio recorded')
+            return
+          }
+          
+          // Create audio blob
+          const audioBlob = new Blob(chunks, { type: 'audio/webm' })
+          
+          // Transcribe audio
+          try {
+            setLoading(true)
+            setError('')
+            
+            const transcription = await api.transcribeAudio(audioBlob)
+            
+            // Set text to input box
+            setInput(transcription.text)
+            setLoading(false)
+          } catch (err) {
+            setError(err instanceof Error ? err.message : 'Transcription failed')
+            setLoading(false)
+          }
+        }
+
+        recorder.onerror = () => {
+          setError('Recording error occurred')
+          setIsRecording(false)
+        }
+
+        recorder.start()
+        setMediaRecorder(recorder)
+        setIsRecording(true)
+      } catch (err) {
+        setError('Microphone access denied or not available')
+      }
     }
   }
 
+  // Image upload handler - show preview first
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type (images and videos)
+    const allowedTypes = ['image/', 'video/']
+    if (!allowedTypes.some(type => file.type.startsWith(type))) {
+      setError('Please upload an image or video file')
+      return
+    }
+
+    // Validate file size (50MB for videos, 20MB for images)
+    const maxSize = file.type.startsWith('video/') ? 50 * 1024 * 1024 : 20 * 1024 * 1024
+    if (file.size > maxSize) {
+      const maxMB = file.type.startsWith('video/') ? 50 : 20
+      setError(`File too large. Max size: ${maxMB}MB`)
+      return
+    }
+
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file)
+    setImagePreview({ file, url: previewUrl })
+    setError('')
+    
+    // Reset file input
+    e.target.value = ''
+  }
+  
+  // Send image after preview
+  const handleSendImage = async () => {
+    if (!imagePreview) return
+
+    setLoading(true)
+    setError('')
+
+    // Capture inputs first (so we can clear UI immediately)
+    const file = imagePreview.file
+    const userText = input
+    const previewUrlToRevoke = imagePreview.url
+    const mediaType = file.type.startsWith('video/') ? 'video' : 'image'
+
+    try {
+      // Convert image to base64 for display BEFORE the API call so we can show
+      // the user bubble immediately while AI generates the reply.
+      const reader = new FileReader()
+      const base64Promise = new Promise<string>((resolve) => {
+        reader.onloadend = () => resolve(reader.result as string)
+        reader.readAsDataURL(file)
+      })
+      const imageBase64 = await base64Promise
+
+      // Push the user bubble RIGHT NOW so user sees their image+text immediately.
+      const userMsg: MessageItem = {
+        id: crypto.randomUUID(),
+        role: 'user',
+        content: userText || '',
+        imageData: mediaType === 'image' ? imageBase64 : undefined,
+      }
+      setMessages((prev) => [...prev, userMsg])
+      setInput('')
+      URL.revokeObjectURL(previewUrlToRevoke)
+      setImagePreview(null)
+
+      // Now call AI; user bubble already visible.
+      const res = await api.analyzeMedia(file, userText || '', conversationId, chatSession)
+
+      setConversationId(res.conversation_id)
+      if (res.relationship_level_up && res.new_relationship_level && res.new_relationship_level >= 2) {
+        setFunFactLevel(res.new_relationship_level)
+        setFunFactOpen(true)
+      }
+
+      const assistantMsg: MessageItem = {
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: res.reply,
+        detected_intent: res.detected_intent,
+        detected_emotion: res.detected_emotion,
+        avatar_action: res.avatar_action,
+      }
+      setMessages((prev) => [...prev, assistantMsg])
+
+      await fetchConversations()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to analyze media')
+    } finally {
+      setLoading(false)
+    }
+  }
+  
+  // Cancel image preview
+  const handleCancelImage = () => {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview.url)
+      setImagePreview(null)
+    }
+  }
+
+  // URL analysis handler (YouTube or web)
+  const handleUrlAnalysis = async () => {
+    const urlPattern = /https?:\/\/[^\s]+/
+    const urlMatch = input.match(urlPattern)
+    
+    if (!urlMatch) return false // No URL found, proceed with normal send
+
+    setError('')
+    setLoading(true)
+
+    try {
+      // Create a dummy file for the API (it will detect URL in message)
+      const dummyBlob = new Blob([''], { type: 'text/plain' })
+      const dummyFile = new File([dummyBlob], 'url.txt', { type: 'text/plain' })
+      
+      const res = await api.analyzeMedia(dummyFile, input, conversationId, chatSession)
+      
+      // Update conversation
+      setConversationId(res.conversation_id)
+      if (res.relationship_level_up && res.new_relationship_level && res.new_relationship_level >= 2) {
+        setFunFactLevel(res.new_relationship_level)
+        setFunFactOpen(true)
+      }
+
+      // Add user message
+      const userMsg: MessageItem = {
+        id: crypto.randomUUID(),
+        role: 'user',
+        content: input,
+      }
+
+      // Add assistant response
+      const assistantMsg: MessageItem = {
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: res.reply,
+        detected_intent: res.detected_intent,
+        detected_emotion: res.detected_emotion,
+        avatar_action: res.avatar_action,
+      }
+
+      setMessages((prev) => [...prev, userMsg, assistantMsg])
+      setInput('')
+      await fetchConversations()
+      
+      return true // URL was handled
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to analyze URL')
+      return true // Still handled, just failed
+    } finally {
+      setLoading(false)
+    }
+  }
   if (authLoading) {
     return <ConnectingVirFriendo />
   }
@@ -1156,24 +1617,18 @@ export default function Chat() {
   const composerBusy = chatPanelTab === 'chat' && (loading || streamingAwaiting)
 
   return (
-    <div className="ad-shell vf-chat-shell" id="top">
+    <div className="ad-shell vf-chat-shell vf-chat-cozy" id="top" data-mood={moodPreset}>
+      {/* Hidden YouTube iframe target for music player — survives drawer close */}
+      <div className="vf-music-iframe-host" aria-hidden>
+        <div id="pally-yt-player" />
+      </div>
       <AppTopbar />
       <div className="vf-chat-stage">
+        <CozyChatBg />
         <div className="vf-chat-body">
         <aside className="vf-chat-sidebar">
           <div className="vf-chat-sidebar-frame">
             <div className="vf-chat-sidebar-label">{displayName}</div>
-            <div className="vf-chat-sidebar-bond" aria-label={`Bond level ${relationshipLevel}`}>
-              <div className="vf-chat-hearts-row vf-chat-hearts-row--sidebar">
-                {Array.from({ length: RELATIONSHIP_HEART_SLOTS }).map((_, i) => (
-                  <RelationshipHeartIcon key={i} filled={i < heartsFilledFromLevel(relationshipLevel)} size={20} />
-                ))}
-              </div>
-              <p className="vf-chat-sidebar-bond-level">Relationship level {relationshipLevel}</p>
-              <p className="vf-chat-sidebar-bond-meta">
-                {userMessageCount} messages sent · {messagesUntilNextLevel(userMessageCount)} until next level
-              </p>
-            </div>
             <div className="vf-chat-sidebar-primary">
               <div className={`vf-chat-panel vf-chat-panel--model ${expressionClass}`}>
                 <div className="vf-chat-model-vtuber">
@@ -1187,34 +1642,226 @@ export default function Chat() {
         <main className="vf-chat-main">
           <nav className="vf-chat-tabs" aria-label="Chat sections">
             <div className="vf-chat-tabs-primary">
-              {(['chat', 'game', 'memory', 'diary', 'relationship'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  className={`vf-chat-tab${chatPanelTab === tab ? ' vf-chat-tab--active' : ''}`}
-                  onClick={() => setChatPanelTab(tab)}
-                >
-                  {tab === 'chat'
-                    ? 'Chat'
-                    : tab === 'game'
-                      ? 'Game'
-                      : tab === 'memory'
-                        ? 'Memory'
-                        : tab === 'diary'
-                          ? 'Diary'
-                          : 'Relationship'}
-                </button>
-              ))}
+              <button
+                type="button"
+                className={`vf-chat-tab${chatPanelTab === 'chat' ? ' vf-chat-tab--active' : ''}`}
+                onClick={() => setChatPanelTab('chat')}
+              >
+                Chat
+              </button>
+              {chatPanelTab !== 'chat' && (
+                <span className="vf-chat-tab-current" aria-live="polite">
+                  ›&nbsp;{chatPanelTab.charAt(0).toUpperCase() + chatPanelTab.slice(1)}
+                </span>
+              )}
             </div>
             <div className="vf-chat-tabs-actions" role="group" aria-label="Session">
-              <button type="button" className="vf-chat-tab vf-chat-tab--ghost" onClick={() => setConversationsPanelOpen(true)}>
-                Conversations
-              </button>
-              <button type="button" className="vf-chat-tab vf-chat-tab--ghost" onClick={() => setHistoryOpen(true)}>
-                History
+              <button
+                type="button"
+                className="vf-chat-gear"
+                onClick={() => setSettingsPanelOpen(true)}
+                title="Settings"
+                aria-label="Open chat settings"
+              >
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
               </button>
             </div>
           </nav>
+
+          {settingsPanelOpen && (
+            <div className="vf-chat-settings-overlay" onClick={() => setSettingsPanelOpen(false)}>
+              <aside
+                className="vf-chat-settings-drawer"
+                onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-label="Chat settings"
+              >
+                <header className="vf-chat-settings-head">
+                  <h3>Chat Settings</h3>
+                  <button type="button" className="vf-chat-settings-close" onClick={() => setSettingsPanelOpen(false)} aria-label="Close">
+                    ×
+                  </button>
+                </header>
+                <section className="vf-chat-settings-section">
+                  <label className="vf-chat-settings-label">View</label>
+                  <div className="vf-chat-settings-actions">
+                    {(['game', 'memory'] as const).map((tab) => (
+                      <button
+                        key={tab}
+                        type="button"
+                        className={`vf-chat-settings-action${chatPanelTab === tab ? ' is-active' : ''}`}
+                        onClick={() => {
+                          setChatPanelTab(tab)
+                          setSettingsPanelOpen(false)
+                        }}
+                      >
+                        <span className="vf-chat-settings-action-icon" aria-hidden>
+                          {tab === 'game' ? '🎮' : '🧠'}
+                        </span>
+                        {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="vf-chat-settings-section">
+                  <label className="vf-chat-settings-label">Session</label>
+                  <div className="vf-chat-settings-actions">
+                    <button
+                      type="button"
+                      className="vf-chat-settings-action"
+                      onClick={() => {
+                        setSettingsPanelOpen(false)
+                        setConversationsPanelOpen(true)
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                      </svg>
+                      Conversations
+                    </button>
+                    <button
+                      type="button"
+                      className="vf-chat-settings-action"
+                      onClick={() => {
+                        setSettingsPanelOpen(false)
+                        setHistoryOpen(true)
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <polyline points="3 3 3 8 8 8" />
+                        <polyline points="12 7 12 12 15 14" />
+                      </svg>
+                      History
+                    </button>
+                  </div>
+                </section>
+
+                <section className="vf-chat-settings-section">
+                  <label className="vf-chat-settings-label">Mood / Background</label>
+                  <div className="vf-chat-mood-grid">
+                    {(['cozy', 'cafe', 'garden', 'library', 'beach'] as const).map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setMoodPreset(m)}
+                        className={`vf-chat-mood-chip vf-chat-mood-chip--${m}${moodPreset === m ? ' is-active' : ''}`}
+                      >
+                        <span className="vf-chat-mood-swatch" aria-hidden />
+                        <span className="vf-chat-mood-name">{m}</span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+                <section className="vf-chat-settings-section">
+                  <label className="vf-chat-settings-label" htmlFor="vf-typing-speed">
+                    Typing speed: <span className="vf-chat-settings-val">{typingSpeedPct}%</span>
+                  </label>
+                  <input
+                    id="vf-typing-speed"
+                    type="range"
+                    min={10}
+                    max={200}
+                    step={10}
+                    value={typingSpeedPct}
+                    onChange={(e) => setTypingSpeedPct(Number(e.target.value))}
+                    className="vf-chat-settings-range"
+                  />
+                </section>
+                <section className="vf-chat-settings-section">
+                  <label className="vf-chat-settings-toggle">
+                    <input
+                      type="checkbox"
+                      checked={suggestionsEnabled}
+                      onChange={(e) => setSuggestionsEnabled(e.target.checked)}
+                    />
+                    <span>Show suggested replies</span>
+                  </label>
+                </section>
+
+                <section className="vf-chat-settings-section vf-music-section">
+                  <label className="vf-chat-settings-label">🎵 Music</label>
+                  <div className="vf-music-now">
+                    <span className="vf-music-now-icon" aria-hidden>{musicPlaying ? '🎶' : '⏸️'}</span>
+                    <span className="vf-music-now-title" title={musicTitle}>{musicTitle}</span>
+                  </div>
+                  <div className="vf-music-controls">
+                    <button type="button" className="vf-music-btn" onClick={musicPrev} title="Previous" aria-label="Previous">⏮</button>
+                    <button type="button" className="vf-music-btn vf-music-btn--play" onClick={musicToggle} title={musicPlaying ? 'Pause' : 'Play'} aria-label={musicPlaying ? 'Pause' : 'Play'}>
+                      {musicPlaying ? '⏸' : '▶'}
+                    </button>
+                    <button type="button" className="vf-music-btn" onClick={musicNext} title="Next" aria-label="Next">⏭</button>
+                    <button
+                      type="button"
+                      className={`vf-music-btn${musicLoop ? ' is-active' : ''}`}
+                      onClick={musicToggleLoop}
+                      title={`Loop ${musicLoop ? 'on' : 'off'}`}
+                      aria-pressed={musicLoop}
+                    >🔁</button>
+                    <button
+                      type="button"
+                      className={`vf-music-btn${musicShuffle ? ' is-active' : ''}`}
+                      onClick={musicToggleShuffle}
+                      title={`Shuffle ${musicShuffle ? 'on' : 'off'}`}
+                      aria-pressed={musicShuffle}
+                    >🔀</button>
+                  </div>
+                  <div className="vf-music-volume">
+                    <span aria-hidden>🔈</span>
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={musicVolume}
+                      onChange={(e) => musicSetVolume(Number(e.target.value))}
+                      className="vf-chat-settings-range"
+                      aria-label="Volume"
+                    />
+                    <span className="vf-music-volume-val">{musicVolume}</span>
+                  </div>
+                  <div className="vf-music-url">
+                    <input
+                      type="text"
+                      placeholder="YouTube video or playlist URL"
+                      value={musicUrlDraft}
+                      onChange={(e) => setMusicUrlDraft(e.target.value)}
+                      className="vf-music-url-input"
+                    />
+                    <button
+                      type="button"
+                      className="vf-music-url-load"
+                      onClick={() => {
+                        const url = musicUrlDraft.trim() || DEFAULT_MUSIC_URL
+                        setMusicUrl(url)
+                      }}
+                      disabled={musicUrlDraft.trim() === musicUrl}
+                    >Load</button>
+                  </div>
+                  <div className="vf-music-default">
+                    <button
+                      type="button"
+                      className="vf-music-default-btn"
+                      onClick={() => {
+                        setMusicUrlDraft(DEFAULT_MUSIC_URL)
+                        setMusicUrl(DEFAULT_MUSIC_URL)
+                      }}
+                      disabled={musicUrl === DEFAULT_MUSIC_URL}
+                    >Reset to lofi girl</button>
+                  </div>
+                </section>
+
+                <footer className="vf-chat-settings-foot">
+                  <p className="vf-chat-settings-hint">
+                    Tip: type <code>/</code> in the chat to see commands.
+                  </p>
+                </footer>
+              </aside>
+            </div>
+          )}
 
           <div className="vf-chat-pane">
             {chatPanelTab === 'chat' && (
@@ -1222,10 +1869,72 @@ export default function Chat() {
         <div className="vf-chat-chat-inner relative flex flex-col flex-1 min-h-0 vn-stage-bg">
               <div className="absolute inset-0 vn-stage-vignette pointer-events-none" aria-hidden />
               <div ref={messagesScrollRef} className="vf-chat-messages flex-1 overflow-y-auto px-2 sm:px-4 py-3 space-y-6 min-h-0">
+                {messages.length === 0 && !loading && (
+                  <div className="vf-chat-empty">
+                    <div className="vf-chat-empty-bubble">
+                      <span className="vf-chat-empty-emoji" aria-hidden>👂</span>
+                      <p className="vf-chat-empty-line">đang nghe nè</p>
+                      <p className="vf-chat-empty-sub">Nhắn gì cũng được — kể chuyện, hỏi, xả stress hay rủ chơi game đều ok.</p>
+                    </div>
+                  </div>
+                )}
                 {messages.map((msg, index) => {
-                  if (msg.role === 'user') {
+                  const isUser = msg.role === 'user'
+                  const actionsMenu = (
+                    <div className={`vf-chat-msg-actions${hoverMenuMsgId === msg.id ? ' is-open' : ''}`}>
+                      <button
+                        type="button"
+                        className="vf-chat-msg-actions-btn"
+                        aria-label="Message actions"
+                        onClick={() => setHoverMenuMsgId(hoverMenuMsgId === msg.id ? null : msg.id)}
+                      >
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden>
+                          <circle cx="5" cy="12" r="1.7" />
+                          <circle cx="12" cy="12" r="1.7" />
+                          <circle cx="19" cy="12" r="1.7" />
+                        </svg>
+                      </button>
+                      {hoverMenuMsgId === msg.id && (
+                        <div className="vf-chat-msg-actions-menu" role="menu">
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => {
+                              navigator.clipboard?.writeText(msg.content)
+                              setHoverMenuMsgId(null)
+                            }}
+                          >
+                            📋 Copy
+                          </button>
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => {
+                              setMessages((prev) => prev.filter((m) => m.id !== msg.id))
+                              setHoverMenuMsgId(null)
+                            }}
+                          >
+                            🗑️ Delete
+                          </button>
+                          {!isUser && index === messages.length - 1 && (
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={() => {
+                                setHoverMenuMsgId(null)
+                                void regenerateLastReply()
+                              }}
+                            >
+                              🔁 Regenerate
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                  if (isUser) {
                     return (
-                      <div key={msg.id} className="vf-chat-user-row">
+                      <div key={msg.id} className="vf-chat-user-row vf-chat-msg-row">
                         <div className="vf-chat-bubble vf-chat-bubble--user vf-chat-msg-pop">
                           <div className="vf-chat-user-head">
                             <div className="vf-chat-user-avatar-wrap vf-chat-user-avatar-wrap--inline" aria-hidden>
@@ -1234,17 +1943,31 @@ export default function Chat() {
                             <span className="vf-chat-bubble-who">You</span>
                           </div>
                           <div className="vf-chat-bubble-text-wrap vf-chat-user-text">
-                            <div className="vf-chat-bubble-text vf-chat-bubble-text--md">
-                              <ChatMarkdown text={msg.content} variant="user" />
-                            </div>
+                            {/* Display image if present */}
+                            {msg.imageData && (
+                              <div className="mb-2">
+                                <img 
+                                  src={msg.imageData} 
+                                  alt="Uploaded" 
+                                  className="max-w-[80px] max-h-[80px] object-contain rounded border border-vn-inputBorder"
+                                />
+                              </div>
+                            )}
+                            {msg.content && (
+                              <div className="vf-chat-bubble-text vf-chat-bubble-text--md">
+                                <ChatMarkdown text={msg.content} variant="user" />
+                              </div>
+                            )}
                           </div>
+                          {actionsMenu}
                         </div>
                       </div>
                     )
                   }
                   return (
-                    <div key={msg.id} className="vf-chat-narrative-row">
+                    <div key={msg.id} className="vf-chat-narrative-row vf-chat-msg-row">
                       <div className="vf-chat-narrative-inner">{renderAssistantNarrative(msg, index)}</div>
+                      {actionsMenu}
                     </div>
                   )
                 })}
@@ -1258,8 +1981,63 @@ export default function Chat() {
           </div>
               )}
 
-              <div className="flex-shrink-0 border-t border-vn-dialogueBorder/50 bg-vn-dialogue/60 backdrop-blur-sm p-4">
-          <div className="mx-auto max-w-3xl w-full px-2">
+              <div className="flex-shrink-0 border-t border-vn-dialogueBorder/50 bg-vn-dialogue/60 backdrop-blur-sm p-4 relative">
+          <div className="mx-auto max-w-3xl w-full px-2 relative">
+            {/* Slash command palette */}
+            {slashOpen && !composerBusy && (
+              <div className="vf-chat-slash-palette" role="listbox" aria-label="Slash commands">
+                {SLASH_COMMANDS.filter((c) => c.cmd.includes(slashFilter.toLowerCase())).map((c) => (
+                  <button
+                    key={c.cmd}
+                    type="button"
+                    className="vf-chat-slash-item"
+                    onClick={() => {
+                      setSlashOpen(false)
+                      setInput('')
+                      if (c.cmd === 'clear') {
+                        setMessages([])
+                      } else if (c.cmd === 'regen') {
+                        void regenerateLastReply()
+                      } else if (c.cmd === 'continue') {
+                        void sendText('Please continue.')
+                      } else if (c.cmd === 'narrate') {
+                        void sendText('Reply in a short narrative scene-style description.')
+                      } else if (c.cmd === 'ooc') {
+                        setInput('(OOC) ')
+                      } else if (c.cmd === 'imagine') {
+                        // Pre-fill — user types prompt then submits
+                        setInput('/imagine ')
+                      } else if (c.cmd.startsWith('mood ')) {
+                        // placeholder for Live2D emotion hook (no AI call)
+                      } else {
+                        setInput('/' + c.cmd + ' ')
+                      }
+                    }}
+                  >
+                    <span className="vf-chat-slash-cmd">/{c.cmd}</span>
+                    <span className="vf-chat-slash-desc">{c.desc}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Suggested replies — clickable chips that fill the input */}
+            {suggestionsEnabled && !composerBusy && !slashOpen && messages.length > 0 && (
+              <div className="vf-chat-suggestions" aria-label="Suggested replies">
+                {SUGGESTED_REPLIES.slice(0, 2).map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    className="vf-chat-suggest-chip"
+                    onClick={() => setInput(s)}
+                    title="Click to use this reply"
+                  >
+                    💡 {s}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {composerBusy ? (
               <div
                 className="vf-chat-rabbit-only flex w-full min-h-[3rem] items-center justify-center py-2"
@@ -1268,25 +2046,117 @@ export default function Chat() {
                 <ChatRabbitWait variant="inline" phase={loading ? 'search' : 'writing'} />
               </div>
             ) : (
-              <form
-                onSubmit={handleSend}
-                className="flex h-12 w-full shrink-0 items-center gap-2 rounded-2xl border border-vn-dialogueBorder bg-vn-stage/80 pl-2 pr-2 shadow-vn-inner animate-vn-fade-in focus-within:ring-2 focus-within:ring-vn-nameGlow/40 focus-within:border-vn-nameGlow/50 motion-reduce:animate-none"
-              >
+              <div className="relative w-full">
+                {/* Image Preview Popup */}
+                {imagePreview && (
+                  <div className="absolute bottom-full left-0 mb-2 bg-vn-cardBg border border-vn-inputBorder rounded-lg p-1.5 shadow-xl z-10">
+                    <div className="relative">
+                      {imagePreview.file.type.startsWith('image/') ? (
+                        <img
+                          src={imagePreview.url}
+                          alt="Preview"
+                          className="w-20 h-20 object-cover rounded"
+                        />
+                      ) : (
+                        <video
+                          src={imagePreview.url}
+                          className="w-20 h-20 object-cover rounded"
+                          muted
+                        />
+                      )}
+                      <button
+                        type="button"
+                        onClick={handleCancelImage}
+                        className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition shadow-lg text-xs font-bold"
+                        title="Remove"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                <form
+                  onSubmit={handleSend}
+                  className="flex h-12 w-full shrink-0 items-center gap-2 rounded-2xl border border-vn-dialogueBorder bg-vn-stage/80 pl-2 pr-2 shadow-vn-inner animate-vn-fade-in focus-within:ring-2 focus-within:ring-vn-nameGlow/40 focus-within:border-vn-nameGlow/50 motion-reduce:animate-none"
+                >
                 <input
                   type="text"
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type a message..."
+                  onChange={(e) => {
+                    const v = e.target.value
+                    setInput(v)
+                    if (v.startsWith('/')) {
+                      setSlashOpen(true)
+                      setSlashFilter(v.slice(1).toLowerCase())
+                    } else {
+                      setSlashOpen(false)
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape' && slashOpen) {
+                      setSlashOpen(false)
+                    }
+                  }}
+                  onPaste={(e) => {
+                    const items = e.clipboardData?.items
+                    if (!items) return
+                    for (let i = 0; i < items.length; i++) {
+                      const it = items[i]
+                      if (it.kind === 'file' && (it.type.startsWith('image/') || it.type.startsWith('video/'))) {
+                        const file = it.getAsFile()
+                        if (file) {
+                          e.preventDefault()
+                          if (imagePreview) URL.revokeObjectURL(imagePreview.url)
+                          const previewUrl = URL.createObjectURL(file)
+                          setImagePreview({ file, url: previewUrl })
+                          break
+                        }
+                      }
+                    }
+                  }}
+                  placeholder="Type, paste image/video, or upload... (/ for commands)"
                   className="flex-1 min-w-0 bg-transparent px-3 py-2 text-vn-text placeholder-vn-textDim outline-none rounded-2xl text-[0.9375rem] leading-snug"
                   disabled={loading || streamingAwaiting}
                 />
-                <button type="button" className="flex-shrink-0 p-2 rounded-xl text-vn-textDim hover:bg-white/10 hover:text-vn-text transition" title="Voice (coming soon)">
+                
+                {/* Image/Video Upload Button */}
+                <label className="flex-shrink-0 p-2 rounded-xl text-vn-textDim hover:bg-white/10 hover:text-vn-text transition cursor-pointer" title="Upload image or video">
+                  <input
+                    type="file"
+                    accept="image/*,video/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    disabled={loading || streamingAwaiting}
+                  />
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </label>
+                
+                {/* Voice Recording Button */}
+                <button 
+                  type="button" 
+                  onClick={handleVoiceToggle}
+                  className={`flex-shrink-0 p-2 rounded-xl transition relative ${
+                    isRecording 
+                      ? 'text-red-400 bg-red-400/20 animate-pulse' 
+                      : 'text-vn-textDim hover:bg-white/10 hover:text-vn-text'
+                  }`}
+                  title={isRecording ? "Click to stop recording" : "Click to start voice recording"}
+                  disabled={loading || streamingAwaiting}
+                >
                   <IconMic className="w-5 h-5" />
+                  {isRecording && (
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping" />
+                  )}
                 </button>
+                
                 <button type="submit" disabled={loading || !input.trim() || streamingAwaiting} className="flex-shrink-0 p-2 rounded-xl text-vn-name hover:bg-vn-nameGlow/20 disabled:opacity-40 disabled:hover:bg-transparent transition" title="Send">
                   <IconSend className="w-5 h-5" />
                 </button>
               </form>
+              </div>
             )}
           </div>
         </div>
@@ -2044,8 +2914,6 @@ export default function Chat() {
                   <TetrisGame onExit={() => setActiveGame(null)} />
                 ) : activeGame === 'Snake' ? (
                   <SnakeGame onExit={() => setActiveGame(null)} />
-                ) : activeGame === 'Ringrealms' ? (
-                  <AncientRtsGame onExit={() => setActiveGame(null)} />
                 ) : activeGame ? (
                   <div className="flex flex-col flex-1 min-h-[200px] items-center justify-center gap-4 px-2">
                     <div className="rounded-xl border border-vn-dialogueBorder bg-vn-stageLight/70 min-h-[160px] w-full max-w-md flex flex-col items-center justify-center text-center px-4 py-6">
@@ -2113,66 +2981,6 @@ export default function Chat() {
                     </ul>
                   )}
                 </div>
-              </div>
-            )}
-            {chatPanelTab === 'diary' && (
-              <div className="vf-chat-subpane flex flex-col flex-1 min-h-0 overflow-auto p-4 vn-stage-bg">
-                <h2 className="text-sm font-semibold text-vn-name mb-2">Diary</h2>
-                <p className="text-xs text-vn-textDim mb-3">Private notes about this AI — saved to your account.</p>
-                <textarea
-                  value={diaryDraft}
-                  onChange={(e) => setDiaryDraft(e.target.value)}
-                  rows={5}
-                  placeholder="How is the AI doing? Write anything..."
-                  className="w-full rounded-xl border border-vn-dialogueBorder bg-vn-stage/80 px-3 py-2 text-sm text-vn-text placeholder-vn-textDim outline-none focus:ring-2 focus:ring-vn-nameGlow/30 mb-3"
-                />
-                {diaryError ? <p className="text-sm text-red-300 mb-2">{diaryError}</p> : null}
-                <button
-                  type="button"
-                  onClick={() => void saveDiary()}
-                  disabled={diarySaving || !diaryDraft.trim()}
-                  className="mb-6 rounded-xl border border-vn-nameGlow/50 bg-vn-nameGlow/15 px-4 py-2 text-sm text-vn-name hover:bg-vn-nameGlow/25 disabled:opacity-40 transition"
-                >
-                  {diarySaving ? 'Saving…' : 'Save entry'}
-                </button>
-                <h3 className="text-xs font-semibold text-vn-textDim uppercase tracking-wide mb-2">Past entries</h3>
-                {diaryLoading ? (
-                  <p className="text-vn-textDim text-sm">Loading…</p>
-                ) : diaryEntries.length === 0 ? (
-                  <p className="text-vn-textDim text-sm">No diary entries yet.</p>
-                ) : (
-                  <ul className="space-y-3">
-                    {diaryEntries.map((d) => (
-                      <li
-                        key={d.id}
-                        className="rounded-xl border border-vn-dialogueBorder bg-vn-stageLight/50 px-3 py-2 text-sm text-vn-text whitespace-pre-wrap"
-                      >
-                        <p className="text-xs text-vn-textDim mb-1">{new Date(d.created_at).toLocaleString()}</p>
-                        {d.content}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
-            {chatPanelTab === 'relationship' && (
-              <div className="vf-chat-subpane vf-chat-relationship-pane flex flex-col flex-1 min-h-0 overflow-auto p-4 sm:p-6 vn-stage-bg">
-                <h2 className="vf-chat-relationship-title">Relationship</h2>
-                <p className="vf-chat-relationship-sub">with {displayName}</p>
-                <div className="vf-chat-hearts-row vf-chat-hearts-row--detail" aria-label={`Bond: ${heartsFilledFromLevel(relationshipLevel)} of ${RELATIONSHIP_HEART_SLOTS} hearts`}>
-                  {Array.from({ length: RELATIONSHIP_HEART_SLOTS }).map((_, i) => (
-                    <RelationshipHeartIcon key={i} filled={i < heartsFilledFromLevel(relationshipLevel)} size={32} />
-                  ))}
-                </div>
-                <p className="vf-chat-relationship-level">Level {relationshipLevel}</p>
-                <p className="vf-chat-relationship-progress">
-                  {userMessageCount} messages sent · {messagesUntilNextLevel(userMessageCount)} until next level
-                </p>
-                {relationshipLevel > RELATIONSHIP_HEART_SLOTS ? (
-                  <p className="vf-chat-relationship-note text-xs text-vn-textDim mt-2">
-                    Max hearts shown — your bond continues to grow beyond level {RELATIONSHIP_HEART_SLOTS}.
-                  </p>
-                ) : null}
               </div>
             )}
           </div>
@@ -2261,7 +3069,10 @@ export default function Chat() {
             </div>
             <div className="flex-1 overflow-y-auto p-4">
               {conversationsLoading ? (
-                <p className="text-vn-textDim text-sm">Loading...</p>
+                <div className="vf-chat-loading-row">
+                  <span className="vf-chat-spinner" aria-hidden />
+                  <span>Loading…</span>
+                </div>
               ) : conversations.length === 0 ? (
                 <p className="text-vn-textDim text-sm">No conversations yet.</p>
               ) : (
@@ -2320,7 +3131,10 @@ export default function Chat() {
               {!conversationId ? (
                 <p className="text-vn-textDim text-sm">Select or start a conversation to see history.</p>
               ) : historyLoading ? (
-                <p className="text-vn-textDim text-sm">Loading...</p>
+                <div className="vf-chat-loading-row">
+                  <span className="vf-chat-spinner" aria-hidden />
+                  <span>Loading…</span>
+                </div>
               ) : historyMessages.length === 0 ? (
                 <p className="text-vn-textDim text-sm">No messages in this conversation yet.</p>
               ) : (

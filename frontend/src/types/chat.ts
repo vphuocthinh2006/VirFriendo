@@ -25,6 +25,8 @@ export interface MessageItem {
   id: string
   role: 'user' | 'assistant'
   content: string
+  /** Base64 image data for user messages with images */
+  imageData?: string
   /** Chunks để hiển thị từ từ (chỉ cho assistant). */
   chunks?: string[]
   /** Chỉ số chunk đang hiển thị (0 = chỉ chunk đầu). */

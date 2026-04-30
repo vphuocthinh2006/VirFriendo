@@ -426,6 +426,19 @@ export async function sendMessage(
   return handleResponse(res)
 }
 
+export async function imagineImage(
+  prompt: string,
+  conversationId: string | null,
+  aspectRatio: '1:1' | '16:9' | '9:16' | '4:3' | '3:4' = '1:1',
+): Promise<{ conversation_id: string; image_url: string; prompt: string }> {
+  const res = await fetch(`${API_BASE}/chat/imagine`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ prompt, conversation_id: conversationId, aspect_ratio: aspectRatio }),
+  })
+  return handleResponse(res)
+}
+
 export async function getConversations() {
   const res = await fetch(`${API_BASE}/chat/conversations`, { headers: headers() })
   return handleResponse(res)
@@ -506,4 +519,65 @@ export async function ackAgentFunFact(agentId: string, level: number): Promise<v
     const detail = (await res.json().catch(() => ({})))?.detail ?? res.statusText
     throw new Error(typeof detail === 'string' ? detail : JSON.stringify(detail))
   }
+}
+
+// --- Voice Transcription ---
+export type TranscribeResponse = {
+  text: string
+  language: string | null
+}
+
+export async function transcribeAudio(audioBlob: Blob): Promise<TranscribeResponse> {
+  const formData = new FormData()
+  formData.append('file', audioBlob, 'audio.webm')
+  
+  const token = getToken()
+  const res = await fetch(`${API_BASE}/chat/transcribe`, {
+    method: 'POST',
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : '',
+    },
+    body: formData,
+  })
+  return handleResponse<TranscribeResponse>(res)
+}
+
+// --- Image/Video Analysis ---
+export type MediaAnalysisResponse = {
+  conversation_id: string
+  reply: string
+  detected_intent: string | null
+  detected_emotion: string | null
+  avatar_action: string | null
+  user_message_count: number | null
+  relationship_level: number | null
+  relationship_level_up: boolean
+  new_relationship_level: number | null
+}
+
+export async function analyzeMedia(
+  file: File,
+  message: string,
+  conversationId: string | null,
+  session?: ChatSessionContext | null,
+): Promise<MediaAnalysisResponse> {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('message', message)
+  if (conversationId) formData.append('conversation_id', conversationId)
+  if (session?.agent_id) formData.append('agent_id', session.agent_id)
+  if (session?.entry_mode) formData.append('entry_mode', session.entry_mode)
+  if (session?.persona) formData.append('persona', session.persona)
+  if (session?.character_name) formData.append('character_name', session.character_name)
+  if (session?.gender) formData.append('gender', session.gender)
+  
+  const token = getToken()
+  const res = await fetch(`${API_BASE}/chat/analyze-media`, {
+    method: 'POST',
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : '',
+    },
+    body: formData,
+  })
+  return handleResponse<MediaAnalysisResponse>(res)
 }

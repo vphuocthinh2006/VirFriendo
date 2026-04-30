@@ -10,7 +10,15 @@ langgraph
 langchain
 langchain-groq
 langchain-openai
+langchain-anthropic
 openai>=1.40.0
+groq>=0.4.0
+google-generativeai>=0.8.0
+Pillow>=10.0.0
+deepgram-sdk>=3.0.0
+replicate>=1.0.0
+youtube-transcript-api>=0.6.0
+beautifulsoup4>=4.12.0
 
 transformers
 torch

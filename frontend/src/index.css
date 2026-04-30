@@ -4,24 +4,29 @@
 
 html {
   scroll-behavior: smooth;
-  scrollbar-color: rgba(59, 130, 246, 0.45) rgba(191, 219, 254, 0.4);
+  scrollbar-color: rgba(166, 209, 125, 0.6) rgba(255, 240, 192, 0.4);
 }
 
-/* Cloud theme: trắng + xanh dương friendly */
+/* Fanhua theme: cream + green + red, black text */
 :root {
-  --bg3-black: #f0f6ff;
-  --bg3-black-rich: #e0ecff;
-  --bg3-gold: #3b82f6;
-  --bg3-gold-bright: #60a5fa;
-  --bg3-gold-deep: #1e40af;
-  --bg3-text: #1e3a5f;
+  --bg3-black: #fff9e6;
+  --bg3-black-rich: #fdf4d4;
+  --bg3-gold: #a6d17d;
+  --bg3-gold-bright: #b8dc92;
+  --bg3-gold-deep: #7ba94f;
+  --bg3-text: #1a1a1a;
+  --fanhua-red: #fa6255;
+  --fanhua-red-bright: #fc7d70;
+  --fanhua-yellow: #fdcb46;
+  --fanhua-cream: #fff9e6;
+  --fanhua-cream-deep: #fdf4d4;
   --bg3-font-display: "Cinzel", "Georgia", serif;
   --bg3-font-body: "Pixelify Sans", "Courier New", monospace;
 }
 
 ::selection {
-  background: rgba(59, 130, 246, 0.28);
-  color: #1e3a5f;
+  background: rgba(250, 98, 85, 0.28);
+  color: #1a1a1a;
 }
 
 ::-webkit-scrollbar {
@@ -30,17 +35,17 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(191, 219, 254, 0.35);
+  background: rgba(253, 244, 212, 0.55);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(96, 165, 250, 0.7), rgba(59, 130, 246, 0.8));
+  background: linear-gradient(180deg, rgba(184, 220, 146, 0.85), rgba(166, 209, 125, 0.95));
   border-radius: 4px;
-  border: 1px solid rgba(59, 130, 246, 1.0);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(96, 165, 250, 0.9), rgba(37, 99, 235, 0.9));
+  background: linear-gradient(180deg, rgba(184, 220, 146, 1), rgba(123, 169, 79, 0.95));
 }
 
 body {
@@ -48,10 +53,10 @@ body {
   color: var(--bg3-text);
   font-family: var(--bg3-font-body);
   background:
-    radial-gradient(ellipse 95% 65% at 50% -18%, rgba(96, 165, 250, 0.22), transparent 58%),
-    radial-gradient(ellipse 55% 48% at 0% 100%, rgba(186, 230, 253, 0.55), transparent 52%),
-    radial-gradient(ellipse 55% 48% at 100% 100%, rgba(191, 219, 254, 0.55), transparent 52%),
-    linear-gradient(180deg, #f0f6ff 0%, #e0ecff 55%, #cfe1ff 100%);
+    radial-gradient(ellipse 95% 65% at 50% -18%, rgba(166, 209, 125, 0.18), transparent 58%),
+    radial-gradient(ellipse 55% 48% at 0% 100%, rgba(253, 203, 70, 0.22), transparent 52%),
+    radial-gradient(ellipse 55% 48% at 100% 100%, rgba(250, 98, 85, 0.16), transparent 52%),
+    linear-gradient(180deg, #fff9e6 0%, #fdf4d4 55%, #fff0c0 100%);
 }
 
 #root {
@@ -92,7 +97,7 @@ body {
   font-family: var(--bg3-font-body);
   font-size: 0.82rem;
   letter-spacing: 0.04em;
-  color: rgba(100, 116, 139, 0.85);
+  color: rgba(107, 107, 107, 0.85);
   text-decoration: none;
   transition: color 0.2s ease;
 }
@@ -106,19 +111,19 @@ body {
   width: min(420px, 100%);
   padding: clamp(1.75rem, 4vw, 2.35rem) clamp(1.35rem, 4vw, 2rem) clamp(2rem, 4vw, 2.5rem);
   border-radius: 3px;
-  border: 1px solid rgba(59, 130, 246, 0.38);
-  background: linear-gradient(165deg, rgba(224, 236, 255, 0.98) 0%, rgba(240, 246, 255, 0.99) 100%);
+  border: 1px solid rgba(166, 209, 125, 0.38);
+  background: linear-gradient(165deg, rgba(253, 244, 212, 0.98) 0%, rgba(255, 249, 230, 0.99) 100%);
   box-shadow:
-    inset 0 0 0 1px rgba(30, 58, 95, 0.275),
-    inset 0 1px 0 rgba(30, 58, 95, 0.08),
-    0 0 40px rgba(59, 130, 246, 0.06),
-    0 28px 70px rgba(30, 58, 95, 0.275);
+    inset 0 0 0 1px rgba(26, 26, 26, 0.275),
+    inset 0 1px 0 rgba(26, 26, 26, 0.08),
+    0 0 40px rgba(166, 209, 125, 0.06),
+    0 28px 70px rgba(26, 26, 26, 0.275);
 }
 
 .aid-auth-card__rim {
   position: absolute;
   inset: 5px;
-  border: 1px solid rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(166, 209, 125, 0.1);
   border-radius: 1px;
   pointer-events: none;
   opacity: 0.85;
@@ -134,10 +139,10 @@ body {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   text-align: center;
-  color: #1e40af;
+  color: #fa6255;
   text-shadow:
-    0 2px 0 rgba(30, 58, 95, 0.225),
-    0 0 24px rgba(59, 130, 246, 0.12);
+    0 2px 0 rgba(26, 26, 26, 0.225),
+    0 0 24px rgba(166, 209, 125, 0.12);
 }
 
 .aid-auth-subtitle {
@@ -149,7 +154,7 @@ body {
   line-height: 1.5;
   text-align: center;
   font-style: italic;
-  color: rgba(100, 116, 139, 0.88);
+  color: rgba(107, 107, 107, 0.88);
 }
 
 .aid-auth-stack {
@@ -225,7 +230,7 @@ body {
 .aid-auth-or__line {
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.35), transparent);
+  background: linear-gradient(90deg, transparent, rgba(166, 209, 125, 0.35), transparent);
 }
 
 .aid-auth-or__text {
@@ -233,7 +238,7 @@ body {
   font-size: 0.68rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(100, 116, 139, 0.85);
+  color: rgba(107, 107, 107, 0.85);
   white-space: nowrap;
 }
 
@@ -256,7 +261,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(30, 58, 95, 0.9);
+  color: rgba(26, 26, 26, 0.9);
 }
 
 .aid-auth-label-row {
@@ -270,13 +275,13 @@ body {
   font-family: var(--bg3-font-body);
   font-size: 0.78rem;
   font-style: italic;
-  color: #60a5fa;
+  color: #b8dc92;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .aid-auth-forgot:hover {
-  color: #1e40af;
+  color: #fa6255;
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -285,28 +290,28 @@ body {
   width: 100%;
   box-sizing: border-box;
   border-radius: 3px;
-  border: 1px solid rgba(224, 236, 255, 0.65);
-  background: rgba(224, 236, 255, 0.85);
-  color: #1e3a5f;
+  border: 1px solid rgba(253, 244, 212, 0.65);
+  background: rgba(253, 244, 212, 0.85);
+  color: #1a1a1a;
   padding: 0.65rem 0.8rem;
   font-family: var(--bg3-font-body);
   font-size: 0.95rem;
   outline: none;
-  box-shadow: inset 0 2px 6px rgba(30, 58, 95, 0.19);
+  box-shadow: inset 0 2px 6px rgba(26, 26, 26, 0.19);
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
 }
 
 .aid-auth-input::placeholder {
-  color: rgba(100, 116, 139, 0.55);
+  color: rgba(107, 107, 107, 0.55);
 }
 
 .aid-auth-input:focus {
-  border-color: rgba(59, 130, 246, 0.55);
+  border-color: rgba(166, 209, 125, 0.55);
   box-shadow:
-    inset 0 2px 6px rgba(30, 58, 95, 0.175),
-    0 0 0 1px rgba(59, 130, 246, 0.2);
+    inset 0 2px 6px rgba(26, 26, 26, 0.175),
+    0 0 0 1px rgba(166, 209, 125, 0.2);
 }
 
 .aid-auth-submit {
@@ -331,7 +336,7 @@ body {
 }
 
 .aid-auth-msg--error {
-  color: #fecaca;
+  color: #fdcb46;
   background: rgba(127, 29, 29, 0.35);
   border: 1px solid rgba(248, 113, 113, 0.35);
 }
@@ -347,11 +352,11 @@ body {
   text-align: center;
   font-family: var(--bg3-font-body);
   font-size: 0.88rem;
-  color: rgba(100, 116, 139, 0.88);
+  color: rgba(107, 107, 107, 0.88);
 }
 
 .aid-auth-footer-link {
-  color: #60a5fa;
+  color: #b8dc92;
   font-weight: 600;
   letter-spacing: 0.03em;
   text-decoration: none;
@@ -359,7 +364,7 @@ body {
 }
 
 .aid-auth-footer-link:hover {
-  color: #1e40af;
+  color: #fa6255;
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -401,14 +406,14 @@ body {
 
 /* Home / landing / auth: mỏng — nhìn xuyên rõ body / shell phía sau */
 .vf-connect-overlay--marketing::before {
-  background: rgba(224, 236, 255, 0.2);
+  background: rgba(253, 244, 212, 0.2);
   backdrop-filter: blur(22px) saturate(1.08);
   -webkit-backdrop-filter: blur(22px) saturate(1.08);
 }
 
 /* Trong app (vd. /chat đang auth check): hơi đậm hơn nhưng vẫn kính */
 .vf-connect-overlay--app::before {
-  background: rgba(224, 236, 255, 0.35);
+  background: rgba(253, 244, 212, 0.35);
   backdrop-filter: blur(24px) saturate(1.08);
   -webkit-backdrop-filter: blur(24px) saturate(1.08);
 }
@@ -420,11 +425,11 @@ body {
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .vf-connect-overlay--marketing::before {
-    background: rgba(30, 58, 95, 0.225);
+    background: rgba(26, 26, 26, 0.225);
   }
 
   .vf-connect-overlay--app::before {
-    background: rgba(30, 58, 95, 0.29);
+    background: rgba(26, 26, 26, 0.29);
   }
 }
 
@@ -435,12 +440,12 @@ body {
   width: min(100%, 460px);
   padding: clamp(1rem, 4vw, 1.65rem) clamp(1.1rem, 4vw, 1.85rem);
   border-radius: 14px;
-  border: 1px solid rgba(59, 130, 246, 0.35);
-  background: linear-gradient(168deg, #dbeafe, #f0f6ff);
+  border: 1px solid rgba(166, 209, 125, 0.35);
+  background: linear-gradient(168deg, #fdf4d4, #fff9e6);
   box-shadow:
-    0 0 0 1px rgba(30, 58, 95, 0.275) inset,
-    0 0 32px rgba(59, 130, 246, 0.06),
-    0 28px 64px rgba(30, 58, 95, 0.325);
+    0 0 0 1px rgba(26, 26, 26, 0.275) inset,
+    0 0 32px rgba(166, 209, 125, 0.06),
+    0 28px 64px rgba(26, 26, 26, 0.325);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -453,9 +458,9 @@ body {
   font-size: clamp(1.42rem, 4.2vw, 1.9rem);
   font-weight: 600;
   letter-spacing: 0.03em;
-  color: rgba(30, 58, 95, 0.98);
+  color: rgba(26, 26, 26, 0.98);
   text-align: center;
-  text-shadow: 0 2px 20px rgba(30, 58, 95, 0.275);
+  text-shadow: 0 2px 20px rgba(26, 26, 26, 0.275);
 }
 
 .vf-connect-tagline {
@@ -465,7 +470,7 @@ body {
   font-size: clamp(0.76rem, 2vw, 0.88rem);
   font-weight: 400;
   letter-spacing: 0.05em;
-  color: rgba(30, 58, 95, 0.75);
+  color: rgba(26, 26, 26, 0.75);
   text-align: center;
   line-height: 1.5;
 }
@@ -474,16 +479,16 @@ body {
   width: min(100%, 300px);
   height: 5px;
   border-radius: 999px;
-  background: rgba(30, 58, 95, 0.225);
+  background: rgba(26, 26, 26, 0.225);
   overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(100, 116, 139, 0.2) inset;
+  box-shadow: 0 0 0 1px rgba(107, 107, 107, 0.2) inset;
 }
 
 .vf-connect-progress__fill {
   height: 100%;
   width: 0;
   border-radius: inherit;
-  background: linear-gradient(90deg, #1e40af, #3b82f6, #dbeafe, #3b82f6, #1e40af);
+  background: linear-gradient(90deg, #fa6255, #a6d17d, #fdf4d4, #a6d17d, #fa6255);
   background-size: 180% 100%;
   animation: vf-connect-progress-fill var(--vf-connect-load-ms, 3.6s) cubic-bezier(0.18, 0.82, 0.22, 1) forwards;
 }
@@ -534,8 +539,8 @@ body {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 3px solid rgba(59, 130, 246, 0.22);
-  border-top-color: rgba(96, 165, 250, 0.88);
+  border: 3px solid rgba(166, 209, 125, 0.22);
+  border-top-color: rgba(184, 220, 146, 0.88);
   animation: vf-connect-spin 0.8s linear infinite;
 }
 
@@ -548,7 +553,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .vf-connect-css-spinner {
     animation: none;
-    border-color: rgba(96, 165, 250, 0.45);
+    border-color: rgba(184, 220, 146, 0.45);
   }
 }
 
@@ -559,7 +564,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(30, 58, 95, 0.82);
+  color: rgba(26, 26, 26, 0.82);
   text-align: center;
 }
 
@@ -567,60 +572,60 @@ body {
   width: 100%;
   max-width: 28rem;
   border-radius: 1rem;
-  border: 1px solid rgba(59, 130, 246, 0.22);
-  background: linear-gradient(180deg, #ffffff, #f0f6ff);
-  box-shadow: 0 24px 60px rgba(30, 58, 95, 0.275);
+  border: 1px solid rgba(166, 209, 125, 0.22);
+  background: linear-gradient(180deg, #ffffff, #fff9e6);
+  box-shadow: 0 24px 60px rgba(26, 26, 26, 0.275);
   padding: 1.25rem;
 }
 
 .vf-hero-card {
   width: min(92vw, 960px);
   border-radius: 1.25rem;
-  border: 1px solid rgba(59, 130, 246, 0.18);
-  background: linear-gradient(180deg, #ffffff, #f0f6ff);
-  box-shadow: 0 30px 80px rgba(30, 58, 95, 0.275);
+  border: 1px solid rgba(166, 209, 125, 0.18);
+  background: linear-gradient(180deg, #ffffff, #fff9e6);
+  box-shadow: 0 30px 80px rgba(26, 26, 26, 0.275);
   padding: clamp(1.25rem, 3vw, 2.2rem);
 }
 
 .vf-input {
   width: 100%;
   border-radius: 0.75rem;
-  border: 1px solid rgba(59, 130, 246, 0.72);
-  background: rgba(59, 130, 246, 0.16);
-  color: #1e3a5f;
+  border: 1px solid rgba(166, 209, 125, 0.72);
+  background: rgba(166, 209, 125, 0.16);
+  color: #1a1a1a;
   padding: 0.65rem 0.8rem;
   outline: none;
 }
 
 .vf-input:focus {
-  border-color: rgba(59, 130, 246, 1.0);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.32);
+  border-color: rgba(166, 209, 125, 1.0);
+  box-shadow: 0 0 0 2px rgba(166, 209, 125, 0.32);
 }
 
 .vf-btn-primary {
   border-radius: 0.75rem;
-  border: 1px solid rgba(59, 130, 246, 0.88);
-  background: linear-gradient(180deg, #dbeafe, #f0f6ff);
-  color: #1e3a5f;
+  border: 1px solid rgba(166, 209, 125, 0.88);
+  background: linear-gradient(180deg, #fdf4d4, #fff9e6);
+  color: #1a1a1a;
   padding: 0.65rem 0.8rem;
   font-weight: 600;
 }
 
 .vf-btn-primary:hover {
-  background: linear-gradient(180deg, #bfdbfe, #e0ecff);
+  background: linear-gradient(180deg, #a6d17d, #fdf4d4);
 }
 
 .vf-btn-ghost {
   border-radius: 0.75rem;
-  border: 1px solid rgba(59, 130, 246, 0.8);
-  background: rgba(59, 130, 246, 0.16);
-  color: #1e3a5f;
+  border: 1px solid rgba(166, 209, 125, 0.8);
+  background: rgba(166, 209, 125, 0.16);
+  color: #1a1a1a;
   padding: 0.65rem 0.8rem;
   font-weight: 500;
 }
 
 .vf-btn-ghost:hover {
-  background: rgba(59, 130, 246, 0.4);
+  background: rgba(166, 209, 125, 0.4);
 }
 
 @keyframes vf-fade-inout {
@@ -666,7 +671,7 @@ body {
 }
 
 .vf-landing-brand {
-  color: #1e3a5f;
+  color: #1a1a1a;
   font-weight: 700;
   letter-spacing: 0.22em;
   font-size: 1.45rem;
@@ -678,13 +683,13 @@ body {
   border-radius: 999px;
   padding: 0.45rem 0.95rem;
   font-size: 0.78rem;
-  border: 1px solid rgba(59, 130, 246, 0.56);
+  border: 1px solid rgba(166, 209, 125, 0.56);
   transition: 180ms ease;
 }
 
 .vf-top-btn-primary {
-  color: #1e3a5f;
-  background: #f0f6ff;
+  color: #1a1a1a;
+  background: #fff9e6;
 }
 
 .vf-top-btn-primary:hover {
@@ -692,12 +697,12 @@ body {
 }
 
 .vf-top-btn-ghost {
-  color: #1e3a5f;
-  background: rgba(59, 130, 246, 0.16);
+  color: #1a1a1a;
+  background: rgba(166, 209, 125, 0.16);
 }
 
 .vf-top-btn-ghost:hover {
-  background: rgba(59, 130, 246, 0.48);
+  background: rgba(166, 209, 125, 0.48);
 }
 
 .vf-landing-main {
@@ -709,17 +714,17 @@ body {
   position: relative;
   min-height: min(74vh, 620px);
   border-radius: 1.35rem;
-  border: 1px solid rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(166, 209, 125, 0.15);
   overflow: hidden;
-  background: #f0f6ff;
+  background: #fff9e6;
 }
 
 .vf-landing-hero-art {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 20%, rgba(59, 130, 246, 0.12), transparent 45%),
-    #f0f6ff;
+    radial-gradient(circle at 50% 20%, rgba(166, 209, 125, 0.12), transparent 45%),
+    #fff9e6;
   filter: none;
 }
 
@@ -727,7 +732,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(224, 236, 255, 0.65), transparent 42%);
+  background: linear-gradient(90deg, rgba(253, 244, 212, 0.65), transparent 42%);
 }
 
 .vf-landing-overlay-card {
@@ -736,9 +741,9 @@ body {
   width: min(360px, calc(100% - 2rem));
   margin: 2.6rem 0 0 1.4rem;
   border-radius: 1.05rem;
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  background: linear-gradient(180deg, #ffffff, #f0f6ff);
-  box-shadow: 0 18px 40px rgba(30, 58, 95, 0.275);
+  border: 1px solid rgba(166, 209, 125, 0.2);
+  background: linear-gradient(180deg, #ffffff, #fff9e6);
+  box-shadow: 0 18px 40px rgba(26, 26, 26, 0.275);
   padding: 1.15rem 1rem;
 }
 
@@ -746,7 +751,7 @@ body {
 .vf-auth-email-btn {
   width: 100%;
   border-radius: 0.7rem;
-  border: 1px solid rgba(59, 130, 246, 0.96);
+  border: 1px solid rgba(166, 209, 125, 0.96);
   padding: 0.62rem 0.72rem;
   font-size: 0.86rem;
   display: inline-flex;
@@ -756,14 +761,14 @@ body {
 }
 
 .vf-auth-google-btn {
-  color: #e0ecff;
-  background: #f0f6ff;
-  border-color: rgba(59, 130, 246, 1.0);
+  color: #fdf4d4;
+  background: #fff9e6;
+  border-color: rgba(166, 209, 125, 1.0);
 }
 
 .vf-auth-email-btn {
-  color: #1e3a5f;
-  background: rgba(59, 130, 246, 0.2);
+  color: #1a1a1a;
+  background: rgba(166, 209, 125, 0.2);
   border-style: solid;
 }
 
@@ -777,7 +782,7 @@ body {
 }
 
 .vf-auth-email-btn:hover {
-  background: rgba(59, 130, 246, 0.48);
+  background: rgba(166, 209, 125, 0.48);
 }
 
 .vf-google-icon {
@@ -794,9 +799,9 @@ body {
   box-sizing: border-box;
   background: transparent;
   color: var(--bg3-text);
-  --aid-gold: #3b82f6;
-  --aid-gold-bright: #60a5fa;
-  --aid-gold-deep: #1e40af;
+  --aid-gold: #a6d17d;
+  --aid-gold-bright: #b8dc92;
+  --aid-gold-deep: #fa6255;
   --aid-font-display: var(--bg3-font-display);
   --aid-font-serif: var(--bg3-font-body);
   font-family: var(--aid-font-serif);
@@ -842,11 +847,11 @@ body {
   padding: max(0px, env(safe-area-inset-top, 0)) max(20px, env(safe-area-inset-right, 0)) 0
     max(20px, env(safe-area-inset-left, 0));
   background:
-    linear-gradient(180deg, rgba(224, 236, 255, 0.97) 0%, rgba(240, 246, 255, 0.99) 100%);
-  border-bottom: 1px solid rgba(59, 130, 246, 0.28);
+    linear-gradient(180deg, rgba(253, 244, 212, 0.97) 0%, rgba(255, 249, 230, 0.99) 100%);
+  border-bottom: 1px solid rgba(166, 209, 125, 0.28);
   box-shadow:
-    inset 0 -1px 0 rgba(30, 58, 95, 0.225),
-    0 8px 28px rgba(30, 58, 95, 0.175);
+    inset 0 -1px 0 rgba(26, 26, 26, 0.225),
+    0 8px 28px rgba(26, 26, 26, 0.175);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -864,9 +869,9 @@ body {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(96, 165, 250, 0.35) 20%,
-    rgba(96, 165, 250, 0.55) 50%,
-    rgba(96, 165, 250, 0.35) 80%,
+    rgba(184, 220, 146, 0.35) 20%,
+    rgba(184, 220, 146, 0.55) 50%,
+    rgba(184, 220, 146, 0.35) 80%,
     transparent 100%
   );
   pointer-events: none;
@@ -911,10 +916,10 @@ body {
   font-size: 0.95rem;
   text-transform: uppercase;
   margin-right: 0.6rem;
-  color: #1e40af;
+  color: #fa6255;
   text-shadow:
-    0 1px 0 rgba(30, 58, 95, 0.325),
-    0 0 20px rgba(59, 130, 246, 0.15);
+    0 1px 0 rgba(26, 26, 26, 0.325),
+    0 0 20px rgba(166, 209, 125, 0.15);
 }
 
 .aid-topbar-brand-link {
@@ -932,7 +937,7 @@ body {
   font-size: 0.78rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #64748b;
+  color: #6b6b6b;
   opacity: 0.92;
   position: relative;
   display: inline-flex;
@@ -956,7 +961,7 @@ body {
 }
 
 .aid-nav-link:hover {
-  color: #1e40af;
+  color: #fa6255;
   opacity: 1;
   transform: translateY(-1px);
 }
@@ -968,7 +973,7 @@ body {
   right: 0;
   bottom: -10px;
   height: 2px;
-  background: #3b82f6;
+  background: #a6d17d;
 }
 
 .aid-signin-btn {
@@ -981,8 +986,8 @@ body {
   text-transform: uppercase;
   padding: 0.58rem 1rem;
   border-radius: 3px 5px 4px 6px / 4px 3px 5px 4px;
-  border: 2px solid #bfdbfe;
-  box-shadow: 2px 3px 0 rgba(30, 58, 95, 0.125);
+  border: 2px solid #a6d17d;
+  box-shadow: 2px 3px 0 rgba(26, 26, 26, 0.125);
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.35s ease,
@@ -992,23 +997,23 @@ body {
 .aid-signin-btn-glow:hover {
   transform: translateY(-1px);
   box-shadow:
-    0 0 0 1px rgba(30, 58, 95, 0.45),
-    0 12px 36px rgba(30, 58, 95, 0.35);
-  background: #bfdbfe;
+    0 0 0 1px rgba(26, 26, 26, 0.45),
+    0 12px 36px rgba(26, 26, 26, 0.35);
+  background: #a6d17d;
 }
 
 .aid-topbar .aid-signin-btn {
   background: transparent;
-  color: #1e40af;
+  color: #fa6255;
   border: 2px solid var(--aid-gold-deep);
   box-shadow: none;
 }
 
 .aid-topbar .aid-signin-btn-glow:hover {
-  background: rgba(30, 58, 95, 0.14);
+  background: rgba(26, 26, 26, 0.14);
   color: #ffffff;
   border-color: var(--aid-gold-bright);
-  box-shadow: 0 0 0 1px rgba(30, 58, 95, 0.25);
+  box-shadow: 0 0 0 1px rgba(26, 26, 26, 0.25);
 }
 
 /* App top bar (used on /menu only — /chat stays standalone) */
@@ -1062,7 +1067,7 @@ body {
   transform: translateY(-50%);
   width: 1rem;
   height: 1rem;
-  color: rgba(100, 116, 139, 0.65);
+  color: rgba(107, 107, 107, 0.65);
   pointer-events: none;
 }
 
@@ -1073,9 +1078,9 @@ body {
   font-family: var(--aid-font-serif);
   font-size: 0.84rem;
   letter-spacing: 0.03em;
-  color: #1e3a5f;
-  background: rgba(30, 58, 95, 0.21);
-  border: 1px solid rgba(59, 130, 246, 0.28);
+  color: #1a1a1a;
+  background: rgba(26, 26, 26, 0.21);
+  border: 1px solid rgba(166, 209, 125, 0.28);
   border-radius: 4px;
   outline: none;
   transition:
@@ -1084,12 +1089,12 @@ body {
 }
 
 .aid-app-search::placeholder {
-  color: rgba(100, 116, 139, 0.75);
+  color: rgba(107, 107, 107, 0.75);
 }
 
 .aid-app-search:focus {
-  border-color: rgba(96, 165, 250, 0.55);
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2);
+  border-color: rgba(184, 220, 146, 0.55);
+  box-shadow: 0 0 0 1px rgba(166, 209, 125, 0.2);
 }
 
 .aid-app-topbar-right {
@@ -1111,9 +1116,9 @@ body {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(30, 58, 95, 0.88);
-  background: rgba(59, 130, 246, 0.2);
-  border: 1px solid rgba(59, 130, 246, 0.28);
+  color: rgba(26, 26, 26, 0.88);
+  background: rgba(166, 209, 125, 0.2);
+  border: 1px solid rgba(166, 209, 125, 0.28);
   border-radius: 3px;
   cursor: default;
   transition: border-color 0.2s ease;
@@ -1126,12 +1131,12 @@ body {
 }
 
 .aid-app-premium:hover {
-  border-color: rgba(96, 165, 250, 0.4);
+  border-color: rgba(184, 220, 146, 0.4);
 }
 
 .aid-app-premium-icon {
   font-size: 0.55rem;
-  color: rgba(96, 165, 250, 0.85);
+  color: rgba(184, 220, 146, 0.85);
 }
 
 .aid-app-play {
@@ -1147,12 +1152,12 @@ body {
   text-transform: uppercase;
   text-decoration: none;
   color: #ffffff;
-  background: linear-gradient(180deg, #93c5fd 0%, #3b82f6 45%, #1e40af 100%);
-  border: 2px solid rgba(224, 236, 255, 0.95);
+  background: linear-gradient(180deg, #b8dc92 0%, #a6d17d 45%, #fa6255 100%);
+  border: 2px solid rgba(253, 244, 212, 0.95);
   border-radius: 4px;
   box-shadow:
-    0 1px 0 rgba(191, 219, 254, 0.35) inset,
-    0 4px 14px rgba(30, 58, 95, 0.2);
+    0 1px 0 rgba(255, 240, 192, 0.35) inset,
+    0 4px 14px rgba(26, 26, 26, 0.2);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
@@ -1162,15 +1167,15 @@ body {
 .aid-app-play:hover {
   filter: brightness(1.06);
   box-shadow:
-    0 1px 0 rgba(191, 219, 254, 0.45) inset,
-    0 0 0 1px rgba(30, 58, 95, 0.35),
-    0 8px 24px rgba(30, 58, 95, 0.35);
+    0 1px 0 rgba(255, 240, 192, 0.45) inset,
+    0 0 0 1px rgba(26, 26, 26, 0.35),
+    0 8px 24px rgba(26, 26, 26, 0.35);
 }
 
 .aid-app-play--here {
   box-shadow:
-    0 0 0 2px rgba(96, 165, 250, 0.45),
-    0 4px 18px rgba(59, 130, 246, 0.35);
+    0 0 0 2px rgba(184, 220, 146, 0.45),
+    0 4px 18px rgba(166, 209, 125, 0.35);
 }
 
 .aid-app-play-icon {
@@ -1190,9 +1195,9 @@ body {
   height: 2.35rem;
   padding: 0;
   border-radius: 50%;
-  border: 1px solid rgba(59, 130, 246, 0.35);
-  background: rgba(30, 58, 95, 0.175);
-  color: #1e3a5f;
+  border: 1px solid rgba(166, 209, 125, 0.35);
+  background: rgba(26, 26, 26, 0.175);
+  color: #1a1a1a;
   cursor: pointer;
   transition:
     border-color 0.2s ease,
@@ -1200,8 +1205,8 @@ body {
 }
 
 .aid-app-user-btn:hover {
-  border-color: rgba(96, 165, 250, 0.55);
-  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(184, 220, 146, 0.55);
+  background: rgba(166, 209, 125, 0.12);
 }
 
 .aid-app-user-icon {
@@ -1216,9 +1221,9 @@ body {
   min-width: 11rem;
   padding: 0.35rem;
   border-radius: 6px;
-  border: 1px solid rgba(59, 130, 246, 0.28);
-  background: linear-gradient(165deg, rgba(224, 236, 255, 0.98) 0%, rgba(240, 246, 255, 0.99) 100%);
-  box-shadow: 0 16px 40px rgba(30, 58, 95, 0.275);
+  border: 1px solid rgba(166, 209, 125, 0.28);
+  background: linear-gradient(165deg, rgba(253, 244, 212, 0.98) 0%, rgba(255, 249, 230, 0.99) 100%);
+  box-shadow: 0 16px 40px rgba(26, 26, 26, 0.275);
 }
 
 .aid-app-user-dd-item {
@@ -1232,14 +1237,14 @@ body {
   background: transparent;
   font-family: var(--aid-font-serif);
   font-size: 0.88rem;
-  color: #1e3a5f;
+  color: #1a1a1a;
   cursor: pointer;
   text-align: left;
   transition: background 0.15s ease;
 }
 
 .aid-app-user-dd-item:hover {
-  background: rgba(59, 130, 246, 0.32);
+  background: rgba(166, 209, 125, 0.32);
 }
 
 .aid-app-dd-icon {
@@ -1311,10 +1316,10 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 100% 72% at 50% -12%, rgba(59, 130, 246, 0.2), transparent 58%),
-    radial-gradient(ellipse 58% 48% at 12% 88%, rgba(224, 236, 255, 0.42), transparent 54%),
-    radial-gradient(ellipse 58% 48% at 88% 85%, rgba(186, 230, 253, 0.4), transparent 54%),
-    linear-gradient(180deg, #f0f6ff 0%, #f0f6ff 42%, #cfe1ff 100%);
+    radial-gradient(ellipse 100% 72% at 50% -12%, rgba(166, 209, 125, 0.2), transparent 58%),
+    radial-gradient(ellipse 58% 48% at 12% 88%, rgba(253, 244, 212, 0.42), transparent 54%),
+    radial-gradient(ellipse 58% 48% at 88% 85%, rgba(255, 240, 192, 0.4), transparent 54%),
+    linear-gradient(180deg, #fff9e6 0%, #fff9e6 42%, #fff0c0 100%);
   transform: scale(1.04);
   animation: aid-bg-pan 18s ease-in-out infinite;
 }
@@ -1336,8 +1341,8 @@ body {
   position: absolute;
   inset: -20%;
   background:
-    radial-gradient(ellipse 58% 46% at 22% 32%, rgba(96, 165, 250, 0.1), transparent 56%),
-    radial-gradient(ellipse 52% 42% at 78% 58%, rgba(100, 116, 139, 0.08), transparent 52%);
+    radial-gradient(ellipse 58% 46% at 22% 32%, rgba(184, 220, 146, 0.1), transparent 56%),
+    radial-gradient(ellipse 52% 42% at 78% 58%, rgba(107, 107, 107, 0.08), transparent 52%);
   mix-blend-mode: screen;
   opacity: 0.55;
   animation: aid-aurora-drift 24s ease-in-out infinite;
@@ -1358,12 +1363,12 @@ body {
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(1.5px 1.5px at 12% 18%, rgba(30, 58, 95, 0.5), transparent),
-    radial-gradient(1px 1px at 55% 42%, rgba(59, 130, 246, 1.0), transparent),
-    radial-gradient(1px 1px at 78% 22%, rgba(30, 58, 95, 0.38), transparent),
-    radial-gradient(1.5px 1.5px at 30% 68%, rgba(59, 130, 246, 1.0), transparent),
+    radial-gradient(1.5px 1.5px at 12% 18%, rgba(26, 26, 26, 0.5), transparent),
+    radial-gradient(1px 1px at 55% 42%, rgba(166, 209, 125, 1.0), transparent),
+    radial-gradient(1px 1px at 78% 22%, rgba(26, 26, 26, 0.38), transparent),
+    radial-gradient(1.5px 1.5px at 30% 68%, rgba(166, 209, 125, 1.0), transparent),
     radial-gradient(1px 1px at 88% 76%, rgba(255, 248, 220, 0.4), transparent),
-    radial-gradient(1px 1px at 42% 12%, rgba(30, 58, 95, 0.22), transparent);
+    radial-gradient(1px 1px at 42% 12%, rgba(26, 26, 26, 0.22), transparent);
   background-size: 100% 100%;
   opacity: 0.52;
   animation: aid-particle-twinkle 6s ease-in-out infinite;
@@ -1407,8 +1412,8 @@ body {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(30, 58, 95, 0.125), rgba(30, 58, 95, 0.225)),
-    radial-gradient(circle at 50% 58%, transparent 35%, rgba(30, 58, 95, 0.24) 100%);
+    linear-gradient(180deg, rgba(26, 26, 26, 0.125), rgba(26, 26, 26, 0.225)),
+    radial-gradient(circle at 50% 58%, transparent 35%, rgba(26, 26, 26, 0.24) 100%);
   pointer-events: none;
 }
 
@@ -1433,12 +1438,12 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 2px;
-  border: 1px solid rgba(59, 130, 246, 0.38);
+  border: 1px solid rgba(166, 209, 125, 0.38);
   box-shadow:
-    inset 0 0 0 1px rgba(30, 58, 95, 0.275),
-    inset 0 1px 0 rgba(30, 58, 95, 0.1),
-    0 24px 60px rgba(30, 58, 95, 0.225),
-    0 0 0 1px rgba(30, 58, 95, 0.175);
+    inset 0 0 0 1px rgba(26, 26, 26, 0.275),
+    inset 0 1px 0 rgba(26, 26, 26, 0.1),
+    0 24px 60px rgba(26, 26, 26, 0.225),
+    0 0 0 1px rgba(26, 26, 26, 0.175);
   pointer-events: none;
   z-index: 0;
 }
@@ -1455,12 +1460,12 @@ body {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(96, 165, 250, 0.35) 15%,
-    rgba(30, 58, 95, 0.65) 50%,
-    rgba(96, 165, 250, 0.35) 85%,
+    rgba(184, 220, 146, 0.35) 15%,
+    rgba(26, 26, 26, 0.65) 50%,
+    rgba(184, 220, 146, 0.35) 85%,
     transparent
   );
-  box-shadow: 0 0 18px rgba(59, 130, 246, 0.25);
+  box-shadow: 0 0 18px rgba(166, 209, 125, 0.25);
   pointer-events: none;
   z-index: 1;
 }
@@ -1481,11 +1486,11 @@ body {
   letter-spacing: 0.35em;
   text-transform: uppercase;
   margin-bottom: 0.35rem;
-  color: #f17d8e;
+  color: #fa6255;
   text-shadow:
-    0 2px 0 rgba(15, 23, 42, 0.18),
-    0 8px 22px rgba(241, 125, 142, 0.35),
-    0 0 28px rgba(245, 184, 196, 0.4);
+    0 2px 0 rgba(26, 26, 26, 0.18),
+    0 8px 22px rgba(250, 98, 85, 0.35),
+    0 0 28px rgba(253, 203, 70, 0.4);
 }
 
 .aid-kicker-scratch {
@@ -1511,14 +1516,14 @@ body {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin: 0;
-  color: #1e3a5f;
+  color: #1a1a1a;
   text-shadow:
-    0 1px 0 rgba(30, 58, 95, 0.125),
-    0 2px 0 rgba(30, 58, 95, 0.1),
-    1px 0 0 rgba(30, 58, 95, 0.08),
-    -1px 0 0 rgba(30, 58, 95, 0.075),
-    0 14px 36px rgba(30, 58, 95, 0.19),
-    0 0 48px rgba(59, 130, 246, 0.14);
+    0 1px 0 rgba(26, 26, 26, 0.125),
+    0 2px 0 rgba(26, 26, 26, 0.1),
+    1px 0 0 rgba(26, 26, 26, 0.08),
+    -1px 0 0 rgba(26, 26, 26, 0.075),
+    0 14px 36px rgba(26, 26, 26, 0.19),
+    0 0 48px rgba(166, 209, 125, 0.14);
 }
 
 .aid-title-animated {
@@ -1531,12 +1536,12 @@ body {
   justify-content: center;
   align-items: flex-end;
   gap: 0;
-  color: #1e3a5f;
+  color: #1a1a1a;
 }
 
 .aid-title-char {
   display: inline-block;
-  color: #1e3a5f;
+  color: #1a1a1a;
 }
 
 .aid-scratch-char {
@@ -1583,10 +1588,10 @@ body {
   font-weight: 400;
   line-height: 1.5;
   font-style: italic;
-  color: #64748b;
+  color: #6b6b6b;
   text-shadow:
-    0 2px 8px rgba(30, 58, 95, 0.25),
-    0 0 1px rgba(30, 58, 95, 0.4);
+    0 2px 8px rgba(26, 26, 26, 0.25),
+    0 0 1px rgba(26, 26, 26, 0.4);
 }
 
 .aid-actions {
@@ -1656,12 +1661,12 @@ body {
 .aid-cta-primary {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, #bfdbfe 0%, #1e40af 100%);
+  background: linear-gradient(180deg, #a6d17d 0%, #fa6255 100%);
   color: #ffffff;
-  border: 2px solid #bfdbfe;
+  border: 2px solid #a6d17d;
   box-shadow:
-    2px 3px 0 rgba(30, 58, 95, 0.14),
-    inset 0 1px 0 rgba(59, 130, 246, 1.0);
+    2px 3px 0 rgba(26, 26, 26, 0.14),
+    inset 0 1px 0 rgba(166, 209, 125, 1.0);
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.35s ease,
@@ -1677,7 +1682,7 @@ body {
   background: linear-gradient(
     105deg,
     transparent 0%,
-    rgba(59, 130, 246, 1.0) 45%,
+    rgba(166, 209, 125, 1.0) 45%,
     transparent 70%
   );
   transform: translateX(-120%) skewX(-12deg);
@@ -1700,19 +1705,19 @@ body {
 .aid-cta-primary:hover {
   transform: translateY(-3px) scale(1.02);
   box-shadow:
-    2px 5px 0 rgba(30, 58, 95, 0.11),
-    0 0 0 1px rgba(30, 58, 95, 0.45),
+    2px 5px 0 rgba(26, 26, 26, 0.11),
+    0 0 0 1px rgba(26, 26, 26, 0.45),
     0 18px 44px rgba(239, 148, 40, 0.42);
   filter: brightness(1.05);
 }
 
 .aid-cta-secondary {
-  background: linear-gradient(180deg, rgba(224, 236, 255, 0.95) 0%, rgba(224, 236, 255, 0.98) 100%);
+  background: linear-gradient(180deg, rgba(253, 244, 212, 0.95) 0%, rgba(253, 244, 212, 0.98) 100%);
   color: var(--aid-gold-bright);
   border: 2px solid var(--aid-gold-deep);
   box-shadow:
-    2px 3px 0 rgba(30, 58, 95, 0.225),
-    inset 0 0 0 1px rgba(30, 58, 95, 0.07);
+    2px 3px 0 rgba(26, 26, 26, 0.225),
+    inset 0 0 0 1px rgba(26, 26, 26, 0.07);
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.35s ease,
@@ -1723,21 +1728,21 @@ body {
 
 .aid-cta-secondary:hover {
   transform: translateY(-2px);
-  background: linear-gradient(180deg, rgba(224, 236, 255, 0.98) 0%, rgba(224, 236, 255, 0.99) 100%);
+  background: linear-gradient(180deg, rgba(253, 244, 212, 0.98) 0%, rgba(253, 244, 212, 0.99) 100%);
   border-color: var(--aid-gold-bright);
-  color: #1e40af;
+  color: #fa6255;
   box-shadow:
-    2px 5px 0 rgba(30, 58, 95, 0.16),
-    0 12px 36px rgba(59, 130, 246, 0.22);
+    2px 5px 0 rgba(26, 26, 26, 0.16),
+    0 12px 36px rgba(166, 209, 125, 0.22);
 }
 
 .aid-cta-google {
-  background: linear-gradient(180deg, #dbeafe 0%, #bfdbfe 100%);
-  color: #1e3a5f;
-  border: 2px solid rgba(224, 236, 255, 0.9);
+  background: linear-gradient(180deg, #fdf4d4 0%, #a6d17d 100%);
+  color: #1a1a1a;
+  border: 2px solid rgba(253, 244, 212, 0.9);
   box-shadow:
-    2px 3px 0 rgba(30, 58, 95, 0.11),
-    inset 0 1px 0 rgba(59, 130, 246, 1.0);
+    2px 3px 0 rgba(26, 26, 26, 0.11),
+    inset 0 1px 0 rgba(166, 209, 125, 1.0);
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.35s ease,
@@ -1746,10 +1751,10 @@ body {
 
 .aid-cta-google:hover {
   transform: translateY(-2px);
-  background: linear-gradient(180deg, #1e3a5f 0%, #bfdbfe 100%);
+  background: linear-gradient(180deg, #1a1a1a 0%, #a6d17d 100%);
   box-shadow:
-    2px 5px 0 rgba(30, 58, 95, 0.09),
-    0 14px 40px rgba(59, 130, 246, 0.12);
+    2px 5px 0 rgba(26, 26, 26, 0.09),
+    0 14px 40px rgba(166, 209, 125, 0.12);
 }
 
 .aid-cta-google:disabled {
@@ -1772,7 +1777,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(96, 165, 250, 0.75);
+  color: rgba(184, 220, 146, 0.75);
   text-decoration: none;
   transition:
     color 0.25s ease,
@@ -1849,11 +1854,11 @@ body {
   flex-shrink: 0;
   background: linear-gradient(
     180deg,
-    rgba(96, 165, 250, 0.85) 0%,
-    rgba(59, 130, 246, 0.15) 100%
+    rgba(184, 220, 146, 0.85) 0%,
+    rgba(166, 209, 125, 0.15) 100%
   );
   border-radius: 1px;
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.25);
+  box-shadow: 0 0 8px rgba(166, 209, 125, 0.25);
 }
 
 .aid-scroll-cue-arrow {
@@ -1878,14 +1883,14 @@ body {
 /* What to do — parchment / BG3 black–gold, scroll-driven stagger in/out */
 .aid-what {
   --aid-parchment-font: "Pixelify Sans", "Courier New", monospace;
-  --aid-parchment-bg: linear-gradient(165deg, #dbeafe 0%, #e0ecff 48%, #cfe1ff 100%);
+  --aid-parchment-bg: linear-gradient(165deg, #fdf4d4 0%, #fdf4d4 48%, #fff0c0 100%);
   position: relative;
   padding: clamp(2.75rem, 7vw, 5rem) clamp(1rem, 4vw, 2.5rem) 4rem;
   background:
-    radial-gradient(ellipse 80% 45% at 50% 0%, rgba(59, 130, 246, 0.08), transparent 55%),
-    linear-gradient(180deg, #f0f6ff 0%, #cfe1ff 100%);
-  border-top: 1px solid rgba(59, 130, 246, 0.22);
-  box-shadow: inset 0 1px 0 rgba(96, 165, 250, 0.06);
+    radial-gradient(ellipse 80% 45% at 50% 0%, rgba(166, 209, 125, 0.08), transparent 55%),
+    linear-gradient(180deg, #fff9e6 0%, #fff0c0 100%);
+  border-top: 1px solid rgba(166, 209, 125, 0.22);
+  box-shadow: inset 0 1px 0 rgba(184, 220, 146, 0.06);
 }
 
 .aid-what-inner {
@@ -1901,11 +1906,11 @@ body {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-variant-caps: small-caps;
-  color: #1e3a5f;
+  color: #1a1a1a;
   margin: 0 0 2rem;
   text-shadow:
-    0 2px 0 rgba(30, 58, 95, 0.225),
-    0 0 24px rgba(59, 130, 246, 0.1);
+    0 2px 0 rgba(26, 26, 26, 0.225),
+    0 0 24px rgba(166, 209, 125, 0.1);
   opacity: 0.88;
   transform: translateY(8px);
   transition:
@@ -1924,9 +1929,9 @@ body {
   width: 4rem;
   height: 2px;
   margin: 0.9rem auto 0;
-  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.75), transparent);
+  background: linear-gradient(90deg, transparent, rgba(184, 220, 146, 0.75), transparent);
   border-radius: 2px;
-  box-shadow: 0 0 14px rgba(59, 130, 246, 0.35);
+  box-shadow: 0 0 14px rgba(166, 209, 125, 0.35);
 }
 
 .aid-what-list {
@@ -1944,13 +1949,13 @@ body {
   width: min(100%, 32rem);
   box-sizing: border-box;
   padding: 1.4rem 1.35rem 1.45rem 1.35rem;
-  border-radius: 12px;
-  border: 1px solid rgba(96, 165, 250, 0.35);
-  background: linear-gradient(165deg, #1e3a5f 0%, #1e293b 55%, #0f172a 100%);
+  border-radius: 16px;
+  border: 2px solid #7ba94f;
+  background: linear-gradient(165deg, #b8dc92 0%, #a6d17d 55%, #94c269 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 12px 32px rgba(30, 58, 95, 0.25),
-    0 0 0 1px rgba(59, 130, 246, 0.15);
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 10px 28px rgba(123, 169, 79, 0.28),
+    0 0 0 4px rgba(255, 249, 230, 0.6);
   opacity: 0;
   transition-property: opacity, transform;
   transition-duration: 0.58s;
@@ -2017,13 +2022,13 @@ body {
   display: grid;
   place-items: center;
   color: #ffffff;
-  background: linear-gradient(145deg, #60a5fa 0%, #3b82f6 55%, #1e40af 100%);
+  background: linear-gradient(145deg, #b8dc92 0%, #a6d17d 55%, #fa6255 100%);
   border-radius: 50%;
-  border: 2px solid rgba(224, 236, 255, 0.95);
+  border: 2px solid rgba(253, 244, 212, 0.95);
   box-shadow:
-    0 1px 0 rgba(191, 219, 254, 0.35) inset,
-    0 4px 12px rgba(30, 58, 95, 0.25),
-    0 0 16px rgba(59, 130, 246, 0.25);
+    0 1px 0 rgba(255, 240, 192, 0.35) inset,
+    0 4px 12px rgba(26, 26, 26, 0.25),
+    0 0 16px rgba(166, 209, 125, 0.25);
 }
 
 .aid-what-copy {
@@ -2045,8 +2050,8 @@ body {
   font-style: italic;
   letter-spacing: 0.03em;
   line-height: 1.22;
-  color: #f0f6ff;
-  text-shadow: 0 2px 8px rgba(15, 23, 42, 0.45);
+  color: #1a1a1a;
+  text-shadow: 0 2px 8px rgba(255, 249, 230, 0.6);
 }
 
 .aid-what-detail {
@@ -2057,7 +2062,7 @@ body {
   font-style: normal;
   line-height: 1.62;
   letter-spacing: 0.02em;
-  color: rgba(219, 234, 254, 0.92);
+  color: rgba(26, 26, 26, 0.92);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2143,9 +2148,9 @@ body {
 .aid-landing-menu-cta {
   padding: clamp(2.5rem, 6vw, 4rem) clamp(1rem, 4vw, 2rem);
   background:
-    radial-gradient(ellipse 65% 40% at 50% 0%, rgba(59, 130, 246, 0.09), transparent 55%),
-    linear-gradient(180deg, #f0f6ff 0%, #cfe1ff 100%);
-  border-top: 1px solid rgba(59, 130, 246, 0.2);
+    radial-gradient(ellipse 65% 40% at 50% 0%, rgba(166, 209, 125, 0.09), transparent 55%),
+    linear-gradient(180deg, #fff9e6 0%, #fff0c0 100%);
+  border-top: 1px solid rgba(166, 209, 125, 0.2);
 }
 
 .aid-landing-menu-cta-inner {
@@ -2160,7 +2165,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #1e3a5f;
+  color: #1a1a1a;
   margin: 0 0 0.75rem;
 }
 
@@ -2168,7 +2173,7 @@ body {
   font-family: var(--aid-font-serif);
   font-size: clamp(0.92rem, 1.8vw, 1.05rem);
   line-height: 1.6;
-  color: rgba(30, 58, 95, 0.88);
+  color: rgba(26, 26, 26, 0.88);
   margin: 0 0 1.5rem;
 }
 
@@ -2204,7 +2209,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #1e3a5f;
+  color: #1a1a1a;
   margin: 0 0 0.65rem;
 }
 
@@ -2212,7 +2217,7 @@ body {
   font-family: var(--aid-font-serif);
   font-size: clamp(0.92rem, 1.75vw, 1.05rem);
   line-height: 1.65;
-  color: rgba(30, 58, 95, 0.85);
+  color: rgba(26, 26, 26, 0.85);
   margin: 0;
 }
 
@@ -2222,10 +2227,10 @@ body {
   position: relative;
   padding: clamp(2.5rem, 6vw, 4.25rem) clamp(1rem, 4vw, 2rem) clamp(2.75rem, 6vw, 4rem);
   background:
-    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(59, 130, 246, 0.07), transparent 55%),
-    linear-gradient(180deg, #cfe1ff 0%, #cfe1ff 100%);
-  border-top: 1px solid rgba(59, 130, 246, 0.2);
-  box-shadow: inset 0 1px 0 rgba(96, 165, 250, 0.05);
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(166, 209, 125, 0.07), transparent 55%),
+    linear-gradient(180deg, #fff0c0 0%, #fff0c0 100%);
+  border-top: 1px solid rgba(166, 209, 125, 0.2);
+  box-shadow: inset 0 1px 0 rgba(184, 220, 146, 0.05);
 }
 
 .aid-deployed-inner {
@@ -2245,10 +2250,10 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   font-variant-caps: small-caps;
-  color: #1e3a5f;
+  color: #1a1a1a;
   margin: 0 0 clamp(1.75rem, 4vw, 2.5rem);
   text-align: center;
-  text-shadow: 0 2px 0 rgba(30, 58, 95, 0.2);
+  text-shadow: 0 2px 0 rgba(26, 26, 26, 0.2);
   opacity: 0.82;
   transform: translateY(10px);
   transition:
@@ -2259,8 +2264,8 @@ body {
 .aid-deployed-heading-icon {
   width: 1.15rem;
   height: 1.15rem;
-  color: rgba(96, 165, 250, 0.85);
-  filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.35));
+  color: rgba(184, 220, 146, 0.85);
+  filter: drop-shadow(0 0 10px rgba(166, 209, 125, 0.35));
   flex-shrink: 0;
 }
 
@@ -2287,12 +2292,12 @@ body {
   display: flex;
   flex-direction: column;
   border-radius: 4px;
-  border: 1px solid rgba(59, 130, 246, 0.26);
-  background: linear-gradient(165deg, #dbeafe 0%, #e0ecff 48%, #cfe1ff 100%);
+  border: 1px solid rgba(166, 209, 125, 0.26);
+  background: linear-gradient(165deg, #fdf4d4 0%, #fdf4d4 48%, #fff0c0 100%);
   box-shadow:
-    inset 0 1px 0 rgba(96, 165, 250, 0.06),
-    0 14px 36px rgba(30, 58, 95, 0.25),
-    0 0 0 1px rgba(30, 58, 95, 0.175);
+    inset 0 1px 0 rgba(184, 220, 146, 0.06),
+    0 14px 36px rgba(26, 26, 26, 0.25),
+    0 0 0 1px rgba(26, 26, 26, 0.175);
   overflow: hidden;
   opacity: 0;
   transform: translateY(14px);
@@ -2322,11 +2327,11 @@ body {
 }
 
 .aid-ai-card:hover {
-  border-color: rgba(96, 165, 250, 0.38);
+  border-color: rgba(184, 220, 146, 0.38);
   box-shadow:
-    inset 0 1px 0 rgba(96, 165, 250, 0.09),
-    0 18px 44px rgba(30, 58, 95, 0.275),
-    0 0 28px rgba(59, 130, 246, 0.12);
+    inset 0 1px 0 rgba(184, 220, 146, 0.09),
+    0 18px 44px rgba(26, 26, 26, 0.275),
+    0 0 28px rgba(166, 209, 125, 0.12);
 }
 
 .aid-ai-card__head {
@@ -2334,7 +2339,7 @@ body {
   align-items: center;
   gap: 0.65rem;
   padding: 0.75rem 0.85rem 0.65rem;
-  border-bottom: 1px solid rgba(59, 130, 246, 0.24);
+  border-bottom: 1px solid rgba(166, 209, 125, 0.24);
 }
 
 .aid-ai-card__author-avatar {
@@ -2342,8 +2347,8 @@ body {
   height: 2.35rem;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(224, 236, 255, 0.95);
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.35);
+  border: 2px solid rgba(253, 244, 212, 0.95);
+  box-shadow: 0 0 0 1px rgba(166, 209, 125, 0.35);
   flex-shrink: 0;
 }
 
@@ -2367,7 +2372,7 @@ body {
   font-size: 0.88rem;
   font-weight: 600;
   letter-spacing: 0.04em;
-  color: #1e3a5f;
+  color: #1a1a1a;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2375,14 +2380,14 @@ body {
 
 .aid-ai-card__author-badge {
   font-size: 0.55rem;
-  color: rgba(100, 116, 139, 0.75);
+  color: rgba(107, 107, 107, 0.75);
   line-height: 1;
 }
 
 .aid-ai-card__date {
   font-family: var(--bg3-font-body);
   font-size: 0.78rem;
-  color: rgba(100, 116, 139, 0.88);
+  color: rgba(107, 107, 107, 0.88);
 }
 
 .aid-ai-card__menu {
@@ -2394,7 +2399,7 @@ body {
   border: none;
   border-radius: 4px;
   background: transparent;
-  color: rgba(100, 116, 139, 0.65);
+  color: rgba(107, 107, 107, 0.65);
   font-size: 1rem;
   line-height: 1;
   letter-spacing: 0.12em;
@@ -2405,15 +2410,15 @@ body {
 }
 
 .aid-ai-card__menu:hover {
-  color: #1e3a5f;
-  background: rgba(59, 130, 246, 0.24);
+  color: #1a1a1a;
+  background: rgba(166, 209, 125, 0.24);
 }
 
 .aid-ai-card__media {
   position: relative;
   aspect-ratio: 16 / 9;
-  background: #e0ecff;
-  border-bottom: 1px solid rgba(59, 130, 246, 0.12);
+  background: #fdf4d4;
+  border-bottom: 1px solid rgba(166, 209, 125, 0.12);
 }
 
 .aid-ai-card__media img {
@@ -2436,16 +2441,16 @@ body {
   font-style: italic;
   letter-spacing: 0.02em;
   line-height: 1.25;
-  color: #1e3a5f;
+  color: #1a1a1a;
   margin: 0 0 0.5rem;
-  text-shadow: 0 2px 10px rgba(30, 58, 95, 0.225);
+  text-shadow: 0 2px 10px rgba(26, 26, 26, 0.225);
 }
 
 .aid-ai-card__desc {
   font-family: var(--bg3-font-body);
   font-size: 0.88rem;
   line-height: 1.55;
-  color: rgba(30, 58, 95, 0.9);
+  color: rgba(26, 26, 26, 0.9);
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 4;
@@ -2460,7 +2465,7 @@ body {
   gap: 0.75rem;
   padding: 0.85rem 1rem 1rem;
   margin-top: auto;
-  border-top: 1px solid rgba(59, 130, 246, 0.24);
+  border-top: 1px solid rgba(166, 209, 125, 0.24);
 }
 
 .aid-ai-card__stats {
@@ -2477,7 +2482,7 @@ body {
   font-family: var(--bg3-font-display);
   font-size: 0.8rem;
   letter-spacing: 0.04em;
-  color: rgba(100, 116, 139, 0.95);
+  color: rgba(107, 107, 107, 0.95);
 }
 
 .aid-ai-card__stat-icon {
@@ -2497,7 +2502,7 @@ button.aid-ai-card__like-btn {
 }
 
 button.aid-ai-card__like-btn.is-liked {
-  color: #3b82f6;
+  color: #a6d17d;
 }
 
 button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
@@ -2512,9 +2517,9 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   flex-shrink: 0;
   padding: 0.45rem 0.9rem;
   border-radius: 3px;
-  border: 1px solid rgba(59, 130, 246, 0.45);
-  background: rgba(240, 246, 255, 0.65);
-  color: #1e3a5f;
+  border: 1px solid rgba(166, 209, 125, 0.45);
+  background: rgba(255, 249, 230, 0.65);
+  color: #1a1a1a;
   font-family: var(--bg3-font-display);
   font-size: 0.72rem;
   font-weight: 600;
@@ -2529,10 +2534,10 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .aid-ai-card__chat:hover {
-  border-color: rgba(96, 165, 250, 0.75);
-  background: rgba(59, 130, 246, 0.12);
-  color: #1e3a5f;
-  box-shadow: 0 0 18px rgba(59, 130, 246, 0.2);
+  border-color: rgba(184, 220, 146, 0.75);
+  background: rgba(166, 209, 125, 0.12);
+  color: #1a1a1a;
+  box-shadow: 0 0 18px rgba(166, 209, 125, 0.2);
 }
 
 .aid-ai-card__chat-icon {
@@ -2546,19 +2551,19 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-family: var(--bg3-font-body);
   font-size: 0.88rem;
   line-height: 1.6;
-  color: rgba(100, 116, 139, 0.82);
+  color: rgba(107, 107, 107, 0.82);
 }
 
 .aid-deployed-hint-link {
-  color: #60a5fa;
+  color: #b8dc92;
   font-weight: 600;
   text-decoration: none;
-  border-bottom: 1px solid rgba(96, 165, 250, 0.35);
+  border-bottom: 1px solid rgba(184, 220, 146, 0.35);
   transition: color 0.2s ease;
 }
 
 .aid-deployed-hint-link:hover {
-  color: #1e40af;
+  color: #fa6255;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2578,10 +2583,10 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 
 /* Footer — left: Team TUQ + names; right: VirFriendo | Contact us */
 .aid-footer {
-  background: linear-gradient(180deg, rgba(240, 246, 255, 0.95) 0%, #cfe1ff 100%);
-  border-top: 1px solid rgba(59, 130, 246, 0.22);
-  box-shadow: inset 0 1px 0 rgba(30, 58, 95, 0.04);
-  color: rgba(30, 58, 95, 0.92);
+  background: linear-gradient(180deg, rgba(255, 249, 230, 0.95) 0%, #fff0c0 100%);
+  border-top: 1px solid rgba(166, 209, 125, 0.22);
+  box-shadow: inset 0 1px 0 rgba(26, 26, 26, 0.04);
+  color: rgba(26, 26, 26, 0.92);
 }
 
 .aid-footer-compact {
@@ -2604,14 +2609,14 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   align-items: center;
   gap: 0.65rem 1.25rem;
   padding-top: 0.85rem;
-  border-top: 1px solid rgba(59, 130, 246, 0.14);
+  border-top: 1px solid rgba(166, 209, 125, 0.14);
 }
 
 .aid-footer-copy {
   margin: 0;
   font-family: var(--aid-font-serif);
   font-size: clamp(0.72rem, 1.45vw, 0.85rem);
-  color: rgba(100, 116, 139, 0.88);
+  color: rgba(107, 107, 107, 0.88);
   letter-spacing: 0.03em;
 }
 
@@ -2628,13 +2633,13 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(30, 58, 95, 0.85);
+  color: rgba(26, 26, 26, 0.85);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .aid-footer-legal-link:hover {
-  color: #60a5fa;
+  color: #b8dc92;
 }
 
 .aid-footer-inner {
@@ -2667,12 +2672,12 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(96, 165, 250, 0.92);
+  color: rgba(184, 220, 146, 0.92);
   white-space: nowrap;
 }
 
 .aid-footer-names {
-  color: rgba(100, 116, 139, 0.9);
+  color: rgba(107, 107, 107, 0.9);
 }
 
 .aid-footer-actions {
@@ -2686,13 +2691,13 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .aid-footer-sep {
-  color: rgba(59, 130, 246, 0.88);
+  color: rgba(166, 209, 125, 0.88);
   font-weight: 300;
   user-select: none;
 }
 
 .aid-footer-inline-link {
-  color: #60a5fa;
+  color: #b8dc92;
   text-decoration: none;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -2702,8 +2707,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .aid-footer-inline-link:hover {
-  color: #1e40af;
-  text-shadow: 0 0 12px rgba(59, 130, 246, 0.35);
+  color: #fa6255;
+  text-shadow: 0 0 12px rgba(166, 209, 125, 0.35);
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -2937,10 +2942,10 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   min-height: 100dvh;
   overflow-x: clip;
   background: transparent;
-  --vf-contact-accent: #3b82f6;
-  --vf-contact-muted: #bfdbfe;
-  --vf-contact-bar: #dbeafe;
-  --vf-contact-bar-border: rgba(59, 130, 246, 0.28);
+  --vf-contact-accent: #a6d17d;
+  --vf-contact-muted: #a6d17d;
+  --vf-contact-bar: #fdf4d4;
+  --vf-contact-bar-border: rgba(166, 209, 125, 0.28);
 }
 
 .aid-contact-main {
@@ -3001,8 +3006,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .aid-contact-row-anchor:hover {
-  background: #bfdbfe;
-  border-color: rgba(96, 165, 250, 0.22);
+  background: #a6d17d;
+  border-color: rgba(184, 220, 146, 0.22);
 }
 
 .aid-contact-icon-tile {
@@ -3013,7 +3018,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   place-items: center;
   background: var(--vf-contact-accent);
   border-radius: 4px;
-  color: #f0f6ff;
+  color: #fff9e6;
 }
 
 .aid-contact-fb-svg {
@@ -3035,7 +3040,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .aid-contact-row-label {
-  color: rgba(30, 58, 95, 0.92);
+  color: rgba(26, 26, 26, 0.92);
 }
 
 .aid-contact-row-name {
@@ -3076,7 +3081,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: clamp(0.72rem, 1.6vw, 0.82rem);
   letter-spacing: 0.06em;
-  color: rgba(30, 58, 95, 0.55);
+  color: rgba(26, 26, 26, 0.55);
 }
 
 .aid-updates-scroll {
@@ -3087,7 +3092,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   -webkit-overflow-scrolling: touch;
   text-align: left;
   padding: 0 0 max(1.5rem, env(safe-area-inset-bottom, 0px));
-  scrollbar-color: rgba(96, 165, 250, 0.35) rgba(30, 58, 95, 0.1);
+  scrollbar-color: rgba(184, 220, 146, 0.35) rgba(26, 26, 26, 0.1);
 }
 
 .aid-updates-scroll::-webkit-scrollbar {
@@ -3095,7 +3100,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .aid-updates-scroll::-webkit-scrollbar-thumb {
-  background: rgba(96, 165, 250, 0.28);
+  background: rgba(184, 220, 146, 0.28);
   border-radius: 4px;
 }
 
@@ -3131,18 +3136,18 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   letter-spacing: 0.14em;
   padding: 0.2rem 0.45rem;
   border-radius: 4px;
-  border: 1px solid rgba(59, 130, 246, 0.4);
-  color: rgba(30, 58, 95, 0.85);
+  border: 1px solid rgba(166, 209, 125, 0.4);
+  color: rgba(26, 26, 26, 0.85);
 }
 
 .aid-updates-kind--release {
   color: var(--vf-contact-accent);
-  border-color: rgba(96, 165, 250, 0.35);
+  border-color: rgba(184, 220, 146, 0.35);
 }
 
 .aid-updates-kind--hotpatch {
   color: #ffb347;
-  border-color: rgba(30, 58, 95, 0.45);
+  border-color: rgba(26, 26, 26, 0.45);
   box-shadow: 0 0 0 1px rgba(255, 140, 60, 0.12);
 }
 
@@ -3163,21 +3168,21 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 
 .aid-updates-kind--chore {
   color: rgba(180, 190, 210, 0.82);
-  border-color: rgba(59, 130, 246, 0.48);
+  border-color: rgba(166, 209, 125, 0.48);
 }
 
 .aid-updates-kind--update {
-  color: rgba(30, 58, 95, 0.78);
+  color: rgba(26, 26, 26, 0.78);
 }
 
 /* Legacy kinds from older changelog.json */
 .aid-updates-kind--version {
   color: var(--vf-contact-accent);
-  border-color: rgba(96, 165, 250, 0.35);
+  border-color: rgba(184, 220, 146, 0.35);
 }
 
 .aid-updates-kind--commit {
-  color: rgba(30, 58, 95, 0.75);
+  color: rgba(26, 26, 26, 0.75);
 }
 
 .aid-updates-id {
@@ -3185,7 +3190,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: rgba(96, 165, 250, 0.55);
+  color: rgba(184, 220, 146, 0.55);
 }
 
 .aid-updates-subject {
@@ -3193,7 +3198,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-family: var(--aid-font-serif);
   font-size: clamp(0.95rem, 2.1vw, 1.05rem);
   line-height: 1.45;
-  color: rgba(30, 58, 95, 0.94);
+  color: rgba(26, 26, 26, 0.94);
 }
 
 .aid-updates-foot {
@@ -3204,11 +3209,11 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   gap: 0.5rem 1rem;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 0.78rem;
-  color: rgba(30, 58, 95, 0.65);
+  color: rgba(26, 26, 26, 0.65);
 }
 
 .aid-updates-time {
-  color: rgba(30, 58, 95, 0.75);
+  color: rgba(26, 26, 26, 0.75);
 }
 
 .aid-updates-hash {
@@ -3216,8 +3221,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-size: 0.74rem;
   padding: 0.12rem 0.35rem;
   border-radius: 4px;
-  background: rgba(30, 58, 95, 0.175);
-  color: rgba(96, 165, 250, 0.65);
+  background: rgba(26, 26, 26, 0.175);
+  color: rgba(184, 220, 146, 0.65);
 }
 
 /* Alternate landing frame (legacy, optional) */
@@ -3226,7 +3231,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   position: relative;
   overflow: hidden;
   padding: 0.9rem 1rem 1.2rem;
-  background: radial-gradient(120% 90% at 50% 0%, #dbeafe 0%, #e0ecff 50%, #f0f6ff 100%);
+  background: radial-gradient(120% 90% at 50% 0%, #fdf4d4 0%, #fdf4d4 50%, #fff9e6 100%);
 }
 
 .vf-ad-ambient {
@@ -3271,7 +3276,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .vf-ad-brand {
-  color: #ecf1fb;
+  color: #fdf4d4;
   font-size: 1.04rem;
   font-weight: 600;
 }
@@ -3280,13 +3285,13 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   border-radius: 999px;
   padding: 0.42rem 0.92rem;
   font-size: 0.78rem;
-  border: 1px solid rgba(59, 130, 246, 0.56);
+  border: 1px solid rgba(166, 209, 125, 0.56);
   transition: 180ms ease;
 }
 
 .vf-ad-top-btn-primary {
   background: #eef2fa;
-  color: #1e3a5f;
+  color: #1a1a1a;
 }
 
 .vf-ad-top-btn-primary:hover {
@@ -3294,12 +3299,12 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .vf-ad-top-btn-ghost {
-  background: rgba(59, 130, 246, 0.16);
+  background: rgba(166, 209, 125, 0.16);
   color: #e7eefb;
 }
 
 .vf-ad-top-btn-ghost:hover {
-  background: rgba(59, 130, 246, 0.4);
+  background: rgba(166, 209, 125, 0.4);
 }
 
 .vf-ad-main {
@@ -3312,19 +3317,19 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 .vf-ad-hero-frame {
   min-height: min(78vh, 670px);
   border-radius: 1.4rem;
-  border: 1px solid rgba(59, 130, 246, 0.36);
+  border: 1px solid rgba(166, 209, 125, 0.36);
   overflow: hidden;
   position: relative;
-  box-shadow: 0 24px 58px rgba(30, 58, 95, 0.2);
+  box-shadow: 0 24px 58px rgba(26, 26, 26, 0.2);
 }
 
 .vf-ad-hero-art {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 72% 38%, rgba(30, 58, 95, 0.6), transparent 33%),
-    radial-gradient(circle at 46% 74%, rgba(100, 116, 139, 0.42), transparent 42%),
-    linear-gradient(180deg, rgba(220, 163, 92, 0.75), rgba(126, 82, 54, 0.68) 56%, rgba(224, 236, 255, 0.72));
+    radial-gradient(circle at 72% 38%, rgba(26, 26, 26, 0.6), transparent 33%),
+    radial-gradient(circle at 46% 74%, rgba(107, 107, 107, 0.42), transparent 42%),
+    linear-gradient(180deg, rgba(220, 163, 92, 0.75), rgba(126, 82, 54, 0.68) 56%, rgba(253, 244, 212, 0.72));
   transform: scale(1.04);
   animation: vf-ad-hero-zoom 9s ease-in-out infinite;
 }
@@ -3348,9 +3353,9 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   top: 1.6rem;
   width: min(360px, calc(100% - 2.4rem));
   border-radius: 1rem;
-  border: 1px solid rgba(59, 130, 246, 0.52);
+  border: 1px solid rgba(166, 209, 125, 0.52);
   background: linear-gradient(180deg, rgba(24, 29, 37, 0.93), rgba(18, 22, 29, 0.95));
-  box-shadow: 0 20px 44px rgba(30, 58, 95, 0.175);
+  box-shadow: 0 20px 44px rgba(26, 26, 26, 0.175);
   padding: 1.1rem 1rem;
 }
 
@@ -3423,12 +3428,12 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 .vn-stage-bg {
   /* cloud sky gradient */
   background:
-    radial-gradient(ellipse 140% 90% at 50% 110%, #bfdbfe 0%, #dbeafe 40%, #f0f6ff 100%);
+    radial-gradient(ellipse 140% 90% at 50% 110%, #a6d17d 0%, #fdf4d4 40%, #fff9e6 100%);
   animation: vn-stage-bg 10s ease-in-out infinite;
 }
 .vn-stage-vignette {
   background:
-    radial-gradient(ellipse 120% 80% at 50% 85%, transparent 45%, rgba(30, 58, 95, 0.175) 100%);
+    radial-gradient(ellipse 120% 80% at 50% 85%, transparent 45%, rgba(26, 26, 26, 0.175) 100%);
   pointer-events: none;
 }
 
@@ -3457,8 +3462,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 @keyframes vn-portrait-glow {
-  0%, 100% { box-shadow: 0 0 30px -5px rgba(212,165,116,0.25), 0 25px 50px -12px rgba(30, 58, 95, 0.175); }
-  50% { box-shadow: 0 0 40px 0 rgba(212,165,116,0.35), 0 25px 50px -12px rgba(30, 58, 95, 0.175); }
+  0%, 100% { box-shadow: 0 0 30px -5px rgba(212,165,116,0.25), 0 25px 50px -12px rgba(26, 26, 26, 0.175); }
+  50% { box-shadow: 0 0 40px 0 rgba(212,165,116,0.35), 0 25px 50px -12px rgba(26, 26, 26, 0.175); }
 }
 .vn-portrait-glow {
   animation: vn-portrait-glow 3s ease-in-out infinite;
@@ -3476,20 +3481,20 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   background:
     linear-gradient(180deg, rgba(24,13,15,0.96) 0%, rgba(13,9,12,0.98) 100%);
   box-shadow:
-    0 -4px 36px rgba(30, 58, 95, 0.225),
-    inset 0 1px 0 rgba(59, 130, 246, 0.16),
+    0 -4px 36px rgba(26, 26, 26, 0.225),
+    inset 0 1px 0 rgba(166, 209, 125, 0.16),
     0 0 24px rgba(255,155,124,0.15);
 }
 .vn-name-tag {
-  color: #1e3a5f;
+  color: #1a1a1a;
   text-shadow: 0 0 20px rgba(255,155,124,0.45);
 }
 .vn-text-spoken {
-  color: #1e3a5f;
+  color: #1a1a1a;
   text-shadow: 0 0 14px rgba(255,155,124,0.28);
 }
 .vn-text-pending {
-  color: #94a3b8;
+  color: #9a9a9a;
 }
 
 /* Streaming cursor blink */
@@ -3498,7 +3503,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   50% { opacity: 0; }
 }
 .vn-cursor-blink {
-  color: #1e3a5f;
+  color: #1a1a1a;
   animation: cursor-blink 0.8s step-end infinite;
   margin-left: 1px;
 }
@@ -3507,28 +3512,28 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
    /menu — VirFriendo home: black + antique gold (same tokens as .aid-root)
    ============================================================================= */
 .ad-shell {
-  --aid-gold: #3b82f6;
-  --aid-gold-bright: #60a5fa;
-  --aid-gold-deep: #1e40af;
+  --aid-gold: #a6d17d;
+  --aid-gold-bright: #b8dc92;
+  --aid-gold-deep: #fa6255;
   --aid-font-display: var(--bg3-font-display);
   --aid-font-serif: var(--bg3-font-body);
-  --ad-orange: #3b82f6;
-  --ad-orange-hover: #60a5fa;
-  --ad-bg: #f0f6ff;
-  --ad-surface: #f0f6ff;
-  --ad-surface-2: #e0ecff;
-  --ad-border: rgba(59, 130, 246, 0.22);
+  --ad-orange: #a6d17d;
+  --ad-orange-hover: #b8dc92;
+  --ad-bg: #fff9e6;
+  --ad-surface: #fff9e6;
+  --ad-surface-2: #fdf4d4;
+  --ad-border: rgba(166, 209, 125, 0.22);
   --ad-text: var(--bg3-text);
-  --ad-muted: rgba(148, 163, 184, 0.88);
+  --ad-muted: rgba(154, 154, 154, 0.88);
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background:
-    radial-gradient(ellipse 95% 65% at 50% -18%, rgba(59, 130, 246, 0.12), transparent 58%),
-    radial-gradient(ellipse 55% 48% at 0% 100%, rgba(186, 230, 253, 0.45), transparent 52%),
-    radial-gradient(ellipse 55% 48% at 100% 100%, rgba(191, 219, 254, 0.42), transparent 52%),
-    linear-gradient(180deg, var(--bg3-black-rich) 0%, var(--bg3-black) 55%, #cfe1ff 100%);
+    radial-gradient(ellipse 95% 65% at 50% -18%, rgba(166, 209, 125, 0.12), transparent 58%),
+    radial-gradient(ellipse 55% 48% at 0% 100%, rgba(255, 240, 192, 0.45), transparent 52%),
+    radial-gradient(ellipse 55% 48% at 100% 100%, rgba(255, 240, 192, 0.42), transparent 52%),
+    linear-gradient(180deg, var(--bg3-black-rich) 0%, var(--bg3-black) 55%, #fff0c0 100%);
   color: var(--ad-text);
   font-family: var(--aid-font-serif);
 }
@@ -3555,7 +3560,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 
 .ad-card__main-link:focus-visible,
 .aid-ai-card__main-link:focus-visible {
-  outline: 2px solid var(--ad-orange, #3b82f6);
+  outline: 2px solid var(--ad-orange, #a6d17d);
   outline-offset: 2px;
   border-radius: 8px;
 }
@@ -3571,12 +3576,12 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
-  --vf-gold: #3b82f6;
-  --vf-gold-bright: #60a5fa;
-  --vf-gold-deep: #1e40af;
-  --vf-gold-mid: #3b82f6;
-  --vf-ink: #e0ecff;
-  --vf-cream: #1e40af;
+  --vf-gold: #a6d17d;
+  --vf-gold-bright: #b8dc92;
+  --vf-gold-deep: #fa6255;
+  --vf-gold-mid: #a6d17d;
+  --vf-ink: #fdf4d4;
+  --vf-cream: #fa6255;
 }
 
 .ad-agent-detail__toolbar {
@@ -3589,7 +3594,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(148, 163, 184, 0.85);
+  color: rgba(154, 154, 154, 0.85);
   text-decoration: none;
   font-family: var(--bg3-font-display, "Cinzel", Georgia, serif);
 }
@@ -3602,12 +3607,12 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   margin: 0 0 0;
   border-radius: 4px 4px 0 0;
   overflow: hidden;
-  border: 1px solid rgba(30, 64, 175, 0.45);
+  border: 1px solid rgba(250, 98, 85, 0.45);
   border-bottom: none;
   background: var(--vf-ink);
   box-shadow:
-    inset 0 0 0 1px rgba(96, 165, 250, 0.08),
-    0 0 40px rgba(30, 58, 95, 0.225);
+    inset 0 0 0 1px rgba(184, 220, 146, 0.08),
+    0 0 40px rgba(26, 26, 26, 0.225);
 }
 
 .ad-agent-detail__hero-media {
@@ -3629,8 +3634,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(240, 246, 255, 0.92) 0%,
-    rgba(224, 236, 255, 0.55) 38%,
+    rgba(255, 249, 230, 0.92) 0%,
+    rgba(253, 244, 212, 0.55) 38%,
     transparent 68%
   );
   pointer-events: none;
@@ -3650,8 +3655,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   line-height: 1.15;
   color: var(--vf-cream);
   text-shadow:
-    0 0 28px rgba(30, 58, 95, 0.425),
-    0 0 1px rgba(96, 165, 250, 0.35);
+    0 0 28px rgba(26, 26, 26, 0.425),
+    0 0 1px rgba(184, 220, 146, 0.35);
   z-index: 1;
 }
 
@@ -3663,11 +3668,11 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   gap: 0.75rem 1rem;
   margin-top: 0;
   padding: 0.65rem 0.85rem;
-  background: linear-gradient(180deg, rgba(224, 236, 255, 0.98) 0%, rgba(240, 246, 255, 0.99) 100%);
-  border: 1px solid rgba(30, 64, 175, 0.4);
+  background: linear-gradient(180deg, rgba(253, 244, 212, 0.98) 0%, rgba(255, 249, 230, 0.99) 100%);
+  border: 1px solid rgba(250, 98, 85, 0.4);
   border-top: none;
   border-radius: 0 0 4px 4px;
-  box-shadow: inset 0 1px 0 rgba(96, 165, 250, 0.06);
+  box-shadow: inset 0 1px 0 rgba(184, 220, 146, 0.06);
 }
 
 .ad-agent-detail__engage {
@@ -3689,7 +3694,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #64748b;
+  color: #6b6b6b;
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
@@ -3700,7 +3705,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-agent-detail__engage-btn:hover {
-  background: rgba(96, 165, 250, 0.08);
+  background: rgba(184, 220, 146, 0.08);
   color: var(--vf-cream);
 }
 
@@ -3737,11 +3742,11 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   min-width: 200px;
   padding: 0.35rem 0;
   border-radius: 4px;
-  border: 1px solid rgba(30, 64, 175, 0.55);
-  background: linear-gradient(165deg, #dbeafe 0%, #e0ecff 100%);
+  border: 1px solid rgba(250, 98, 85, 0.55);
+  background: linear-gradient(165deg, #fdf4d4 0%, #fdf4d4 100%);
   box-shadow:
-    0 12px 32px rgba(30, 58, 95, 0.275),
-    inset 0 0 0 1px rgba(96, 165, 250, 0.06);
+    0 12px 32px rgba(26, 26, 26, 0.275),
+    inset 0 0 0 1px rgba(184, 220, 146, 0.06);
 }
 
 .ad-agent-detail__more-item {
@@ -3750,7 +3755,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   padding: 0.5rem 0.85rem;
   border: none;
   background: transparent;
-  color: rgba(30, 58, 95, 0.92);
+  color: rgba(26, 26, 26, 0.92);
   font-size: 0.8rem;
   text-align: left;
   cursor: pointer;
@@ -3758,7 +3763,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-agent-detail__more-item:hover {
-  background: rgba(96, 165, 250, 0.08);
+  background: rgba(184, 220, 146, 0.08);
   color: var(--vf-cream);
 }
 
@@ -3772,7 +3777,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   min-height: 2.65rem;
   border-radius: 3px;
   border: 2px solid var(--vf-gold-deep);
-  background: linear-gradient(180deg, #bfdbfe 0%, var(--vf-gold-mid) 55%, var(--vf-gold-deep) 100%);
+  background: linear-gradient(180deg, #a6d17d 0%, var(--vf-gold-mid) 55%, var(--vf-gold-deep) 100%);
   color: #ffffff;
   font-size: 0.72rem;
   font-weight: 800;
@@ -3781,8 +3786,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   text-decoration: none;
   font-family: var(--bg3-font-display, "Cinzel", Georgia, serif);
   box-shadow:
-    2px 3px 0 rgba(30, 58, 95, 0.175),
-    0 0 24px rgba(96, 165, 250, 0.18);
+    2px 3px 0 rgba(26, 26, 26, 0.175),
+    0 0 24px rgba(184, 220, 146, 0.18);
   transition:
     filter 0.15s ease,
     transform 0.15s ease;
@@ -3806,15 +3811,15 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-agent-detail__tab {
-  border: 1px solid rgba(30, 64, 175, 0.45);
+  border: 1px solid rgba(250, 98, 85, 0.45);
   border-radius: 3px;
   padding: 0.42rem 0.9rem;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  background: rgba(240, 246, 255, 0.65);
-  color: rgba(148, 163, 184, 0.9);
+  background: rgba(255, 249, 230, 0.65);
+  color: rgba(154, 154, 154, 0.9);
   cursor: pointer;
   font-family: var(--bg3-font-display, "Cinzel", Georgia, serif);
   transition:
@@ -3824,15 +3829,15 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-agent-detail__tab:hover {
-  border-color: rgba(96, 165, 250, 0.45);
+  border-color: rgba(184, 220, 146, 0.45);
   color: var(--vf-cream);
 }
 
 .ad-agent-detail__tab--active {
-  background: rgba(224, 236, 255, 0.95);
+  background: rgba(253, 244, 212, 0.95);
   color: var(--vf-gold-bright);
-  border-color: rgba(96, 165, 250, 0.65);
-  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.12);
+  border-color: rgba(184, 220, 146, 0.65);
+  box-shadow: inset 0 0 0 1px rgba(184, 220, 146, 0.12);
 }
 
 .ad-agent-detail__tab-count {
@@ -3864,7 +3869,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   margin: 0 0 0.75rem;
   font-size: 0.78rem;
   font-weight: 600;
-  color: rgba(30, 58, 95, 0.92);
+  color: rgba(26, 26, 26, 0.92);
   font-family: var(--bg3-font-display, "Cinzel", Georgia, serif);
 }
 
@@ -3886,7 +3891,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   margin: 0 0 1rem;
   font-size: 0.88rem;
   line-height: 1.55;
-  color: rgba(30, 58, 95, 0.92);
+  color: rgba(26, 26, 26, 0.92);
   font-family: var(--bg3-font-body, "Crimson Text", Georgia, serif);
 }
 
@@ -3903,7 +3908,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   display: inline-block;
   padding: 0.2rem 0.55rem;
   border-radius: 3px;
-  border: 1px solid rgba(96, 165, 250, 0.35);
+  border: 1px solid rgba(184, 220, 146, 0.35);
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--vf-gold-bright);
@@ -3913,10 +3918,10 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 .ad-agent-detail__prompt {
   padding: 0.85rem 1rem;
   border-radius: 4px;
-  background: linear-gradient(165deg, rgba(224, 236, 255, 0.55) 0%, rgba(240, 246, 255, 0.85) 100%);
-  border: 1px solid rgba(30, 64, 175, 0.4);
+  background: linear-gradient(165deg, rgba(253, 244, 212, 0.55) 0%, rgba(255, 249, 230, 0.85) 100%);
+  border: 1px solid rgba(250, 98, 85, 0.4);
   margin-bottom: 1.25rem;
-  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.05);
+  box-shadow: inset 0 0 0 1px rgba(184, 220, 146, 0.05);
 }
 
 .ad-agent-detail__prompt-label {
@@ -3925,7 +3930,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(148, 163, 184, 0.85);
+  color: rgba(154, 154, 154, 0.85);
   font-family: var(--bg3-font-display, "Cinzel", Georgia, serif);
 }
 
@@ -3933,7 +3938,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   margin: 0;
   font-size: 0.82rem;
   line-height: 1.5;
-  color: rgba(30, 58, 95, 0.95);
+  color: rgba(26, 26, 26, 0.95);
   white-space: pre-wrap;
   font-family: var(--bg3-font-body, "Crimson Text", Georgia, serif);
 }
@@ -3943,11 +3948,11 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   top: 72px;
   padding: 0.75rem 0.85rem;
   border-radius: 4px;
-  background: linear-gradient(165deg, rgba(224, 236, 255, 0.75) 0%, rgba(240, 246, 255, 0.95) 100%);
-  border: 1px solid rgba(30, 64, 175, 0.4);
+  background: linear-gradient(165deg, rgba(253, 244, 212, 0.75) 0%, rgba(255, 249, 230, 0.95) 100%);
+  border: 1px solid rgba(250, 98, 85, 0.4);
   box-shadow:
-    inset 0 0 0 1px rgba(96, 165, 250, 0.06),
-    0 12px 36px rgba(30, 58, 95, 0.175);
+    inset 0 0 0 1px rgba(184, 220, 146, 0.06),
+    0 12px 36px rgba(26, 26, 26, 0.175);
 }
 
 .ad-agent-detail__meta-list {
@@ -3961,7 +3966,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   gap: 0.55rem;
   align-items: flex-start;
   padding: 0.55rem 0;
-  border-bottom: 1px solid rgba(59, 130, 246, 0.12);
+  border-bottom: 1px solid rgba(166, 209, 125, 0.12);
 }
 
 .ad-agent-detail__meta-list li:last-child .ad-agent-detail__meta-row {
@@ -3974,7 +3979,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   flex-shrink: 0;
   font-size: 0.75rem;
   line-height: 1.4;
-  color: rgba(96, 165, 250, 0.55);
+  color: rgba(184, 220, 146, 0.55);
 }
 
 .ad-agent-detail__meta-row > div {
@@ -3989,7 +3994,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(100, 116, 139, 0.88);
+  color: rgba(107, 107, 107, 0.88);
   font-family: var(--bg3-font-display, "Cinzel", Georgia, serif);
 }
 
@@ -4011,7 +4016,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   margin: 0;
   padding: 1.5rem 0;
   font-size: 0.88rem;
-  color: rgba(148, 163, 184, 0.85);
+  color: rgba(154, 154, 154, 0.85);
   font-family: var(--bg3-font-body, "Crimson Text", Georgia, serif);
 }
 
@@ -4026,8 +4031,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   gap: clamp(0.5rem, 2vw, 1rem);
   min-height: 56px;
   padding: max(6px, env(safe-area-inset-top, 0)) clamp(12px, 2vw, 20px) 8px;
-  background: #f0f6ff;
-  border-bottom: 1px solid #dbeafe;
+  background: #fff9e6;
+  border-bottom: 1px solid #fdf4d4;
 }
 
 .ad-topbar__left {
@@ -4043,7 +4048,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-size: 0.82rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #1e3a5f;
+  color: #1a1a1a;
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
@@ -4082,7 +4087,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-nav-link:hover {
-  color: #1e3a5f;
+  color: #1a1a1a;
 }
 
 .ad-nav-link--active {
@@ -4116,7 +4121,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   transform: translateY(-50%);
   width: 1rem;
   height: 1rem;
-  color: #64748b;
+  color: #6b6b6b;
   pointer-events: none;
 }
 
@@ -4125,19 +4130,19 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   box-sizing: border-box;
   padding: 0.5rem 0.65rem 0.5rem 2.25rem;
   font-size: 0.85rem;
-  color: #1e3a5f;
-  background: #bfdbfe;
+  color: #1a1a1a;
+  background: #a6d17d;
   border: 1px solid #333;
   border-radius: 9999px;
   outline: none;
 }
 
 .ad-topbar__search::placeholder {
-  color: #64748b;
+  color: #6b6b6b;
 }
 
 .ad-topbar__search:focus {
-  border-color: #94a3b8;
+  border-color: #9a9a9a;
   box-shadow: 0 0 0 1px rgba(255, 122, 24, 0.25);
 }
 
@@ -4160,7 +4165,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
-  color: #f0f6ff;
+  color: #fff9e6;
   background: var(--ad-orange);
   border: none;
   border-radius: 4px;
@@ -4169,7 +4174,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 
 .ad-topbar__play:hover {
   background: var(--ad-orange-hover);
-  color: #f0f6ff;
+  color: #fff9e6;
 }
 
 .ad-topbar__play--active {
@@ -4192,15 +4197,15 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   height: 2.25rem;
   padding: 0;
   border-radius: 50%;
-  border: 1px solid #bfdbfe;
-  background: #e0ecff;
-  color: #1e3a5f;
+  border: 1px solid #a6d17d;
+  background: #fdf4d4;
+  color: #1a1a1a;
   cursor: pointer;
 }
 
 .ad-topbar__user-btn:hover {
-  border-color: #94a3b8;
-  background: #bfdbfe;
+  border-color: #9a9a9a;
+  background: #a6d17d;
 }
 
 .ad-user-icon {
@@ -4214,10 +4219,10 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   top: calc(100% + 6px);
   min-width: 10rem;
   padding: 0.35rem;
-  background: #e0ecff;
+  background: #fdf4d4;
   border: 1px solid #333;
   border-radius: 8px;
-  box-shadow: 0 16px 40px rgba(30, 58, 95, 0.3);
+  box-shadow: 0 16px 40px rgba(26, 26, 26, 0.3);
 }
 
 .ad-topbar__dd-item {
@@ -4227,7 +4232,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   width: 100%;
   padding: 0.5rem 0.6rem;
   font-size: 0.875rem;
-  color: #1e3a5f;
+  color: #1a1a1a;
   background: none;
   border: none;
   border-radius: 4px;
@@ -4236,7 +4241,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-topbar__dd-item:hover {
-  background: #bfdbfe;
+  background: #a6d17d;
 }
 
 .ad-dd-icon {
@@ -4301,7 +4306,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 .ad-hero__banner-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(105deg, rgba(30, 58, 95, 0.44) 0%, rgba(30, 58, 95, 0.225) 55%, transparent 100%);
+  background: linear-gradient(105deg, rgba(26, 26, 26, 0.44) 0%, rgba(26, 26, 26, 0.225) 55%, transparent 100%);
   pointer-events: none;
 }
 
@@ -4333,7 +4338,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   margin: 0 0 1rem;
   font-size: 0.9rem;
   line-height: 1.55;
-  color: #1e3a5f;
+  color: #1a1a1a;
 }
 
 .ad-hero__lede strong {
@@ -4350,7 +4355,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-decoration: none;
-  color: #f0f6ff;
+  color: #fff9e6;
   background: var(--ad-orange);
   border-radius: 6px;
 }
@@ -4397,7 +4402,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-hero__rail-item--link:hover {
-  border-color: #bfdbfe;
+  border-color: #a6d17d;
   background: var(--ad-surface-2);
 }
 
@@ -4416,7 +4421,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-size: 0.82rem;
   font-weight: 600;
   line-height: 1.35;
-  color: #1e3a5f;
+  color: #1a1a1a;
 }
 
 .ad-hero__rail-icon {
@@ -4456,7 +4461,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-deployed__title-text {
-  color: #1e3a5f;
+  color: #1a1a1a;
 }
 
 .ad-deployed--visible .ad-deployed__title {
@@ -4484,9 +4489,9 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   gap: 0.35rem;
   padding: 0.4rem 0.75rem;
   border-radius: 999px;
-  border: 1px solid rgba(59, 130, 246, 0.28);
-  background: rgba(30, 58, 95, 0.175);
-  color: #1e3a5f;
+  border: 1px solid rgba(166, 209, 125, 0.28);
+  background: rgba(26, 26, 26, 0.175);
+  color: #1a1a1a;
   font-size: clamp(0.55rem, 1.35vw, 0.62rem);
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -4503,17 +4508,17 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-menu-filters__pill:hover {
-  border-color: rgba(96, 165, 250, 0.4);
-  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(184, 220, 146, 0.4);
+  background: rgba(166, 209, 125, 0.1);
 }
 
 .ad-menu-filters__pill--active {
-  background: linear-gradient(180deg, #93c5fd 0%, #3b82f6 45%, #1e40af 100%);
+  background: linear-gradient(180deg, #b8dc92 0%, #a6d17d 45%, #fa6255 100%);
   color: #ffffff;
-  border-color: rgba(30, 58, 95, 0.85);
+  border-color: rgba(26, 26, 26, 0.85);
   box-shadow:
-    0 1px 0 rgba(191, 219, 254, 0.35) inset,
-    0 4px 14px rgba(30, 58, 95, 0.175);
+    0 1px 0 rgba(255, 240, 192, 0.35) inset,
+    0 4px 14px rgba(26, 26, 26, 0.175);
 }
 
 .ad-menu-filters__pill-icon {
@@ -4547,9 +4552,9 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   appearance: none;
   padding: 0.42rem 1.75rem 0.42rem 0.65rem;
   border-radius: 8px;
-  border: 1px solid rgba(59, 130, 246, 0.28);
-  background: rgba(30, 58, 95, 0.175);
-  color: #1e3a5f;
+  border: 1px solid rgba(166, 209, 125, 0.28);
+  background: rgba(26, 26, 26, 0.175);
+  color: #1a1a1a;
   font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -4567,7 +4572,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   transform: translateY(-50%);
   pointer-events: none;
   font-size: 0.55rem;
-  color: #64748b;
+  color: #6b6b6b;
 }
 
 .ad-menu-filters__filters-wrap {
@@ -4580,9 +4585,9 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   gap: 0.35rem;
   padding: 0.42rem 0.65rem;
   border-radius: 8px;
-  border: 1px solid rgba(59, 130, 246, 0.28);
-  background: rgba(30, 58, 95, 0.175);
-  color: #1e3a5f;
+  border: 1px solid rgba(166, 209, 125, 0.28);
+  background: rgba(26, 26, 26, 0.175);
+  color: #1a1a1a;
   font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -4592,7 +4597,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-menu-filters__filters-btn:hover {
-  border-color: #bfdbfe;
+  border-color: #a6d17d;
 }
 
 .ad-menu-filters__filters-icon {
@@ -4603,7 +4608,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 
 .ad-menu-filters__chev {
   font-size: 0.55rem;
-  color: #64748b;
+  color: #6b6b6b;
   margin-left: 0.1rem;
 }
 
@@ -4616,22 +4621,22 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   padding: 0.75rem;
   border-radius: 8px;
   border: 1px solid #333;
-  background: #e0ecff;
-  box-shadow: 0 12px 32px rgba(30, 58, 95, 0.225);
+  background: #fdf4d4;
+  box-shadow: 0 12px 32px rgba(26, 26, 26, 0.225);
 }
 
 .ad-menu-filters__popover-hint {
   margin: 0;
   font-size: 0.75rem;
   line-height: 1.4;
-  color: #64748b;
+  color: #6b6b6b;
 }
 
 .ad-menu-filters__view {
   display: inline-flex;
   border-radius: 8px;
   border: 1px solid #333;
-  background: #e0ecff;
+  background: #fdf4d4;
   overflow: hidden;
 }
 
@@ -4639,18 +4644,18 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   padding: 0.38rem 0.55rem;
   border: none;
   background: transparent;
-  color: #64748b;
+  color: #6b6b6b;
   cursor: pointer;
   line-height: 0;
 }
 
 .ad-menu-filters__view-btn:hover {
-  color: #1e3a5f;
+  color: #1a1a1a;
 }
 
 .ad-menu-filters__view-btn--active {
-  background: #bfdbfe;
-  color: #1e3a5f;
+  background: #a6d17d;
+  color: #1a1a1a;
 }
 
 .ad-menu-filters__view-icon {
@@ -4703,7 +4708,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   overflow: hidden;
   background: var(--ad-surface);
   border: 1px solid var(--ad-border);
-  box-shadow: 0 12px 32px rgba(30, 58, 95, 0.175);
+  box-shadow: 0 12px 32px rgba(26, 26, 26, 0.175);
   opacity: 0;
   transform: translateY(12px);
   transition:
@@ -4728,7 +4733,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-card:hover {
-  border-color: #bfdbfe;
+  border-color: #a6d17d;
 }
 
 .ad-card__head {
@@ -4736,7 +4741,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   align-items: center;
   gap: 0.6rem;
   padding: 0.65rem 0.75rem;
-  border-bottom: 1px solid #bfdbfe;
+  border-bottom: 1px solid #a6d17d;
   flex-shrink: 0;
 }
 
@@ -4767,7 +4772,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 .ad-card__author-name {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #1e3a5f;
+  color: #1a1a1a;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4775,7 +4780,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 
 .ad-card__badge {
   font-size: 0.5rem;
-  color: #64748b;
+  color: #6b6b6b;
 }
 
 .ad-card__date {
@@ -4791,22 +4796,22 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   border: none;
   border-radius: 4px;
   background: transparent;
-  color: #64748b;
+  color: #6b6b6b;
   font-size: 0.95rem;
   line-height: 1;
   cursor: pointer;
 }
 
 .ad-card__menu:hover {
-  color: #1e3a5f;
-  background: #bfdbfe;
+  color: #1a1a1a;
+  background: #a6d17d;
 }
 
 .ad-card__media {
   position: relative;
   aspect-ratio: 16 / 9;
   flex-shrink: 0;
-  background: #f0f6ff;
+  background: #fff9e6;
 }
 
 .ad-card__media img {
@@ -4829,14 +4834,14 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-weight: 700;
   font-style: italic;
   line-height: 1.25;
-  color: #1e3a5f;
+  color: #1a1a1a;
 }
 
 .ad-card__desc {
   margin: 0;
   font-size: 0.8rem;
   line-height: 1.45;
-  color: #64748b;
+  color: #6b6b6b;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -4851,8 +4856,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   padding: 0.65rem 0.75rem 0.75rem;
   margin-top: auto;
   flex-shrink: 0;
-  border-top: 1px solid #bfdbfe;
-  background: #e0ecff;
+  border-top: 1px solid #a6d17d;
+  background: #fdf4d4;
 }
 
 .ad-card__stats {
@@ -4868,7 +4873,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   gap: 0.3rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #64748b;
+  color: #6b6b6b;
 }
 
 .ad-card__stat-icon {
@@ -4888,7 +4893,7 @@ button.ad-card__like-btn {
 }
 
 button.ad-card__like-btn.is-liked {
-  color: #60a5fa;
+  color: #b8dc92;
 }
 
 button.ad-card__like-btn.is-liked .ad-card__stat-icon {
@@ -4906,13 +4911,13 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   text-transform: uppercase;
   text-decoration: none;
   color: #ffffff;
-  background: linear-gradient(180deg, #93c5fd 0%, #3b82f6 45%, #1e40af 100%);
-  border: 2px solid rgba(224, 236, 255, 0.9);
+  background: linear-gradient(180deg, #b8dc92 0%, #a6d17d 45%, #fa6255 100%);
+  border: 2px solid rgba(253, 244, 212, 0.9);
   border-radius: 4px;
   flex-shrink: 0;
   box-shadow:
-    0 1px 0 rgba(191, 219, 254, 0.35) inset,
-    0 4px 14px rgba(30, 58, 95, 0.175);
+    0 1px 0 rgba(255, 240, 192, 0.35) inset,
+    0 4px 14px rgba(26, 26, 26, 0.175);
   transition:
     filter 0.15s ease,
     box-shadow 0.15s ease;
@@ -4920,12 +4925,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .ad-card__chat:hover {
   filter: brightness(1.06);
-  border-color: rgba(96, 165, 250, 0.55);
+  border-color: rgba(184, 220, 146, 0.55);
   color: #ffffff;
   box-shadow:
-    0 1px 0 rgba(191, 219, 254, 0.45) inset,
-    0 0 0 1px rgba(30, 58, 95, 0.25),
-    0 8px 24px rgba(30, 58, 95, 0.25);
+    0 1px 0 rgba(255, 240, 192, 0.45) inset,
+    0 0 0 1px rgba(26, 26, 26, 0.25),
+    0 8px 24px rgba(26, 26, 26, 0.25);
 }
 
 .ad-card__chat-icon {
@@ -4938,7 +4943,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   text-align: center;
   font-size: 0.85rem;
   line-height: 1.5;
-  color: #64748b;
+  color: #6b6b6b;
 }
 
 .ad-deployed__hint-link {
@@ -4963,8 +4968,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .ad-page-footer {
   margin-top: auto;
   padding: 1.25rem 1rem 1.5rem;
-  border-top: 1px solid rgba(59, 130, 246, 0.22);
-  background: linear-gradient(180deg, rgba(240, 246, 255, 0.98) 0%, #cfe1ff 100%);
+  border-top: 1px solid rgba(166, 209, 125, 0.22);
+  background: linear-gradient(180deg, rgba(255, 249, 230, 0.98) 0%, #fff0c0 100%);
 }
 
 .ad-page-footer__inner {
@@ -4993,7 +4998,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .ad-page-footer__names {
   font-size: 0.8rem;
-  color: #64748b;
+  color: #6b6b6b;
   line-height: 1.45;
 }
 
@@ -5005,7 +5010,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .ad-page-footer__links a {
-  color: #1e3a5f;
+  color: #1a1a1a;
   font-weight: 600;
   text-decoration: none;
 }
@@ -5021,9 +5026,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   align-items: center;
   gap: 0.75rem;
   padding-top: 1rem;
-  border-top: 1px solid #dbeafe;
+  border-top: 1px solid #fdf4d4;
   font-size: 0.75rem;
-  color: #64748b;
+  color: #6b6b6b;
 }
 
 .ad-page-footer__legal p {
@@ -5036,7 +5041,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .ad-page-footer__legal-links a {
-  color: #64748b;
+  color: #6b6b6b;
   text-decoration: none;
   font-weight: 600;
   text-transform: uppercase;
@@ -5058,12 +5063,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   flex-direction: column;
   --aid-font-display: var(--bg3-font-display);
   --aid-font-serif: var(--bg3-font-body);
-  --aid-gold: #3b82f6;
-  --aid-gold-bright: #60a5fa;
-  --aid-gold-deep: #1e40af;
+  --aid-gold: #a6d17d;
+  --aid-gold-bright: #b8dc92;
+  --aid-gold-deep: #fa6255;
   background:
-    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(59, 130, 246, 0.12), transparent 55%),
-    linear-gradient(180deg, #e0ecff 0%, #f0f6ff 45%, #cfe1ff 100%);
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(166, 209, 125, 0.12), transparent 55%),
+    linear-gradient(180deg, #fdf4d4 0%, #fff9e6 45%, #fff0c0 100%);
   color: var(--bg3-text);
 }
 
@@ -5083,14 +5088,14 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: 0.95rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(30, 58, 95, 0.55);
+  color: rgba(26, 26, 26, 0.55);
 }
 
 .chat-entry-agent-line {
   margin: 0 0 1.75rem;
   font-family: var(--bg3-font-body);
   font-size: 0.88rem;
-  color: rgba(30, 58, 95, 0.75);
+  color: rgba(26, 26, 26, 0.75);
   text-align: center;
 }
 
@@ -5099,7 +5104,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 600;
   letter-spacing: 0.12em;
   color: var(--bg3-gold-bright);
-  text-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
+  text-shadow: 0 0 20px rgba(166, 209, 125, 0.25);
 }
 
 .chat-entry-cards {
@@ -5118,13 +5123,13 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   min-height: 112px;
   padding: 1.1rem 1.25rem;
   border-radius: 10px;
-  border: 1px solid rgba(59, 130, 246, 0.28);
-  background: linear-gradient(165deg, rgba(224, 236, 255, 0.92) 0%, rgba(240, 246, 255, 0.96) 100%);
+  border: 1px solid rgba(166, 209, 125, 0.28);
+  background: linear-gradient(165deg, rgba(253, 244, 212, 0.92) 0%, rgba(255, 249, 230, 0.96) 100%);
   box-shadow:
-    inset 0 1px 0 rgba(30, 58, 95, 0.06),
-    0 12px 36px rgba(30, 58, 95, 0.225);
+    inset 0 1px 0 rgba(26, 26, 26, 0.06),
+    0 12px 36px rgba(26, 26, 26, 0.225);
   cursor: pointer;
-  color: #1e3a5f;
+  color: #1a1a1a;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
@@ -5132,11 +5137,11 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .chat-entry-card:hover {
-  border-color: rgba(96, 165, 250, 0.45);
+  border-color: rgba(184, 220, 146, 0.45);
   box-shadow:
-    inset 0 1px 0 rgba(30, 58, 95, 0.1),
-    0 0 0 1px rgba(59, 130, 246, 0.15),
-    0 16px 44px rgba(30, 58, 95, 0.25);
+    inset 0 1px 0 rgba(26, 26, 26, 0.1),
+    0 0 0 1px rgba(166, 209, 125, 0.15),
+    0 16px 44px rgba(26, 26, 26, 0.25);
   transform: translateY(-2px);
 }
 
@@ -5153,14 +5158,14 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #1e40af;
+  color: #fa6255;
 }
 
 .chat-entry-back {
   margin-top: 2rem;
   font-family: var(--bg3-font-body);
   font-size: 0.88rem;
-  color: rgba(148, 163, 184, 0.85);
+  color: rgba(154, 154, 154, 0.85);
   text-decoration: none;
   transition: color 0.2s ease;
 }
@@ -5173,9 +5178,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: min(440px, 100%);
   padding: 1.25rem 1.15rem 1.35rem;
   border-radius: 10px;
-  border: 1px solid rgba(59, 130, 246, 0.32);
-  background: linear-gradient(165deg, rgba(224, 236, 255, 0.97) 0%, rgba(240, 246, 255, 0.99) 100%);
-  box-shadow: 0 24px 60px rgba(30, 58, 95, 0.275);
+  border: 1px solid rgba(166, 209, 125, 0.32);
+  background: linear-gradient(165deg, rgba(253, 244, 212, 0.97) 0%, rgba(255, 249, 230, 0.99) 100%);
+  box-shadow: 0 24px 60px rgba(26, 26, 26, 0.275);
 }
 
 .chat-entry-subbox--wide {
@@ -5197,7 +5202,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #1e40af;
+  color: #fa6255;
 }
 
 .chat-entry-subbox-close {
@@ -5206,7 +5211,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   border: none;
   border-radius: 4px;
   background: transparent;
-  color: rgba(30, 58, 95, 0.75);
+  color: rgba(26, 26, 26, 0.75);
   cursor: pointer;
   font-size: 1rem;
   line-height: 1;
@@ -5214,14 +5219,14 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .chat-entry-subbox-close:hover {
   color: var(--bg3-gold-bright);
-  background: rgba(59, 130, 246, 0.24);
+  background: rgba(166, 209, 125, 0.24);
 }
 
 .chat-entry-subbox-hint {
   margin: 0 0 1rem;
   font-size: 0.82rem;
   line-height: 1.45;
-  color: rgba(148, 163, 184, 0.82);
+  color: rgba(154, 154, 154, 0.82);
 }
 
 .chat-entry-game-grid {
@@ -5261,7 +5266,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .chat-entry-game-tile-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(30, 58, 95, 0.175);
+  box-shadow: 0 6px 20px rgba(26, 26, 26, 0.175);
 }
 
 .chat-entry-game-tile-btn:disabled {
@@ -5273,9 +5278,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: relative;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid rgba(59, 130, 246, 0.22);
+  border: 1px solid rgba(166, 209, 125, 0.22);
   aspect-ratio: 16 / 10;
-  background: #e0ecff;
+  background: #fdf4d4;
 }
 
 .chat-entry-game-img-wrap .chat-entry-game-thumb {
@@ -5302,16 +5307,16 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-align: center;
-  color: rgba(30, 58, 95, 0.9);
+  color: rgba(26, 26, 26, 0.9);
 }
 
 .chat-entry-subbox-done {
   width: 100%;
   padding: 0.55rem;
   border-radius: 6px;
-  border: 1px solid rgba(59, 130, 246, 0.35);
-  background: rgba(30, 58, 95, 0.175);
-  color: #1e3a5f;
+  border: 1px solid rgba(166, 209, 125, 0.35);
+  background: rgba(26, 26, 26, 0.175);
+  color: #1a1a1a;
   font-family: var(--bg3-font-display);
   font-size: 0.72rem;
   font-weight: 600;
@@ -5322,8 +5327,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .chat-entry-subbox-done:hover {
-  border-color: rgba(96, 165, 250, 0.5);
-  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(184, 220, 146, 0.5);
+  background: rgba(166, 209, 125, 0.1);
 }
 
 .chat-entry-step-badge {
@@ -5332,7 +5337,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(96, 165, 250, 0.75);
+  color: rgba(184, 220, 146, 0.75);
 }
 
 .chat-entry-field-block {
@@ -5344,7 +5349,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   margin-bottom: 0.45rem;
   font-family: var(--bg3-font-body);
   font-size: 0.88rem;
-  color: rgba(30, 58, 95, 0.92);
+  color: rgba(26, 26, 26, 0.92);
 }
 
 .chat-entry-input,
@@ -5353,9 +5358,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   box-sizing: border-box;
   padding: 0.55rem 0.65rem;
   border-radius: 6px;
-  border: 1px solid rgba(59, 130, 246, 0.28);
-  background: rgba(30, 58, 95, 0.2);
-  color: #1e3a5f;
+  border: 1px solid rgba(166, 209, 125, 0.28);
+  background: rgba(26, 26, 26, 0.2);
+  color: #1a1a1a;
   font-family: var(--bg3-font-body);
   font-size: 0.92rem;
   outline: none;
@@ -5364,8 +5369,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .chat-entry-input:focus,
 .chat-entry-textarea:focus {
-  border-color: rgba(96, 165, 250, 0.5);
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.15);
+  border-color: rgba(184, 220, 146, 0.5);
+  box-shadow: 0 0 0 1px rgba(166, 209, 125, 0.15);
 }
 
 .chat-entry-input--mt {
@@ -5389,9 +5394,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   min-width: 5rem;
   padding: 0.5rem 0.65rem;
   border-radius: 6px;
-  border: 1px solid rgba(59, 130, 246, 0.28);
-  background: rgba(30, 58, 95, 0.175);
-  color: #1e3a5f;
+  border: 1px solid rgba(166, 209, 125, 0.28);
+  background: rgba(26, 26, 26, 0.175);
+  color: #1a1a1a;
   font-family: var(--bg3-font-display);
   font-size: 0.68rem;
   font-weight: 600;
@@ -5402,13 +5407,13 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .chat-entry-gender-btn:hover {
-  border-color: rgba(96, 165, 250, 0.4);
+  border-color: rgba(184, 220, 146, 0.4);
 }
 
 .chat-entry-gender-btn--active {
-  border-color: rgba(96, 165, 250, 0.55);
-  background: rgba(59, 130, 246, 0.15);
-  color: #1e3a5f;
+  border-color: rgba(184, 220, 146, 0.55);
+  background: rgba(166, 209, 125, 0.15);
+  color: #1a1a1a;
 }
 
 .chat-entry-wizard-actions {
@@ -5433,12 +5438,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .chat-entry-btn-primary {
-  border: 2px solid rgba(224, 236, 255, 0.95);
-  background: linear-gradient(180deg, #93c5fd 0%, #3b82f6 45%, #1e40af 100%);
+  border: 2px solid rgba(253, 244, 212, 0.95);
+  background: linear-gradient(180deg, #b8dc92 0%, #a6d17d 45%, #fa6255 100%);
   color: #ffffff;
   box-shadow:
-    0 1px 0 rgba(191, 219, 254, 0.35) inset,
-    0 4px 14px rgba(30, 58, 95, 0.175);
+    0 1px 0 rgba(255, 240, 192, 0.35) inset,
+    0 4px 14px rgba(26, 26, 26, 0.175);
 }
 
 .chat-entry-btn-primary:hover {
@@ -5446,14 +5451,14 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .chat-entry-btn-secondary {
-  border: 1px solid rgba(59, 130, 246, 0.35);
+  border: 1px solid rgba(166, 209, 125, 0.35);
   background: transparent;
-  color: rgba(30, 58, 95, 0.95);
+  color: rgba(26, 26, 26, 0.95);
 }
 
 .chat-entry-btn-secondary:hover {
-  border-color: rgba(96, 165, 250, 0.45);
-  background: rgba(59, 130, 246, 0.24);
+  border-color: rgba(184, 220, 146, 0.45);
+  background: rgba(166, 209, 125, 0.24);
 }
 
 /* Create character — minimal wizard: fade-in + karaoke title */
@@ -5483,7 +5488,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: rgba(30, 58, 95, 0.75);
+  color: rgba(26, 26, 26, 0.75);
   cursor: pointer;
   font-size: 1.1rem;
   line-height: 1;
@@ -5494,13 +5499,13 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .chat-entry-char-close:hover {
   color: var(--bg3-gold-bright);
-  background: rgba(59, 130, 246, 0.24);
+  background: rgba(166, 209, 125, 0.24);
 }
 
 .chat-entry-char-backlink {
   font-family: var(--bg3-font-body);
   font-size: 0.88rem;
-  color: rgba(148, 163, 184, 0.85);
+  color: rgba(154, 154, 154, 0.85);
   background: none;
   border: none;
   cursor: pointer;
@@ -5545,7 +5550,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(30, 58, 95, 0.45);
+  color: rgba(26, 26, 26, 0.45);
 }
 
 .chat-entry-char-karaoke-title {
@@ -5555,7 +5560,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: clamp(1.05rem, 2.8vw, 1.35rem);
   font-style: normal;
   line-height: 1.45;
-  color: #1e3a5f;
+  color: #1a1a1a;
   font-weight: 500;
 }
 
@@ -5599,10 +5604,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   box-sizing: border-box;
   padding: 0.65rem 0.15rem;
   border: none;
-  border-bottom: 1px solid rgba(100, 116, 139, 0.35);
+  border-bottom: 1px solid rgba(107, 107, 107, 0.35);
   border-radius: 0;
   background: transparent;
-  color: #1e3a5f;
+  color: #1a1a1a;
   font-family: var(--bg3-font-body);
   font-size: clamp(1.1rem, 2.5vw, 1.35rem);
   outline: none;
@@ -5611,12 +5616,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .chat-entry-char-input::placeholder,
 .chat-entry-char-textarea::placeholder {
-  color: rgba(100, 116, 139, 0.55);
+  color: rgba(107, 107, 107, 0.55);
 }
 
 .chat-entry-char-input:focus,
 .chat-entry-char-textarea:focus {
-  border-bottom-color: rgba(59, 130, 246, 0.55);
+  border-bottom-color: rgba(166, 209, 125, 0.55);
 }
 
 .chat-entry-char-input--mt {
@@ -5650,16 +5655,16 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   min-width: 11rem;
   padding: 0.65rem 1.5rem;
   border-radius: 999px;
-  border: 1px solid rgba(224, 236, 255, 0.9);
-  background: linear-gradient(180deg, #dbeafe 0%, #bfdbfe 100%);
-  color: #1e3a5f;
+  border: 1px solid rgba(253, 244, 212, 0.9);
+  background: linear-gradient(180deg, #fdf4d4 0%, #a6d17d 100%);
+  color: #1a1a1a;
   font-family: var(--bg3-font-display);
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(30, 58, 95, 0.175);
+  box-shadow: 0 4px 20px rgba(26, 26, 26, 0.175);
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
@@ -5667,11 +5672,11 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .chat-entry-char-next:hover {
-  border-color: rgba(59, 130, 246, 0.45);
-  color: #1e3a5f;
+  border-color: rgba(166, 209, 125, 0.45);
+  color: #1a1a1a;
   box-shadow:
-    0 0 0 1px rgba(59, 130, 246, 0.15),
-    0 8px 28px rgba(30, 58, 95, 0.225);
+    0 0 0 1px rgba(166, 209, 125, 0.15),
+    0 8px 28px rgba(26, 26, 26, 0.225);
 }
 
 .chat-entry-char-next-icon {
@@ -5770,7 +5775,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-chat-sidebar-bond {
   padding: 0.5rem 0 0.35rem;
-  border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+  border-bottom: 1px solid rgba(166, 209, 125, 0.1);
   margin-bottom: 0.15rem;
 }
 
@@ -5780,7 +5785,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(30, 58, 95, 0.9);
+  color: rgba(26, 26, 26, 0.9);
   margin: 0.35rem 0 0.2rem;
 }
 
@@ -5805,7 +5810,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   border-radius: 1rem;
   overflow: hidden;
   background: var(--ad-surface);
-  box-shadow: 0 8px 32px rgba(30, 58, 95, 0.175);
+  box-shadow: 0 8px 32px rgba(26, 26, 26, 0.175);
 }
 
 .vf-chat-panel {
@@ -5852,9 +5857,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: min(14rem, 48vw);
   height: min(14rem, 48vw);
   max-width: 100%;
-  color: #60a5fa;
+  color: #b8dc92;
   opacity: 0.95;
-  filter: drop-shadow(0 8px 22px rgba(59, 130, 246, 0.35));
+  filter: drop-shadow(0 8px 22px rgba(166, 209, 125, 0.35));
 }
 
 .vf-chat-model-hint {
@@ -5863,7 +5868,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(30, 58, 95, 0.75);
+  color: rgba(26, 26, 26, 0.75);
   padding: 0.35rem 0.75rem 0.85rem;
 }
 
@@ -5873,7 +5878,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 500;
   letter-spacing: 0.05em;
   line-height: 1.5;
-  color: rgba(30, 58, 95, 0.92);
+  color: rgba(26, 26, 26, 0.92);
   margin-bottom: 0.35rem;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -5891,7 +5896,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-model-ring--alert {
-  filter: drop-shadow(0 0 14px rgba(30, 58, 95, 0.45));
+  filter: drop-shadow(0 0 14px rgba(26, 26, 26, 0.45));
 }
 
 .vf-chat-model-ring--calm {
@@ -5903,7 +5908,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-model-ring--wave {
-  filter: drop-shadow(0 0 14px rgba(30, 58, 95, 0.4));
+  filter: drop-shadow(0 0 14px rgba(26, 26, 26, 0.4));
 }
 
 .vf-chat-main {
@@ -5916,8 +5921,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   overflow: hidden;
   background: var(--ad-surface-2);
   box-shadow:
-    0 12px 40px rgba(30, 58, 95, 0.19),
-    inset 0 0 0 1px rgba(59, 130, 246, 0.08);
+    0 12px 40px rgba(26, 26, 26, 0.19),
+    inset 0 0 0 1px rgba(166, 209, 125, 0.08);
 }
 
 .vf-chat-tabs {
@@ -5927,8 +5932,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.45rem 0.55rem;
-  background: linear-gradient(180deg, rgba(224, 236, 255, 0.92) 0%, rgba(224, 236, 255, 0.88) 100%);
-  border-bottom: 1px solid rgba(59, 130, 246, 0.12);
+  background: linear-gradient(180deg, rgba(253, 244, 212, 0.92) 0%, rgba(253, 244, 212, 0.88) 100%);
+  border-bottom: 1px solid rgba(166, 209, 125, 0.12);
   font-family: var(--aid-font-display);
   overflow-x: auto;
   scrollbar-width: thin;
@@ -5960,7 +5965,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(30, 58, 95, 0.88);
+  color: rgba(26, 26, 26, 0.88);
   border: none;
   background: transparent;
   transition: background 0.2s, color 0.2s;
@@ -5968,13 +5973,13 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-tab:hover {
-  color: #1e3a5f;
-  background: rgba(59, 130, 246, 0.12);
+  color: #1a1a1a;
+  background: rgba(166, 209, 125, 0.12);
 }
 
 .vf-chat-tab--active {
-  color: #1e3a5f;
-  background: linear-gradient(180deg, #60a5fa, #3b82f6);
+  color: #1a1a1a;
+  background: linear-gradient(180deg, #b8dc92, #a6d17d);
 }
 
 .vf-chat-tab--ghost {
@@ -6020,21 +6025,21 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .vf-chat-bubble--user {
   background: linear-gradient(
     168deg,
-    rgba(224, 236, 255, 0.97) 0%,
-    rgba(224, 236, 255, 0.99) 55%,
-    rgba(224, 236, 255, 0.96) 100%
+    rgba(253, 244, 212, 0.97) 0%,
+    rgba(253, 244, 212, 0.99) 55%,
+    rgba(253, 244, 212, 0.96) 100%
   );
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  color: #1e3a5f;
+  border: 1px solid rgba(166, 209, 125, 0.2);
+  color: #1a1a1a;
   box-shadow:
-    0 0 0 1px rgba(30, 58, 95, 0.175),
-    0 10px 28px rgba(30, 58, 95, 0.21);
+    0 0 0 1px rgba(26, 26, 26, 0.175),
+    0 10px 28px rgba(26, 26, 26, 0.21);
 }
 
 .vf-chat-bubble--assistant {
-  background: rgba(224, 236, 255, 0.94);
-  border: 1px solid rgba(59, 130, 246, 0.24);
-  color: rgba(30, 58, 95, 0.96);
+  background: rgba(253, 244, 212, 0.94);
+  border: 1px solid rgba(166, 209, 125, 0.24);
+  color: rgba(26, 26, 26, 0.96);
 }
 
 .vf-chat-bubble-who {
@@ -6042,7 +6047,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: rgba(59, 130, 246, 0.72);
+  color: rgba(166, 209, 125, 0.72);
   margin-bottom: 0;
 }
 
@@ -6098,11 +6103,11 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(155deg, rgba(224, 236, 255, 0.98), rgba(224, 236, 255, 0.99));
-  border: 1px solid rgba(59, 130, 246, 0.28);
+  background: linear-gradient(155deg, rgba(253, 244, 212, 0.98), rgba(253, 244, 212, 0.99));
+  border: 1px solid rgba(166, 209, 125, 0.28);
   box-shadow:
-    0 0 0 1px rgba(30, 58, 95, 0.2),
-    inset 0 1px 0 rgba(59, 130, 246, 0.16);
+    0 0 0 1px rgba(26, 26, 26, 0.2),
+    inset 0 1px 0 rgba(166, 209, 125, 0.16);
 }
 
 .vf-chat-user-avatar-wrap--inline {
@@ -6113,7 +6118,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .vf-chat-user-avatar-icon {
   width: 1.35rem;
   height: 1.35rem;
-  color: rgba(30, 58, 95, 0.92);
+  color: rgba(26, 26, 26, 0.92);
 }
 
 .vf-chat-user-avatar-wrap--inline .vf-chat-user-avatar-icon {
@@ -6168,7 +6173,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-style: normal;
   font-size: clamp(1.02rem, 2.15vw, 1.14rem);
   line-height: 1.78;
-  color: rgba(30, 58, 95, 0.93);
+  color: rgba(26, 26, 26, 0.93);
   letter-spacing: 0.02em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -6196,19 +6201,19 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-narrative-block:hover {
-  color: rgba(30, 58, 95, 1);
+  color: rgba(26, 26, 26, 1);
 }
 
 .vf-chat-narrative-block--active {
   text-decoration: underline;
-  text-decoration-color: rgba(30, 58, 95, 0.88);
+  text-decoration-color: rgba(26, 26, 26, 0.88);
   text-underline-offset: 0.3em;
 }
 
 .vf-chat-narrative-pending {
   margin: 0;
   min-height: 1.5em;
-  color: rgba(30, 58, 95, 0.65);
+  color: rgba(26, 26, 26, 0.65);
   font-family: var(--vf-chat-narrative-font);
   font-weight: 400;
 }
@@ -6225,11 +6230,11 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 /* Chess: 8×8 + Unicode pieces — màu quân theo PHE (trắng/đen), không đổi màu theo ô (tránh “sọc” xen kẽ). */
 .vf-chess-board-frame {
   box-shadow:
-    inset 0 0 0 2px rgba(30, 58, 95, 0.1),
-    0 8px 24px rgba(30, 58, 95, 0.21);
+    inset 0 0 0 2px rgba(26, 26, 26, 0.1),
+    0 8px 24px rgba(26, 26, 26, 0.21);
 }
 .vf-chess-square {
-  box-shadow: inset 0 0 0 1px rgba(30, 58, 95, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(26, 26, 26, 0.07);
   position: relative;
 }
 /* Gần chess.com / Lichess: xanh nhạt / xanh đậm */
@@ -6246,18 +6251,18 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 /* Trắng: luôn sáng + viền tối (mọi ô) */
 .vf-chess-piece--white-army {
-  color: #1e3a5f;
+  color: #1a1a1a;
   text-shadow:
     0 0 1px #000,
-    0 1px 2px rgba(30, 58, 95, 0.475),
-    0 0 3px rgba(30, 58, 95, 0.3);
+    0 1px 2px rgba(26, 26, 26, 0.475),
+    0 0 3px rgba(26, 26, 26, 0.3);
 }
 /* Đen: luôn tối + viền sáng nhẹ (mọi ô) */
 .vf-chess-piece--black-army {
   color: #111;
   text-shadow:
-    0 0 1px rgba(59, 130, 246, 1.0),
-    0 1px 1px rgba(59, 130, 246, 0.48);
+    0 0 1px rgba(166, 209, 125, 1.0),
+    0 1px 1px rgba(166, 209, 125, 0.48);
 }
 /* Gợi ý nước (chấm) — chess.com style */
 .vf-chess-hint-dot {
@@ -6268,33 +6273,33 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   height: min(32%, 1.35rem);
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: rgba(30, 58, 95, 0.14);
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 1.0);
+  background: rgba(26, 26, 26, 0.14);
+  box-shadow: 0 0 0 1px rgba(166, 209, 125, 1.0);
   pointer-events: none;
   z-index: 2;
 }
 .vf-chess-square--dark .vf-chess-hint-dot {
-  background: rgba(59, 130, 246, 1.0);
-  box-shadow: 0 0 0 1px rgba(30, 58, 95, 0.1);
+  background: rgba(166, 209, 125, 1.0);
+  box-shadow: 0 0 0 1px rgba(26, 26, 26, 0.1);
 }
 /* Ăn quân: vòng lớn thay vì chấm */
 .vf-chess-hint-capture {
   position: absolute;
   inset: 6%;
   border-radius: 4px;
-  border: 3px solid rgba(30, 58, 95, 0.19);
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 1.0);
+  border: 3px solid rgba(26, 26, 26, 0.19);
+  box-shadow: 0 0 0 1px rgba(166, 209, 125, 1.0);
   pointer-events: none;
   z-index: 2;
 }
 .vf-chess-square--dark .vf-chess-hint-capture {
-  border-color: rgba(59, 130, 246, 1.0);
-  box-shadow: 0 0 0 1px rgba(30, 58, 95, 0.125);
+  border-color: rgba(166, 209, 125, 1.0);
+  box-shadow: 0 0 0 1px rgba(26, 26, 26, 0.125);
 }
 .vf-chess-selected {
   box-shadow:
-    inset 0 0 0 999px rgba(30, 58, 95, 0.38),
-    inset 0 0 0 1px rgba(30, 58, 95, 0.07);
+    inset 0 0 0 999px rgba(26, 26, 26, 0.38),
+    inset 0 0 0 1px rgba(26, 26, 26, 0.07);
 }
 
 /* Markdown: **bold**, `inline`, ```fenced``` — user + bot */
@@ -6335,11 +6340,11 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-chat-md__strong {
   font-weight: 600;
-  color: rgba(30, 58, 95, 0.98);
+  color: rgba(26, 26, 26, 0.98);
 }
 
 .vf-chat-md--user .vf-chat-md__strong {
-  color: rgba(30, 58, 95, 0.98);
+  color: rgba(26, 26, 26, 0.98);
 }
 
 .vf-chat-md__em {
@@ -6353,20 +6358,20 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: 0.88em;
   padding: 0.12em 0.38em;
   border-radius: 0.28rem;
-  background: rgba(30, 58, 95, 0.14);
-  border: 1px solid rgba(59, 130, 246, 0.32);
+  background: rgba(26, 26, 26, 0.14);
+  border: 1px solid rgba(166, 209, 125, 0.32);
 }
 
 .vf-chat-md--user .vf-chat-md__code--inline {
-  background: rgba(30, 58, 95, 0.175);
+  background: rgba(26, 26, 26, 0.175);
 }
 
 .vf-chat-md__pre {
   margin: 0.65rem 0;
   padding: 0.85rem 1rem;
   border-radius: 0.55rem;
-  background: rgba(30, 58, 95, 0.21);
-  border: 1px solid rgba(203, 213, 225, 0.65);
+  background: rgba(26, 26, 26, 0.21);
+  border: 1px solid rgba(232, 226, 208, 0.65);
   overflow-x: auto;
   text-align: left;
   line-height: 1.5;
@@ -6408,7 +6413,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .vf-chat-md__quote {
   margin: 0.5rem 0;
   padding-left: 0.85rem;
-  border-left: 3px solid rgba(30, 58, 95, 0.45);
+  border-left: 3px solid rgba(26, 26, 26, 0.45);
   opacity: 0.92;
 }
 
@@ -6424,7 +6429,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-chat-md__hr {
   border: none;
-  border-top: 1px solid rgba(203, 213, 225, 0.85);
+  border-top: 1px solid rgba(232, 226, 208, 0.85);
   margin: 0.75rem 0;
 }
 
@@ -6445,7 +6450,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-narrative-block:focus-visible {
-  outline: 2px solid rgba(30, 58, 95, 0.55);
+  outline: 2px solid rgba(26, 26, 26, 0.55);
   outline-offset: 3px;
   border-radius: 0.25rem;
 }
@@ -6459,7 +6464,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
-  background: rgba(240, 246, 255, 0.72);
+  background: rgba(255, 249, 230, 0.72);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   animation: vf-chat-popup-in 0.22s ease-out;
@@ -6471,11 +6476,11 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   max-width: min(36rem, 100%);
   padding: 1.35rem 1.5rem 2.75rem;
   border-radius: 0.65rem;
-  background: rgba(224, 236, 255, 0.96);
-  border: 1px solid rgba(203, 213, 225, 0.85);
+  background: rgba(253, 244, 212, 0.96);
+  border: 1px solid rgba(232, 226, 208, 0.85);
   box-shadow:
-    0 0 0 1px rgba(30, 58, 95, 0.2),
-    0 18px 48px rgba(30, 58, 95, 0.275);
+    0 0 0 1px rgba(26, 26, 26, 0.2),
+    0 18px 48px rgba(26, 26, 26, 0.275);
 }
 
 .vf-chat-sentence-popup-text {
@@ -6484,7 +6489,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 400;
   font-size: clamp(1rem, 2.1vw, 1.08rem);
   line-height: 1.68;
-  color: rgba(30, 58, 95, 0.98);
+  color: rgba(26, 26, 26, 0.98);
   text-align: left;
   letter-spacing: 0.02em;
   -webkit-font-smoothing: antialiased;
@@ -6505,7 +6510,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: 2rem;
   height: 2rem;
   flex-shrink: 0;
-  filter: drop-shadow(0 2px 6px rgba(30, 58, 95, 0.175));
+  filter: drop-shadow(0 2px 6px rgba(26, 26, 26, 0.175));
 }
 
 @keyframes vf-chat-popup-in {
@@ -6558,12 +6563,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-rheart--on {
-  color: #60a5fa;
-  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.5));
+  color: #b8dc92;
+  filter: drop-shadow(0 0 8px rgba(184, 220, 146, 0.5));
 }
 
 .vf-chat-rheart--off {
-  color: rgba(100, 116, 139, 0.55);
+  color: rgba(107, 107, 107, 0.55);
 }
 
 .vf-chat-relationship-title {
@@ -6587,7 +6592,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-family: var(--aid-font-display);
   font-size: 0.85rem;
   font-weight: 600;
-  color: rgba(30, 58, 95, 0.95);
+  color: rgba(26, 26, 26, 0.95);
   margin: 0.25rem 0 0.35rem;
 }
 
@@ -6601,10 +6606,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-heart {
-  color: #60a5fa;
+  color: #b8dc92;
   font-size: 0.95rem;
   line-height: 1;
-  text-shadow: 0 0 12px rgba(96, 165, 250, 0.45);
+  text-shadow: 0 0 12px rgba(184, 220, 146, 0.45);
 }
 
 @media (max-width: 900px) {
@@ -6621,13 +6626,13 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-family: var(--aid-font-display);
   font-size: 0.65rem;
   letter-spacing: 0.05em;
-  color: rgba(30, 58, 95, 0.85);
+  color: rgba(26, 26, 26, 0.85);
   margin: 0 0 0.75rem;
   line-height: 1.4;
 }
 
 .vf-chat-memory-pane .aid-updates-meta {
-  color: rgba(148, 163, 184, 0.88);
+  color: rgba(154, 154, 154, 0.88);
 }
 
 .vf-chat-memory-headline {
@@ -6636,12 +6641,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-memory-head-pale {
-  color: rgba(30, 58, 95, 0.75);
+  color: rgba(26, 26, 26, 0.75);
   font-weight: 700;
 }
 
 .vf-chat-memory-head-gold {
-  color: #60a5fa;
+  color: #b8dc92;
   font-weight: 800;
 }
 
@@ -6675,8 +6680,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   justify-content: center;
   flex-direction: column;
   background:
-    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(59, 130, 246, 0.12), transparent 62%),
-    linear-gradient(180deg, rgba(224, 236, 255, 0.92) 0%, rgba(240, 246, 255, 0.96) 100%);
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(166, 209, 125, 0.12), transparent 62%),
+    linear-gradient(180deg, rgba(253, 244, 212, 0.92) 0%, rgba(255, 249, 230, 0.96) 100%);
   backdrop-filter: blur(6px);
 }
 
@@ -6692,10 +6697,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: min(200px, 52vw);
   height: min(200px, 52vw);
   border-radius: 50%;
-  border: 2px dashed rgba(59, 130, 246, 0.38);
+  border: 2px dashed rgba(166, 209, 125, 0.38);
   box-shadow:
-    inset 0 0 0 1px rgba(30, 58, 95, 0.175),
-    0 0 40px rgba(59, 130, 246, 0.08);
+    inset 0 0 0 1px rgba(26, 26, 26, 0.175),
+    0 0 40px rgba(166, 209, 125, 0.08);
   position: relative;
 }
 
@@ -6709,7 +6714,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   max-height: 1.875rem;
   border-width: 1px;
   border-style: dashed;
-  box-shadow: inset 0 0 0 1px rgba(30, 58, 95, 0.175);
+  box-shadow: inset 0 0 0 1px rgba(26, 26, 26, 0.175);
   overflow: hidden;
 }
 
@@ -6730,7 +6735,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-rabbit-inline .vf-chat-rabbit-svg {
-  filter: drop-shadow(0 1px 1px rgba(30, 58, 95, 0.275));
+  filter: drop-shadow(0 1px 1px rgba(26, 26, 26, 0.275));
 }
 
 .vf-chat-rabbit-orbit {
@@ -6759,7 +6764,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: 100%;
   height: 100%;
   display: block;
-  filter: drop-shadow(0 4px 8px rgba(30, 58, 95, 0.225));
+  filter: drop-shadow(0 4px 8px rgba(26, 26, 26, 0.225));
 }
 
 .vf-chat-rabbit-label {
@@ -6767,7 +6772,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-family: var(--bg3-font-body, Georgia, serif);
   font-size: 0.95rem;
   letter-spacing: 0.03em;
-  color: rgba(30, 58, 95, 0.92);
+  color: rgba(26, 26, 26, 0.92);
   text-align: center;
   max-width: 18rem;
 }
@@ -6816,12 +6821,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: 100%;
   padding: 1rem 1rem 1.25rem;
   border-radius: 4px;
-  border: 1px solid rgba(59, 130, 246, 0.42);
-  background: linear-gradient(165deg, rgba(224, 236, 255, 0.98) 0%, rgba(224, 236, 255, 0.99) 100%);
+  border: 1px solid rgba(166, 209, 125, 0.42);
+  background: linear-gradient(165deg, rgba(253, 244, 212, 0.98) 0%, rgba(253, 244, 212, 0.99) 100%);
   box-shadow:
-    inset 0 0 0 1px rgba(30, 58, 95, 0.275),
-    0 0 32px rgba(59, 130, 246, 0.06),
-    0 28px 56px rgba(30, 58, 95, 0.225);
+    inset 0 0 0 1px rgba(26, 26, 26, 0.275),
+    0 0 32px rgba(166, 209, 125, 0.06),
+    0 28px 56px rgba(26, 26, 26, 0.225);
 }
 
 .vf-game-hub--modal {
@@ -6843,8 +6848,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #60a5fa;
-  text-shadow: 0 2px 0 rgba(30, 58, 95, 0.225);
+  color: #b8dc92;
+  text-shadow: 0 2px 0 rgba(26, 26, 26, 0.225);
 }
 
 .vf-game-hub__close {
@@ -6855,7 +6860,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   border: none;
   border-radius: 4px;
   background: transparent;
-  color: rgba(96, 165, 250, 0.85);
+  color: rgba(184, 220, 146, 0.85);
   font-size: 1.15rem;
   line-height: 1;
   cursor: pointer;
@@ -6863,8 +6868,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-game-hub__close:hover {
-  color: #1e40af;
-  background: rgba(59, 130, 246, 0.12);
+  color: #fa6255;
+  background: rgba(166, 209, 125, 0.12);
 }
 
 .vf-game-hub__sub {
@@ -6873,7 +6878,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: 0.78rem;
   line-height: 1.45;
   letter-spacing: 0.02em;
-  color: rgba(59, 130, 246, 0.78);
+  color: rgba(166, 209, 125, 0.78);
 }
 
 @media (min-width: 640px) {
@@ -6916,7 +6921,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-game-card:focus-visible {
-  outline: 2px solid rgba(96, 165, 250, 0.65);
+  outline: 2px solid rgba(184, 220, 146, 0.65);
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -6926,8 +6931,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: 100%;
   aspect-ratio: 4 / 3;
   border-radius: 14px;
-  border: 1px solid rgba(59, 130, 246, 0.45);
-  box-shadow: inset 0 0 0 1px rgba(30, 58, 95, 0.175);
+  border: 1px solid rgba(166, 209, 125, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(26, 26, 26, 0.175);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -6940,37 +6945,37 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: clamp(1.75rem, 5vw, 2.35rem);
   line-height: 1;
   opacity: 0.9;
-  filter: drop-shadow(0 2px 4px rgba(30, 58, 95, 0.325));
+  filter: drop-shadow(0 2px 4px rgba(26, 26, 26, 0.325));
   pointer-events: none;
 }
 
 .vf-game-card__art--chess {
   background:
-    radial-gradient(ellipse 80% 70% at 50% 40%, rgba(224, 236, 255, 0.55), transparent 55%),
-    linear-gradient(155deg, #dbeafe 0%, #f0f6ff 100%);
+    radial-gradient(ellipse 80% 70% at 50% 40%, rgba(253, 244, 212, 0.55), transparent 55%),
+    linear-gradient(155deg, #fdf4d4 0%, #fff9e6 100%);
 }
 
 .vf-game-card__art--chess::after {
   content: "♟";
-  color: rgba(30, 58, 95, 0.92);
+  color: rgba(26, 26, 26, 0.92);
 }
 
 .vf-game-card__art--caro {
   background:
-    repeating-linear-gradient(0deg, #e0ecff 0px, #e0ecff 8px, #cfe1ff 8px, #cfe1ff 16px),
-    repeating-linear-gradient(90deg, #e0ecff 0px, #e0ecff 8px, #cfe1ff 8px, #cfe1ff 16px);
+    repeating-linear-gradient(0deg, #fdf4d4 0px, #fdf4d4 8px, #fff0c0 8px, #fff0c0 16px),
+    repeating-linear-gradient(90deg, #fdf4d4 0px, #fdf4d4 8px, #fff0c0 8px, #fff0c0 16px);
   background-blend-mode: normal;
 }
 
 .vf-game-card__art--caro::after {
   content: "▦";
   font-size: clamp(1.5rem, 4vw, 2rem);
-  color: rgba(59, 130, 246, 0.75);
+  color: rgba(166, 209, 125, 0.75);
 }
 
 .vf-game-card__art--tetris {
   background:
-    linear-gradient(145deg, #a78bfa 0%, #6366f1 42%, #1e3a5f 100%);
+    linear-gradient(145deg, #a78bfa 0%, #6366f1 42%, #1a1a1a 100%);
 }
 
 .vf-game-card__art--tetris::after {
@@ -6989,38 +6994,38 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-game-card__art--story {
-  background: linear-gradient(160deg, #e9d5ff 0%, #1e3a5f 100%);
+  background: linear-gradient(160deg, #e9d5ff 0%, #1a1a1a 100%);
 }
 
 .vf-game-card__art--story::after {
   content: "✦";
-  color: rgba(96, 165, 250, 0.88);
+  color: rgba(184, 220, 146, 0.88);
 }
 
 /* Ringrealms (hub art id ringrealms) — ancient / bronze tile */
 .vf-game-card__art--ringrealms {
   background:
-    radial-gradient(ellipse 85% 70% at 40% 25%, rgba(59, 130, 246, 0.22), transparent 55%),
-    linear-gradient(165deg, #dbeafe 0%, #ffffff 55%, #f0f6ff 100%);
+    radial-gradient(ellipse 85% 70% at 40% 25%, rgba(166, 209, 125, 0.22), transparent 55%),
+    linear-gradient(165deg, #fdf4d4 0%, #ffffff 55%, #fff9e6 100%);
 }
 
 .vf-game-card__art--ringrealms::after {
   content: "⚔";
   font-size: clamp(1.45rem, 4vw, 2rem);
-  color: rgba(96, 165, 250, 0.88);
+  color: rgba(184, 220, 146, 0.88);
 }
 
 /* Back-compat hub art id */
 .vf-game-card__art--zeroad {
   background:
-    radial-gradient(ellipse 85% 70% at 40% 25%, rgba(59, 130, 246, 0.22), transparent 55%),
-    linear-gradient(165deg, #dbeafe 0%, #ffffff 55%, #f0f6ff 100%);
+    radial-gradient(ellipse 85% 70% at 40% 25%, rgba(166, 209, 125, 0.22), transparent 55%),
+    linear-gradient(165deg, #fdf4d4 0%, #ffffff 55%, #fff9e6 100%);
 }
 
 .vf-game-card__art--zeroad::after {
   content: "⚔";
   font-size: clamp(1.45rem, 4vw, 2rem);
-  color: rgba(96, 165, 250, 0.88);
+  color: rgba(184, 220, 146, 0.88);
 }
 
 .vf-game-card__label {
@@ -7029,7 +7034,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(96, 165, 250, 0.92);
+  color: rgba(184, 220, 146, 0.92);
   line-height: 1.25;
   pointer-events: none;
 }
@@ -7055,7 +7060,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(148, 163, 184, 0.8);
+  color: rgba(154, 154, 154, 0.8);
 }
 
 .vf-arcade__title {
@@ -7063,7 +7068,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: clamp(1.55rem, 4.2vw, 2.05rem);
   font-weight: 700;
   letter-spacing: 0.04em;
-  background: linear-gradient(118deg, #dbeafe 0%, #60a5fa 48%, #1e40af 100%);
+  background: linear-gradient(118deg, #fdf4d4 0%, #b8dc92 48%, #fa6255 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -7078,32 +7083,32 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-arcade__btn--ghost {
-  border: 1px solid rgba(59, 130, 246, 0.56);
-  background: rgba(59, 130, 246, 0.24);
-  color: rgba(30, 58, 95, 0.96);
+  border: 1px solid rgba(166, 209, 125, 0.56);
+  background: rgba(166, 209, 125, 0.24);
+  color: rgba(26, 26, 26, 0.96);
 }
 
 .vf-arcade__btn--ghost:hover {
-  background: rgba(59, 130, 246, 0.44);
-  border-color: rgba(59, 130, 246, 0.88);
+  background: rgba(166, 209, 125, 0.44);
+  border-color: rgba(166, 209, 125, 0.88);
 }
 
 .vf-arcade__btn--dim {
   border: 1px solid transparent;
-  color: rgba(148, 163, 184, 0.95);
+  color: rgba(154, 154, 154, 0.95);
   background: transparent;
 }
 
 .vf-arcade__btn--dim:hover {
-  color: rgba(30, 58, 95, 0.95);
-  background: rgba(59, 130, 246, 0.24);
+  color: rgba(26, 26, 26, 0.95);
+  background: rgba(166, 209, 125, 0.24);
 }
 
 .vf-arcade__btn--primary {
   border: none;
-  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
-  color: #f0f6ff;
-  box-shadow: 0 0 0 1px rgba(30, 58, 95, 0.175) inset;
+  background: linear-gradient(135deg, #a6d17d 0%, #fa6255 100%);
+  color: #fff9e6;
+  box-shadow: 0 0 0 1px rgba(26, 26, 26, 0.175) inset;
 }
 
 .vf-arcade__btn--primary:hover {
@@ -7118,7 +7123,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: absolute;
   inset: -12% -8% auto -8%;
   height: 55%;
-  background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(59, 130, 246, 0.14), transparent 62%);
+  background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(166, 209, 125, 0.14), transparent 62%);
   z-index: 0;
 }
 
@@ -7137,12 +7142,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(59, 130, 246, 0.15) 12%,
-    rgba(96, 165, 250, 0.85) 50%,
-    rgba(59, 130, 246, 0.15) 88%,
+    rgba(166, 209, 125, 0.15) 12%,
+    rgba(184, 220, 146, 0.85) 50%,
+    rgba(166, 209, 125, 0.15) 88%,
     transparent
   );
-  box-shadow: 0 0 12px rgba(96, 165, 250, 0.2);
+  box-shadow: 0 0 12px rgba(184, 220, 146, 0.2);
 }
 
 .vf-caro-play__title {
@@ -7151,8 +7156,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(96, 165, 250, 0.96);
-  text-shadow: 0 0 28px rgba(59, 130, 246, 0.18);
+  color: rgba(184, 220, 146, 0.96);
+  text-shadow: 0 0 28px rgba(166, 209, 125, 0.18);
   margin: 0;
 }
 
@@ -7160,7 +7165,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-family: var(--bg3-font-body, Georgia, serif);
   font-size: 0.84rem;
   line-height: 1.55;
-  color: rgba(100, 116, 139, 0.82);
+  color: rgba(107, 107, 107, 0.82);
   margin: 0.55rem 0 0;
   max-width: 32rem;
 }
@@ -7168,9 +7173,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .vf-caro-play__exit {
   padding: 0.45rem 1rem;
   border-radius: 2px;
-  border: 1px solid rgba(59, 130, 246, 0.35);
-  background: rgba(30, 58, 95, 0.175);
-  color: rgba(96, 165, 250, 0.88);
+  border: 1px solid rgba(166, 209, 125, 0.35);
+  background: rgba(26, 26, 26, 0.175);
+  color: rgba(184, 220, 146, 0.88);
   font-family: var(--bg3-font-body, Georgia, serif);
   font-size: 0.8rem;
   letter-spacing: 0.06em;
@@ -7181,20 +7186,20 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-caro-play__exit:hover {
-  border-color: rgba(96, 165, 250, 0.55);
-  background: rgba(59, 130, 246, 0.08);
-  color: var(--bg3-gold-bright, #60a5fa);
+  border-color: rgba(184, 220, 146, 0.55);
+  background: rgba(166, 209, 125, 0.08);
+  color: var(--bg3-gold-bright, #b8dc92);
 }
 
 .vf-caro-panel {
   position: relative;
   border-radius: 3px;
-  border: 1px solid rgba(59, 130, 246, 0.38);
-  background: linear-gradient(165deg, rgba(224, 236, 255, 0.97) 0%, rgba(224, 236, 255, 0.99) 100%);
+  border: 1px solid rgba(166, 209, 125, 0.38);
+  background: linear-gradient(165deg, rgba(253, 244, 212, 0.97) 0%, rgba(253, 244, 212, 0.99) 100%);
   box-shadow:
-    inset 0 0 0 1px rgba(30, 58, 95, 0.275),
-    inset 0 1px 0 rgba(30, 58, 95, 0.06),
-    0 12px 40px rgba(30, 58, 95, 0.225);
+    inset 0 0 0 1px rgba(26, 26, 26, 0.275),
+    inset 0 1px 0 rgba(26, 26, 26, 0.06),
+    0 12px 40px rgba(26, 26, 26, 0.225);
   padding: 1.35rem 1.25rem 1.5rem;
   overflow: hidden;
 }
@@ -7208,8 +7213,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
     -12deg,
     transparent,
     transparent 18px,
-    rgba(59, 130, 246, 0.025) 18px,
-    rgba(59, 130, 246, 0.025) 19px
+    rgba(166, 209, 125, 0.025) 18px,
+    rgba(166, 209, 125, 0.025) 19px
   );
   pointer-events: none;
 }
@@ -7223,7 +7228,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: absolute;
   width: 14px;
   height: 14px;
-  border-color: rgba(96, 165, 250, 0.45);
+  border-color: rgba(184, 220, 146, 0.45);
   border-style: solid;
   z-index: 2;
   pointer-events: none;
@@ -7259,7 +7264,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(96, 165, 250, 0.62);
+  color: rgba(184, 220, 146, 0.62);
   margin: 0 0 0.65rem;
 }
 
@@ -7267,7 +7272,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-family: var(--bg3-font-body, Georgia, serif);
   font-size: 0.78rem;
   line-height: 1.5;
-  color: rgba(148, 163, 184, 0.78);
+  color: rgba(154, 154, 154, 0.78);
   margin: 0;
 }
 
@@ -7281,9 +7286,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   min-width: 3.35rem;
   padding: 0.45rem 0.65rem;
   border-radius: 2px;
-  border: 1px solid rgba(59, 130, 246, 0.28);
-  background: rgba(30, 58, 95, 0.19);
-  color: rgba(30, 58, 95, 0.88);
+  border: 1px solid rgba(166, 209, 125, 0.28);
+  background: rgba(26, 26, 26, 0.19);
+  color: rgba(26, 26, 26, 0.88);
   font-family: ui-monospace, monospace;
   font-size: 0.78rem;
   letter-spacing: 0.04em;
@@ -7294,17 +7299,17 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-caro-grid-pill:hover {
-  border-color: rgba(96, 165, 250, 0.45);
-  background: rgba(59, 130, 246, 0.07);
+  border-color: rgba(184, 220, 146, 0.45);
+  background: rgba(166, 209, 125, 0.07);
 }
 
 .vf-caro-grid-pill--on {
-  border-color: rgba(96, 165, 250, 0.65);
-  background: linear-gradient(180deg, rgba(59, 130, 246, 0.2) 0%, rgba(224, 236, 255, 0.35) 100%);
-  color: var(--bg3-gold-bright, #60a5fa);
+  border-color: rgba(184, 220, 146, 0.65);
+  background: linear-gradient(180deg, rgba(166, 209, 125, 0.2) 0%, rgba(253, 244, 212, 0.35) 100%);
+  color: var(--bg3-gold-bright, #b8dc92);
   box-shadow:
-    0 0 0 1px rgba(59, 130, 246, 0.15),
-    0 4px 18px rgba(30, 58, 95, 0.175);
+    0 0 0 1px rgba(166, 209, 125, 0.15),
+    0 4px 18px rgba(26, 26, 26, 0.175);
 }
 
 .vf-caro-stone {
@@ -7315,9 +7320,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   gap: 0.25rem;
   padding: 0.65rem 0.5rem;
   border-radius: 2px;
-  border: 1px solid rgba(59, 130, 246, 0.28);
-  background: rgba(30, 58, 95, 0.175);
-  color: rgba(30, 58, 95, 0.9);
+  border: 1px solid rgba(166, 209, 125, 0.28);
+  background: rgba(26, 26, 26, 0.175);
+  color: rgba(26, 26, 26, 0.9);
   transition:
     border-color 0.18s ease,
     background 0.18s ease,
@@ -7325,8 +7330,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-caro-stone:hover {
-  border-color: rgba(96, 165, 250, 0.4);
-  background: rgba(59, 130, 246, 0.06);
+  border-color: rgba(184, 220, 146, 0.4);
+  background: rgba(166, 209, 125, 0.06);
 }
 
 .vf-caro-stone--on {
@@ -7346,7 +7351,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: 0.65rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(100, 116, 139, 0.75);
+  color: rgba(107, 107, 107, 0.75);
 }
 
 .vf-caro-cta {
@@ -7361,11 +7366,11 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #1e3a5f;
-  background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 48%, #6b5420 100%);
+  color: #1a1a1a;
+  background: linear-gradient(180deg, #b8dc92 0%, #a6d17d 48%, #6b5420 100%);
   box-shadow:
-    inset 0 1px 0 rgba(30, 58, 95, 0.35),
-    0 6px 22px rgba(30, 58, 95, 0.225);
+    inset 0 1px 0 rgba(26, 26, 26, 0.35),
+    0 6px 22px rgba(26, 26, 26, 0.225);
   transition:
     filter 0.2s ease,
     transform 0.15s ease;
@@ -7384,7 +7389,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .vf-caro-live-title {
   font-family: var(--bg3-font-body, Georgia, serif);
   font-size: 0.92rem;
-  color: rgba(30, 58, 95, 0.95);
+  color: rgba(26, 26, 26, 0.95);
   margin: 0;
 }
 
@@ -7394,17 +7399,17 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   height: 4px;
   margin: 0 0.5rem;
   border-radius: 50%;
-  background: rgba(96, 165, 250, 0.65);
+  background: rgba(184, 220, 146, 0.65);
   vertical-align: middle;
-  box-shadow: 0 0 8px rgba(96, 165, 250, 0.45);
+  box-shadow: 0 0 8px rgba(184, 220, 146, 0.45);
 }
 
 .vf-caro-secondary-btn {
   padding: 0.4rem 0.85rem;
   border-radius: 2px;
-  border: 1px solid rgba(59, 130, 246, 0.35);
-  background: rgba(30, 58, 95, 0.175);
-  color: rgba(96, 165, 250, 0.9);
+  border: 1px solid rgba(166, 209, 125, 0.35);
+  background: rgba(26, 26, 26, 0.175);
+  color: rgba(184, 220, 146, 0.9);
   font-size: 0.75rem;
   letter-spacing: 0.05em;
   transition:
@@ -7413,8 +7418,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-caro-secondary-btn:hover:not(:disabled) {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(96, 165, 250, 0.5);
+  background: rgba(166, 209, 125, 0.1);
+  border-color: rgba(184, 220, 146, 0.5);
 }
 
 .vf-caro-secondary-btn:disabled {
@@ -7424,11 +7429,11 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .vf-caro-board-frame {
   padding: 0.55rem;
   border-radius: 2px;
-  border: 1px solid rgba(59, 130, 246, 0.22);
+  border: 1px solid rgba(166, 209, 125, 0.22);
   background:
-    linear-gradient(145deg, rgba(224, 236, 255, 0.95), rgba(240, 246, 255, 0.98)),
-    repeating-linear-gradient(90deg, #e0ecff 0px, #e0ecff 7px, #cfe1ff 7px, #cfe1ff 14px);
-  box-shadow: inset 0 0 24px rgba(30, 58, 95, 0.275);
+    linear-gradient(145deg, rgba(253, 244, 212, 0.95), rgba(255, 249, 230, 0.98)),
+    repeating-linear-gradient(90deg, #fdf4d4 0px, #fdf4d4 7px, #fff0c0 7px, #fff0c0 14px);
+  box-shadow: inset 0 0 24px rgba(26, 26, 26, 0.275);
 }
 
 .vf-caro-board-grid {
@@ -7446,8 +7451,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   align-items: center;
   justify-content: center;
   border-radius: 2px;
-  border: 1px solid rgba(224, 236, 255, 0.85);
-  background: linear-gradient(165deg, rgba(224, 236, 255, 0.92) 0%, rgba(224, 236, 255, 0.96) 100%);
+  border: 1px solid rgba(253, 244, 212, 0.85);
+  background: linear-gradient(165deg, rgba(253, 244, 212, 0.92) 0%, rgba(253, 244, 212, 0.96) 100%);
   cursor: default;
   transition:
     background 0.15s ease,
@@ -7456,9 +7461,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-caro-cell--empty:hover:not(:disabled) {
-  border-color: rgba(96, 165, 250, 0.35);
-  background: rgba(59, 130, 246, 0.08);
-  box-shadow: inset 0 0 12px rgba(96, 165, 250, 0.08);
+  border-color: rgba(184, 220, 146, 0.35);
+  background: rgba(166, 209, 125, 0.08);
+  box-shadow: inset 0 0 12px rgba(184, 220, 146, 0.08);
   cursor: pointer;
 }
 
@@ -7474,7 +7479,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-caro-cell--foe {
   border-color: rgba(210, 165, 94, 0.4);
-  background: linear-gradient(165deg, rgba(224, 236, 255, 0.55) 0%, rgba(224, 236, 255, 0.88) 100%);
+  background: linear-gradient(165deg, rgba(253, 244, 212, 0.55) 0%, rgba(253, 244, 212, 0.88) 100%);
   box-shadow: inset 0 0 10px rgba(210, 165, 94, 0.1);
 }
 
@@ -7483,15 +7488,15 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   font-family: ui-sans-serif, system-ui, sans-serif;
   line-height: 1;
-  color: rgba(30, 58, 95, 0.96);
-  text-shadow: 0 1px 2px rgba(30, 58, 95, 0.3);
+  color: rgba(26, 26, 26, 0.96);
+  text-shadow: 0 1px 2px rgba(26, 26, 26, 0.3);
 }
 
 .vf-caro-statusline {
   text-align: center;
   font-family: var(--bg3-font-body, Georgia, serif);
   font-size: 0.82rem;
-  color: rgba(100, 116, 139, 0.9);
+  color: rgba(107, 107, 107, 0.9);
   margin: 1rem 0 0;
 }
 
@@ -7501,13 +7506,13 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   gap: 0.5rem;
   margin-bottom: 1rem;
   padding-bottom: 0.65rem;
-  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+  border-bottom: 1px solid rgba(166, 209, 125, 0.2);
 }
 
 .vf-caro-aside-icon {
   font-size: 0.85rem;
-  color: rgba(96, 165, 250, 0.65);
-  text-shadow: 0 0 12px rgba(96, 165, 250, 0.25);
+  color: rgba(184, 220, 146, 0.65);
+  text-shadow: 0 0 12px rgba(184, 220, 146, 0.25);
 }
 
 .vf-caro-aside-title {
@@ -7516,7 +7521,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(96, 165, 250, 0.88);
+  color: rgba(184, 220, 146, 0.88);
   margin: 0;
 }
 
@@ -7530,10 +7535,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   height: 4.5rem;
   margin: 0 auto 1rem;
   border-radius: 2px;
-  border: 1px dashed rgba(59, 130, 246, 0.28);
+  border: 1px dashed rgba(166, 209, 125, 0.28);
   background:
-    linear-gradient(0deg, transparent 46%, rgba(59, 130, 246, 0.12) 47%, rgba(59, 130, 246, 0.12) 53%, transparent 54%),
-    linear-gradient(90deg, transparent 46%, rgba(59, 130, 246, 0.12) 47%, rgba(59, 130, 246, 0.12) 53%, transparent 54%);
+    linear-gradient(0deg, transparent 46%, rgba(166, 209, 125, 0.12) 47%, rgba(166, 209, 125, 0.12) 53%, transparent 54%),
+    linear-gradient(90deg, transparent 46%, rgba(166, 209, 125, 0.12) 47%, rgba(166, 209, 125, 0.12) 53%, transparent 54%);
   opacity: 0.85;
 }
 
@@ -7541,7 +7546,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-family: var(--bg3-font-body, Georgia, serif);
   font-size: 0.82rem;
   line-height: 1.55;
-  color: rgba(100, 116, 139, 0.82);
+  color: rgba(107, 107, 107, 0.82);
   margin: 0;
 }
 
@@ -7554,7 +7559,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.4rem 0;
-  border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+  border-bottom: 1px solid rgba(166, 209, 125, 0.1);
   font-family: var(--bg3-font-body, Georgia, serif);
   font-size: 0.8rem;
 }
@@ -7564,13 +7569,13 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-caro-dl__row dt {
-  color: rgba(100, 116, 139, 0.88);
+  color: rgba(107, 107, 107, 0.88);
   flex-shrink: 0;
 }
 
 .vf-caro-dl__row dd {
   margin: 0;
-  color: rgba(30, 58, 95, 0.95);
+  color: rgba(26, 26, 26, 0.95);
   text-align: right;
 }
 
@@ -7583,9 +7588,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-caro-badge--live {
-  background: rgba(100, 116, 139, 0.22);
-  color: rgba(30, 58, 95, 0.95);
-  border: 1px solid rgba(96, 165, 250, 0.25);
+  background: rgba(107, 107, 107, 0.22);
+  color: rgba(26, 26, 26, 0.95);
+  border: 1px solid rgba(184, 220, 146, 0.25);
 }
 
 .vf-caro-badge--done {
@@ -7598,8 +7603,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   margin-top: 0.85rem;
   padding: 0.65rem 0.75rem;
   border-radius: 2px;
-  border: 1px solid rgba(59, 130, 246, 0.15);
-  background: rgba(30, 58, 95, 0.175);
+  border: 1px solid rgba(166, 209, 125, 0.15);
+  background: rgba(26, 26, 26, 0.175);
   max-height: 9rem;
   overflow-y: auto;
 }
@@ -7609,7 +7614,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: 0.52rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(96, 165, 250, 0.45);
+  color: rgba(184, 220, 146, 0.45);
   margin: 0 0 0.45rem;
 }
 
@@ -7618,7 +7623,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   padding-left: 1.1rem;
   font-size: 0.72rem;
   line-height: 1.45;
-  color: rgba(100, 116, 139, 0.88);
+  color: rgba(107, 107, 107, 0.88);
 }
 
 .vf-caro-review-btn {
@@ -7626,9 +7631,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   margin-top: 0.85rem;
   padding: 0.65rem 0.85rem;
   border-radius: 2px;
-  border: 1px solid rgba(59, 130, 246, 0.38);
-  background: rgba(59, 130, 246, 0.06);
-  color: rgba(96, 165, 250, 0.95);
+  border: 1px solid rgba(166, 209, 125, 0.38);
+  background: rgba(166, 209, 125, 0.06);
+  color: rgba(184, 220, 146, 0.95);
   font-family: var(--bg3-font-body, Georgia, serif);
   font-size: 0.8rem;
   letter-spacing: 0.03em;
@@ -7638,8 +7643,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-caro-review-btn:hover:not(:disabled) {
-  background: rgba(59, 130, 246, 0.12);
-  border-color: rgba(96, 165, 250, 0.5);
+  background: rgba(166, 209, 125, 0.12);
+  border-color: rgba(184, 220, 146, 0.5);
 }
 
 .vf-caro-review-btn:disabled {
@@ -7656,7 +7661,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(96, 165, 250, 0.72);
+  color: rgba(184, 220, 146, 0.72);
   margin: 0 0 0.75rem;
 }
 
@@ -7664,7 +7669,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-family: var(--bg3-font-body, Georgia, serif);
   font-size: 0.84rem;
   line-height: 1.6;
-  color: rgba(30, 58, 95, 0.92);
+  color: rgba(26, 26, 26, 0.92);
   margin: 0;
 }
 
@@ -7678,8 +7683,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .vf-caro-stat {
   padding: 0.45rem 0.5rem;
   border-radius: 2px;
-  border: 1px solid rgba(59, 130, 246, 0.18);
-  background: rgba(30, 58, 95, 0.14);
+  border: 1px solid rgba(166, 209, 125, 0.18);
+  background: rgba(26, 26, 26, 0.14);
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
@@ -7687,14 +7692,14 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-caro-stat__k {
   font-size: 0.65rem;
-  color: rgba(100, 116, 139, 0.85);
+  color: rgba(107, 107, 107, 0.85);
   line-height: 1.25;
 }
 
 .vf-caro-stat__v {
   font-family: ui-monospace, monospace;
   font-size: 0.8rem;
-  color: rgba(30, 58, 95, 0.95);
+  color: rgba(26, 26, 26, 0.95);
 }
 
 /* ===== Cat + Snow scene (Landing hero background, GPU-only) ===== */
@@ -7731,62 +7736,135 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   to   { transform: translate3d(122vw, 0, 0); }
 }
 
-.aid-snow-layer { position: absolute; inset: 0; }
-.aid-snowflake {
+/* Petals (rơi từ canopy của cây) */
+.aid-petal-layer { position: absolute; inset: 0; pointer-events: none; }
+.aid-petal {
   position: absolute;
-  top: -8px;
   display: block;
-  border-radius: 50%;
-  background: #ffffff;
+  border-radius: 50% 0 50% 50%;
+  background: #fa6255;
   will-change: transform, opacity;
-  animation-name: aid-snow-fall;
+  animation-name: aid-petal-fall;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
 }
-@keyframes aid-snow-fall {
-  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
-  8%   { opacity: 0.8; }
-  92%  { opacity: 0.8; }
-  100% { transform: translate3d(var(--drift, 12px), 100vh, 0); opacity: 0; }
+.aid-petal-v0 { background: linear-gradient(135deg, #fa6255 0%, #fc7d70 100%); }
+.aid-petal-v1 { background: linear-gradient(135deg, #fc7d70 0%, #fdcb46 100%); }
+.aid-petal-v2 { background: linear-gradient(135deg, #fdcb46 0%, #ffe089 100%); }
+@keyframes aid-petal-fall {
+  0%   { transform: translate3d(0, 0, 0) rotate(var(--rot, 0deg)); opacity: 0; }
+  10%  { opacity: 0.95; }
+  90%  { opacity: 0.95; }
+  100% { transform: translate3d(var(--drift, 24px), 60vh, 0) rotate(calc(var(--rot, 0deg) + 540deg)); opacity: 0; }
 }
 
+/* Ground — green grass strip */
 .aid-ground {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  height: 64px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, #dbeafe 50%, #bfdbfe 100%);
-  border-top: 1px solid rgba(96, 165, 250, 0.45);
+  height: 78px;
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(166, 209, 125, 0.5) 30%, #a6d17d 60%, #7ba94f 100%);
+  border-top: 1px solid rgba(123, 169, 79, 0.5);
+}
+.aid-ground::before {
+  /* grass tuft texture */
+  content: '';
+  position: absolute;
+  top: 6px; left: 0; right: 0; height: 14px;
+  background-image:
+    radial-gradient(circle at 4% 100%, #7ba94f 1.5px, transparent 2px),
+    radial-gradient(circle at 11% 100%, #7ba94f 1.5px, transparent 2px),
+    radial-gradient(circle at 19% 100%, #7ba94f 1.5px, transparent 2px),
+    radial-gradient(circle at 27% 100%, #7ba94f 1.5px, transparent 2px),
+    radial-gradient(circle at 35% 100%, #7ba94f 1.5px, transparent 2px),
+    radial-gradient(circle at 43% 100%, #7ba94f 1.5px, transparent 2px),
+    radial-gradient(circle at 56% 100%, #7ba94f 1.5px, transparent 2px),
+    radial-gradient(circle at 64% 100%, #7ba94f 1.5px, transparent 2px),
+    radial-gradient(circle at 72% 100%, #7ba94f 1.5px, transparent 2px),
+    radial-gradient(circle at 81% 100%, #7ba94f 1.5px, transparent 2px),
+    radial-gradient(circle at 89% 100%, #7ba94f 1.5px, transparent 2px),
+    radial-gradient(circle at 96% 100%, #7ba94f 1.5px, transparent 2px);
+  background-size: 100% 100%;
+  opacity: 0.85;
 }
 
-.aid-snowpile {
+/* Tree — Yggdrasil-size center, behind cat */
+.aid-tree {
   position: absolute;
-  left: calc(50% - 90px);
+  left: 50%;
   bottom: 50px;
-  width: 180px;
-  z-index: 2;
+  width: min(820px, 78vw);
+  transform: translateX(-50%);
+  z-index: 1;
 }
-.aid-snowpile-svg {
+.aid-tree-svg {
   width: 100%;
   height: auto;
   display: block;
-  filter: drop-shadow(0 5px 8px rgba(30, 58, 95, 0.14));
+  filter: drop-shadow(0 8px 14px rgba(26, 26, 26, 0.2));
+}
+
+/* Flower bed at base of tree (cat jumps over this) */
+.aid-flowerbed {
+  position: absolute;
+  left: 50%;
+  bottom: 56px;
+  width: min(320px, 32vw);
+  transform: translateX(-50%);
+  z-index: 2;
+}
+.aid-flowerbed-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 4px 6px rgba(26, 26, 26, 0.16));
+}
+
+/* Butterfly — hovers near flowers (small orbit around the bed) */
+.aid-butterfly {
+  position: absolute;
+  width: 28px;
+  z-index: 5;
+  will-change: transform;
+  animation-name: aid-butterfly-drift;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+.aid-butterfly-svg { width: 100%; height: auto; display: block; }
+.aid-butterfly-wing-l, .aid-butterfly-wing-r {
+  animation: aid-butterfly-flap 0.22s ease-in-out infinite;
+}
+.aid-butterfly-wing-r { animation-delay: -0.11s; }
+@keyframes aid-butterfly-flap {
+  0%, 100% { transform: scaleX(1); }
+  50%      { transform: scaleX(0.55); }
+}
+/* Small figure-8 orbit ~50px range to keep them near flowers */
+@keyframes aid-butterfly-drift {
+  0%   { transform: translate3d(0, 0, 0); }
+  20%  { transform: translate3d(22px, -14px, 0); }
+  40%  { transform: translate3d(40px, 4px, 0); }
+  60%  { transform: translate3d(20px, 18px, 0); }
+  80%  { transform: translate3d(-12px, 8px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
 }
 
 .aid-cat {
   position: absolute;
-  bottom: 54px;
+  bottom: 64px;
   left: 0;
   width: 110px;
   transform-origin: 50% 100%;
   will-change: transform;
   animation: aid-cat-loop 18s ease-in-out infinite;
-  z-index: 3;
+  z-index: 4;
 }
 .aid-cat-svg {
   width: 100%;
   height: auto;
   display: block;
-  filter: drop-shadow(0 4px 6px rgba(30, 58, 95, 0.22));
+  filter: drop-shadow(0 4px 6px rgba(26, 26, 26, 0.22));
 }
 
 @keyframes aid-cat-loop {
@@ -7811,16 +7889,848 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   50%      { transform: rotate(-12deg); }
 }
 
+/* Cat walk cycle — alternating leg pairs (front-left + back-right vs front-right + back-left) */
+.aid-cat-leg {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  will-change: transform;
+}
+.aid-cat-leg-1, .aid-cat-leg-3 {
+  animation: aid-cat-step 0.32s ease-in-out infinite;
+}
+.aid-cat-leg-2, .aid-cat-leg-4 {
+  animation: aid-cat-step 0.32s ease-in-out infinite;
+  animation-delay: -0.16s;
+}
+@keyframes aid-cat-step {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  35%      { transform: translateY(-3px) scaleY(0.85); }
+  65%      { transform: translateY(0) scaleY(1.05); }
+}
+.aid-cat-body {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: aid-cat-bob 0.32s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes aid-cat-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-1.2px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .aid-cloud, .aid-snowflake, .aid-cat, .aid-cat-tail {
+  .aid-cloud, .aid-petal, .aid-cat, .aid-cat-tail, .aid-cat-leg, .aid-cat-body, .aid-butterfly, .aid-butterfly-wing-l, .aid-butterfly-wing-r {
     animation: none !important;
   }
 }
 
 @media (max-width: 640px) {
-  .aid-cat { width: 80px; bottom: 48px; }
-  .aid-snowpile { width: 120px; left: calc(50% - 60px); bottom: 44px; }
-  .aid-ground { height: 50px; }
+  .aid-cat { width: 80px; bottom: 56px; }
+  .aid-tree { width: 92vw; bottom: 44px; }
+  .aid-flowerbed { width: 60vw; bottom: 50px; }
+  .aid-ground { height: 60px; }
+  .aid-butterfly { width: 22px; }
   .aid-cloud-1 { width: 180px; }
   .aid-cloud-3 { width: 220px; }
+}
+
+/* ===== Cozy Companion Room — Chat page Phase 1 ===== */
+.vf-chat-cozy {
+  background:
+    radial-gradient(ellipse 90% 65% at 50% -10%, rgba(184, 220, 146, 0.18), transparent 60%),
+    radial-gradient(ellipse 70% 55% at 50% 110%, rgba(255, 240, 192, 0.45), transparent 60%),
+    linear-gradient(180deg, #fff9e6 0%, #fdf4d4 60%, #fff0c0 100%);
+}
+
+.vf-chat-cozy .vf-chat-stage {
+  position: relative;
+  isolation: isolate;
+}
+
+.vf-cozy-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  contain: layout paint style;
+}
+
+.vf-cozy-bg .vf-cozy-window {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  width: min(420px, 50vw);
+  height: min(320px, 38vh);
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse 80% 70% at 50% 30%, rgba(255, 240, 192, 0.65) 0%, rgba(253, 244, 212, 0.35) 50%, transparent 80%);
+  filter: blur(20px);
+  z-index: 0;
+}
+
+.vf-cozy-cloud {
+  position: absolute;
+  width: 220px;
+  opacity: 0.85;
+  will-change: transform;
+  animation: vf-cozy-drift linear infinite;
+}
+.vf-cozy-cloud svg { width: 100%; height: auto; display: block; }
+.vf-cozy-cloud-1 { top: 8%;  width: 200px; animation-duration: 64s; animation-delay: 0s;   opacity: 0.92; }
+.vf-cozy-cloud-2 { top: 32%; width: 150px; animation-duration: 84s; animation-delay: -28s; opacity: 0.6; }
+.vf-cozy-cloud-3 { top: 18%; width: 260px; animation-duration: 96s; animation-delay: -56s; opacity: 0.7; }
+
+@keyframes vf-cozy-drift {
+  from { transform: translate3d(-25vw, 0, 0); }
+  to   { transform: translate3d(125vw, 0, 0); }
+}
+
+.vf-cozy-snow {
+  position: absolute;
+  top: -10px;
+  display: block;
+  border-radius: 50%;
+  background: #ffffff;
+  opacity: 0.7;
+  will-change: transform, opacity;
+  animation: vf-cozy-snow-fall linear infinite;
+  pointer-events: none;
+}
+@keyframes vf-cozy-snow-fall {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+  10%  { opacity: 0.7; }
+  90%  { opacity: 0.7; }
+  100% { transform: translate3d(var(--drift, 12px), 100vh, 0); opacity: 0; }
+}
+
+/* Glassmorph the side panels + main pane */
+.vf-chat-cozy .vf-chat-sidebar-frame {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.62) 0%, rgba(253, 244, 212, 0.45) 100%);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 16px 40px rgba(26, 26, 26, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  padding: 1rem 1rem 1.1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.vf-chat-cozy .vf-chat-sidebar-bond {
+  border-bottom-color: rgba(184, 220, 146, 0.22);
+}
+
+/* Avatar card: bigger, halo glow, breathing */
+.vf-chat-cozy .vf-chat-sidebar-primary {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 240, 192, 0.3) 100%);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 12px 32px rgba(166, 209, 125, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  position: relative;
+  overflow: hidden;
+}
+.vf-chat-cozy .vf-chat-sidebar-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% 35%, rgba(184, 220, 146, 0.22) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: vf-cozy-halo 6s ease-in-out infinite;
+}
+@keyframes vf-cozy-halo {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%      { opacity: 0.9;  transform: scale(1.08); }
+}
+.vf-chat-cozy .vf-chat-panel--model {
+  position: relative;
+  z-index: 1;
+  min-height: min(34vh, 320px);
+  max-height: min(48vh, 420px);
+}
+.vf-chat-cozy .vf-chat-model-icon {
+  width: min(16rem, 56vw);
+  height: min(16rem, 56vw);
+  animation: vf-cozy-breathe 4s ease-in-out infinite;
+}
+@keyframes vf-cozy-breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-4px) scale(1.025); }
+}
+
+/* Main chat pane: glass frame */
+.vf-chat-cozy .vf-chat-main {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.55) 0%, rgba(253, 244, 212, 0.42) 100%);
+  backdrop-filter: blur(20px) saturate(1.15);
+  -webkit-backdrop-filter: blur(20px) saturate(1.15);
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 16px 44px rgba(26, 26, 26, 0.13),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  position: relative;
+  z-index: 1;
+}
+
+.vf-chat-cozy .vf-chat-tabs {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(253, 244, 212, 0.4) 100%);
+  border-bottom: 1px solid rgba(184, 220, 146, 0.2);
+  backdrop-filter: blur(8px);
+}
+.vf-chat-cozy .vf-chat-tab--active {
+  background: linear-gradient(180deg, #b8dc92, #a6d17d);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(166, 209, 125, 0.35);
+}
+
+/* Glass chat bubbles */
+.vf-chat-cozy .vf-chat-bubble--user {
+  background: linear-gradient(168deg, rgba(255, 255, 255, 0.78) 0%, rgba(253, 244, 212, 0.7) 100%);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  color: #1a1a1a;
+  box-shadow:
+    0 8px 24px rgba(26, 26, 26, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  border-radius: 1.2rem;
+}
+.vf-chat-cozy .vf-chat-bubble--assistant {
+  background: linear-gradient(168deg, rgba(255, 240, 192, 0.65) 0%, rgba(253, 244, 212, 0.55) 100%);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  color: #1a1a1a;
+  box-shadow:
+    0 8px 24px rgba(26, 26, 26, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  border-radius: 1.2rem;
+}
+
+/* Message input area: glass dock */
+.vf-chat-cozy .vf-chat-composer-row,
+.vf-chat-cozy .vf-chat-input-wrap {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.62) 0%, rgba(253, 244, 212, 0.5) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(184, 220, 146, 0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vf-cozy-cloud, .vf-cozy-snow, .vf-chat-cozy .vf-chat-model-icon, .vf-chat-cozy .vf-chat-sidebar-primary::before {
+    animation: none !important;
+  }
+}
+
+/* ===== Chat Phase 2: gear button + settings drawer + slash + suggestions + hover menu + mood presets ===== */
+
+.vf-chat-gear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  border: 1px solid rgba(166, 209, 125, 0.4);
+  background: rgba(255, 255, 255, 0.6);
+  color: #1a1a1a;
+  cursor: pointer;
+  margin-left: 0.35rem;
+  transition: background 0.18s, transform 0.18s;
+}
+.vf-chat-gear:hover {
+  background: rgba(166, 209, 125, 0.4);
+  transform: rotate(40deg);
+}
+
+.vf-chat-settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(26, 26, 26, 0.32);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: flex-end;
+  animation: vf-chat-fade 0.18s ease-out;
+}
+.vf-chat-settings-drawer {
+  width: min(380px, 92vw);
+  height: 100%;
+  background: linear-gradient(180deg, #fff9e6 0%, #fdf4d4 100%);
+  border-left: 1px solid #a6d17d;
+  box-shadow: -10px 0 40px rgba(26, 26, 26, 0.16);
+  padding: 1.25rem 1.25rem 2rem;
+  overflow-y: auto;
+  animation: vf-chat-slide-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+@keyframes vf-chat-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes vf-chat-slide-in { from { transform: translateX(40px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
+
+.vf-chat-settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #a6d17d;
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+.vf-chat-settings-head h3 {
+  margin: 0;
+  font-family: var(--bg3-font-body);
+  font-size: 1.05rem;
+  color: #1a1a1a;
+  letter-spacing: 0.04em;
+}
+.vf-chat-settings-close {
+  border: none;
+  background: transparent;
+  color: #1a1a1a;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.35rem;
+}
+.vf-chat-settings-close:hover { color: #fa6255; }
+
+.vf-chat-settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.vf-chat-settings-label {
+  font-family: var(--bg3-font-body);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #1a1a1a;
+}
+.vf-chat-settings-val { color: #fa6255; font-weight: 700; }
+
+.vf-chat-mood-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+.vf-chat-mood-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 12px;
+  border: 2px solid #a6d17d;
+  background: rgba(255, 255, 255, 0.7);
+  font-family: var(--bg3-font-body);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: capitalize;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+}
+.vf-chat-mood-chip:hover { background: #fff9e6; transform: translateY(-1px); }
+.vf-chat-mood-chip.is-active {
+  background: linear-gradient(180deg, #b8dc92, #a6d17d);
+  border-color: #7ba94f;
+  box-shadow: 0 4px 12px rgba(123, 169, 79, 0.35);
+}
+.vf-chat-mood-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(26, 26, 26, 0.18);
+  flex-shrink: 0;
+}
+.vf-chat-mood-chip--cozy   .vf-chat-mood-swatch { background: linear-gradient(180deg, #fff9e6, #fdcb46); }
+.vf-chat-mood-chip--cafe   .vf-chat-mood-swatch { background: linear-gradient(180deg, #d4a574, #8b5e3c); }
+.vf-chat-mood-chip--garden .vf-chat-mood-swatch { background: linear-gradient(180deg, #b8dc92, #a6d17d); }
+.vf-chat-mood-chip--library .vf-chat-mood-swatch { background: linear-gradient(180deg, #c4b5f0, #6b4828); }
+.vf-chat-mood-chip--beach  .vf-chat-mood-swatch { background: linear-gradient(180deg, #91dcf8, #fff0c0); }
+
+.vf-chat-settings-range {
+  width: 100%;
+  accent-color: #fa6255;
+}
+.vf-chat-settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--bg3-font-body);
+  font-size: 0.85rem;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+.vf-chat-settings-toggle input { accent-color: #a6d17d; transform: scale(1.15); }
+
+.vf-chat-settings-foot {
+  margin-top: auto;
+  padding-top: 0.8rem;
+  border-top: 1px dashed rgba(26, 26, 26, 0.15);
+}
+.vf-chat-settings-hint {
+  font-size: 0.75rem;
+  color: #6b6b6b;
+  margin: 0;
+}
+.vf-chat-settings-hint code {
+  background: #fdf4d4;
+  border: 1px solid #a6d17d;
+  border-radius: 4px;
+  padding: 0 0.32rem;
+  color: #fa6255;
+  font-family: ui-monospace, monospace;
+}
+
+.vf-chat-shell[data-mood="cafe"] {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212, 165, 116, 0.25), transparent 60%),
+    linear-gradient(180deg, #f5e6c8 0%, #e8d0a8 50%, #d4a574 100%);
+}
+.vf-chat-shell[data-mood="garden"] {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(184, 220, 146, 0.4), transparent 60%),
+    linear-gradient(180deg, #e8f5d6 0%, #c8e4a8 50%, #a6d17d 100%);
+}
+.vf-chat-shell[data-mood="library"] {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(196, 181, 240, 0.3), transparent 60%),
+    linear-gradient(180deg, #f0e8d8 0%, #d4c8a8 50%, #8b6b48 100%);
+}
+.vf-chat-shell[data-mood="beach"] {
+  background:
+    radial-gradient(ellipse 90% 65% at 50% -10%, rgba(145, 220, 248, 0.35), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 50% 110%, rgba(255, 240, 192, 0.5), transparent 60%),
+    linear-gradient(180deg, #e0f4fc 0%, #fffaee 60%, #fff0c0 100%);
+}
+
+.vf-chat-slash-palette {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0.5rem;
+  right: 0.5rem;
+  background: linear-gradient(180deg, #ffffff 0%, #fff9e6 100%);
+  border: 2px solid #a6d17d;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(26, 26, 26, 0.18);
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 30;
+  animation: vf-chat-slide-up 0.16s ease-out;
+}
+@keyframes vf-chat-slide-up { from { transform: translateY(8px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+.vf-chat-slash-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.45rem 0.65rem;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--bg3-font-body);
+}
+.vf-chat-slash-item:hover { background: #fdf4d4; }
+.vf-chat-slash-cmd {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  color: #fa6255;
+  font-weight: 700;
+  font-size: 0.85rem;
+  min-width: 110px;
+}
+.vf-chat-slash-desc {
+  color: #1a1a1a;
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+
+.vf-chat-suggestions {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  z-index: 20;
+}
+.vf-chat-suggest-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.42rem 0.85rem;
+  border-radius: 9999px;
+  border: 2px solid #a6d17d;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  font-family: var(--bg3-font-body);
+  font-size: 0.78rem;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.vf-chat-suggest-chip:hover {
+  background: #fff9e6;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(123, 169, 79, 0.25);
+}
+
+.vf-chat-msg-row { position: relative; }
+.vf-chat-msg-actions {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  opacity: 0;
+  transition: opacity 0.18s;
+  z-index: 5;
+}
+.vf-chat-msg-row:hover .vf-chat-msg-actions,
+.vf-chat-msg-actions.is-open {
+  opacity: 1;
+}
+.vf-chat-msg-actions-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  border: 1px solid rgba(166, 209, 125, 0.5);
+  background: rgba(255, 255, 255, 0.85);
+  color: #1a1a1a;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+.vf-chat-msg-actions-btn:hover {
+  background: #fff9e6;
+  color: #fa6255;
+}
+.vf-chat-msg-actions-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 140px;
+  background: linear-gradient(180deg, #ffffff 0%, #fff9e6 100%);
+  border: 2px solid #a6d17d;
+  border-radius: 12px;
+  box-shadow: 0 10px 26px rgba(26, 26, 26, 0.2);
+  padding: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  z-index: 30;
+  animation: vf-chat-slide-up 0.14s ease-out;
+}
+.vf-chat-msg-actions-menu button {
+  text-align: left;
+  padding: 0.42rem 0.65rem;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--bg3-font-body);
+  font-size: 0.78rem;
+  color: #1a1a1a;
+}
+.vf-chat-msg-actions-menu button:hover { background: #fdf4d4; }
+.vf-chat-msg-action-disabled { opacity: 0.55; cursor: not-allowed !important; }
+
+.vf-chat-settings-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.vf-chat-settings-action {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px;
+  border: 1.5px solid #a6d17d;
+  background: rgba(255, 255, 255, 0.7);
+  font-family: var(--bg3-font-body);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: #1a1a1a;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, transform 0.15s;
+}
+.vf-chat-settings-action:hover {
+  background: #fff9e6;
+  transform: translateX(2px);
+}
+.vf-chat-settings-action svg { color: #fa6255; flex-shrink: 0; }
+
+.vf-chat-tab-current {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--bg3-font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fa6255;
+  margin-left: 0.4rem;
+  opacity: 0.92;
+}
+.vf-chat-settings-action.is-active {
+  background: linear-gradient(180deg, #b8dc92, #a6d17d);
+  border-color: #7ba94f;
+  box-shadow: 0 4px 10px rgba(123, 169, 79, 0.3);
+}
+.vf-chat-settings-action-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* ===== Music player ===== */
+.vf-music-iframe-host {
+  position: fixed;
+  bottom: -9999px;
+  right: -9999px;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.vf-music-section {
+  border-top: 1px dashed rgba(26, 26, 26, 0.15);
+  padding-top: 1rem;
+  margin-top: 0.4rem;
+}
+
+.vf-music-now {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #fff9e6 0%, #fdf4d4 100%);
+  border: 1.5px solid #a6d17d;
+  font-family: var(--bg3-font-body);
+  font-size: 0.78rem;
+  color: #1a1a1a;
+}
+.vf-music-now-icon { font-size: 1rem; flex-shrink: 0; }
+.vf-music-now-title {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vf-music-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.32rem;
+  flex-wrap: wrap;
+}
+.vf-music-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid #a6d17d;
+  background: #ffffff;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.vf-music-btn:hover {
+  background: #fff9e6;
+  transform: scale(1.05);
+}
+.vf-music-btn.is-active {
+  background: linear-gradient(180deg, #b8dc92, #a6d17d);
+  border-color: #7ba94f;
+  color: #1a1a1a;
+  box-shadow: 0 2px 6px rgba(123, 169, 79, 0.3);
+}
+.vf-music-btn--play {
+  width: 44px;
+  height: 44px;
+  font-size: 1.05rem;
+  background: linear-gradient(180deg, #fa6255, #c14336);
+  border-color: #c14336;
+  color: #ffffff;
+}
+.vf-music-btn--play:hover {
+  background: linear-gradient(180deg, #fc7d70, #fa6255);
+}
+
+.vf-music-volume {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.95rem;
+}
+.vf-music-volume .vf-chat-settings-range { flex: 1; }
+.vf-music-volume-val {
+  min-width: 30px;
+  text-align: right;
+  font-family: ui-monospace, monospace;
+  font-size: 0.78rem;
+  color: #1a1a1a;
+}
+
+.vf-music-url {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+.vf-music-url-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.42rem 0.65rem;
+  border-radius: 8px;
+  border: 1.5px solid #a6d17d;
+  background: #ffffff;
+  font-family: var(--bg3-font-body);
+  font-size: 0.78rem;
+  color: #1a1a1a;
+  outline: none;
+}
+.vf-music-url-input:focus {
+  border-color: #fa6255;
+  box-shadow: 0 0 0 3px rgba(250, 98, 85, 0.18);
+}
+.vf-music-url-load {
+  padding: 0.42rem 0.85rem;
+  border-radius: 8px;
+  border: 1.5px solid #fa6255;
+  background: linear-gradient(180deg, #fa6255, #c14336);
+  color: #ffffff;
+  font-family: var(--bg3-font-body);
+  font-size: 0.78rem;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  transition: transform 0.1s;
+}
+.vf-music-url-load:disabled { opacity: 0.5; cursor: not-allowed; }
+.vf-music-url-load:not(:disabled):hover { transform: translateY(-1px); }
+
+.vf-music-default-btn {
+  width: 100%;
+  padding: 0.4rem 0.65rem;
+  border-radius: 8px;
+  border: 1px dashed rgba(26, 26, 26, 0.25);
+  background: transparent;
+  font-family: var(--bg3-font-body);
+  font-size: 0.72rem;
+  color: #6b6b6b;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.vf-music-default-btn:hover:not(:disabled) {
+  background: #fff9e6;
+  color: #1a1a1a;
+}
+.vf-music-default-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ===== Empty conversation greeting ===== */
+.vf-chat-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 280px;
+  padding: 2rem 1rem;
+}
+.vf-chat-empty-bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.6rem 2rem;
+  border-radius: 22px;
+  border: 2px dashed rgba(166, 209, 125, 0.55);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.7) 0%, rgba(253, 244, 212, 0.7) 100%);
+  backdrop-filter: blur(8px);
+  text-align: center;
+  max-width: 420px;
+}
+.vf-chat-empty-emoji {
+  font-size: 2.4rem;
+  line-height: 1;
+  animation: vf-chat-empty-tilt 2.4s ease-in-out infinite;
+}
+@keyframes vf-chat-empty-tilt {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-8deg); }
+  75%      { transform: rotate(8deg); }
+}
+.vf-chat-empty-line {
+  font-family: var(--bg3-font-body);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fa6255;
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+.vf-chat-empty-sub {
+  font-family: var(--bg3-font-body);
+  font-size: 0.82rem;
+  color: #1a1a1a;
+  margin: 0;
+  opacity: 0.78;
+  line-height: 1.5;
+}
+
+/* ===== Spinner for Conversations / History ===== */
+.vf-chat-loading-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--bg3-font-body);
+  font-size: 0.85rem;
+  color: rgba(26, 26, 26, 0.65);
+  padding: 0.5rem 0;
+}
+.vf-chat-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(166, 209, 125, 0.35);
+  border-top-color: #fa6255;
+  animation: vf-chat-spin 0.85s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes vf-chat-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.vf-chat-imagine-bubble {
+  display: inline-block;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2px solid #a6d17d;
+  box-shadow: 0 6px 18px rgba(123, 169, 79, 0.25);
+  max-width: 360px;
+  background: #fff9e6;
+}
+.vf-chat-imagine-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 360px;
+  max-height: 360px;
+  object-fit: contain;
 }

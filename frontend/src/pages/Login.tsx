@@ -26,7 +26,7 @@ export default function Login() {
     setLoading(true)
     try {
       await login(username, password)
-      navigate('/menu', { replace: true })
+      navigate('/chat', { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign-in failed')
     } finally {

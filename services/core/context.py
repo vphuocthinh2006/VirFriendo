@@ -1,5 +1,6 @@
 # services/core/context.py
 """Conversation context: load last N messages từ DB cho continuity (Character.AI style)."""
+import os
 from uuid import UUID
 
 from sqlalchemy import select
@@ -7,8 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.core.models import Message
 
-# Số tin nhắn tối đa gửi vào context (tránh tràn context window)
-MAX_CONTEXT_MESSAGES = 20
+# Số tin nhắn tối đa gửi vào context (tránh tràn context window).
+# Lowered 20 → 12: faster generation + less compute. Override via LLM_MAX_HISTORY env.
+MAX_CONTEXT_MESSAGES = int(os.environ.get("LLM_MAX_HISTORY", "12"))
 
 
 async def get_conversation_context(

@@ -35,8 +35,7 @@ export default function ConnectingVirFriendo() {
       }
     >
       <div className="vf-connect-parchment">
-        <p className="vf-connect-title">Your story is loading</p>
-        <p className="vf-connect-tagline">Hang tight — the next scene is almost ready.</p>
+        <p className="vf-connect-title">hold on our script is running</p>
         <div className="vf-connect-stage vf-connect-stage--css" aria-hidden>
           <div className="vf-connect-css-spinner" />
         </div>

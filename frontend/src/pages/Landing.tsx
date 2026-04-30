@@ -50,25 +50,155 @@ function CloudShape() {
   )
 }
 
-function SnowPile() {
+function FanhuaTree() {
   return (
-    <svg viewBox="0 0 140 50" className="aid-snowpile-svg" aria-hidden>
+    <svg viewBox="0 0 480 520" className="aid-tree-svg" aria-hidden>
       <defs>
-        <linearGradient id="aidSnowPile" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#ffffff" />
-          <stop offset="60%" stopColor="#e0ecff" />
-          <stop offset="100%" stopColor="#bfdbfe" />
+        <linearGradient id="aidTrunk" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#a07246" />
+          <stop offset="50%" stopColor="#7d5230" />
+          <stop offset="100%" stopColor="#5a3a1f" />
         </linearGradient>
+        <radialGradient id="aidCanopy" cx="0.5" cy="0.45" r="0.6">
+          <stop offset="0%" stopColor="#fc8a7e" />
+          <stop offset="55%" stopColor="#fa6255" />
+          <stop offset="100%" stopColor="#c14336" />
+        </radialGradient>
+        <radialGradient id="aidCanopyAlt" cx="0.5" cy="0.5" r="0.6">
+          <stop offset="0%" stopColor="#fdcb46" />
+          <stop offset="60%" stopColor="#f4a82e" />
+          <stop offset="100%" stopColor="#c98318" />
+        </radialGradient>
       </defs>
-      <path
-        d="M4 46 Q18 28 36 30 Q52 14 72 22 Q92 12 110 24 Q126 28 134 38 Q138 42 136 46 Z"
-        fill="url(#aidSnowPile)"
-        stroke="rgba(59,130,246,0.25)"
-        strokeWidth="1"
-      />
-      <ellipse cx="50" cy="32" rx="6" ry="2" fill="#ffffff" opacity="0.85" />
-      <ellipse cx="92" cy="30" rx="5" ry="1.8" fill="#ffffff" opacity="0.8" />
-      <ellipse cx="120" cy="36" rx="4" ry="1.5" fill="#ffffff" opacity="0.7" />
+
+      {/* roots peeking out */}
+      <path d="M180 520 Q200 500 230 504 Q260 500 280 520" fill="url(#aidTrunk)" opacity="0.85" />
+      <path d="M150 520 Q170 504 200 510" fill="url(#aidTrunk)" opacity="0.7" />
+      <path d="M310 520 Q290 506 270 512" fill="url(#aidTrunk)" opacity="0.7" />
+
+      {/* massive trunk */}
+      <path d="M205 520 Q190 410 200 320 Q186 230 215 140 Q230 80 240 50 Q250 80 265 140 Q294 230 280 320 Q290 410 275 520 Z" fill="url(#aidTrunk)" />
+      {/* trunk inner shading */}
+      <path d="M225 520 Q218 410 226 320 Q215 230 235 150" stroke="#5a3a1f" strokeWidth="1.5" fill="none" opacity="0.5" />
+      <path d="M255 520 Q262 410 254 320 Q265 230 245 150" stroke="#5a3a1f" strokeWidth="1.5" fill="none" opacity="0.5" />
+
+      {/* major branches sprawling out */}
+      <path d="M230 230 Q170 210 110 190 Q80 184 60 196" stroke="#6b4828" strokeWidth="14" strokeLinecap="round" fill="none" />
+      <path d="M250 200 Q310 175 380 168 Q420 165 440 178" stroke="#6b4828" strokeWidth="14" strokeLinecap="round" fill="none" />
+      <path d="M232 160 Q200 130 160 118" stroke="#6b4828" strokeWidth="10" strokeLinecap="round" fill="none" />
+      <path d="M250 130 Q290 100 330 88" stroke="#6b4828" strokeWidth="10" strokeLinecap="round" fill="none" />
+
+      {/* canopy clusters — left arm */}
+      <circle cx="60" cy="200" r="42" fill="url(#aidCanopy)" />
+      <circle cx="90" cy="178" r="48" fill="url(#aidCanopy)" />
+      <circle cx="118" cy="208" r="44" fill="url(#aidCanopy)" />
+      <circle cx="50" cy="170" r="36" fill="url(#aidCanopyAlt)" />
+
+      {/* canopy clusters — right arm */}
+      <circle cx="438" cy="180" r="44" fill="url(#aidCanopy)" />
+      <circle cx="408" cy="158" r="50" fill="url(#aidCanopy)" />
+      <circle cx="378" cy="190" r="46" fill="url(#aidCanopy)" />
+      <circle cx="448" cy="148" r="36" fill="url(#aidCanopyAlt)" />
+
+      {/* canopy upper crown */}
+      <circle cx="160" cy="118" r="48" fill="url(#aidCanopy)" />
+      <circle cx="190" cy="78" r="50" fill="url(#aidCanopy)" />
+      <circle cx="240" cy="46" r="58" fill="url(#aidCanopy)" />
+      <circle cx="290" cy="78" r="50" fill="url(#aidCanopy)" />
+      <circle cx="320" cy="118" r="48" fill="url(#aidCanopy)" />
+
+      {/* mid canopy fill */}
+      <circle cx="220" cy="120" r="46" fill="url(#aidCanopy)" />
+      <circle cx="270" cy="120" r="46" fill="url(#aidCanopy)" />
+      <circle cx="180" cy="158" r="44" fill="url(#aidCanopy)" />
+      <circle cx="300" cy="158" r="44" fill="url(#aidCanopy)" />
+      <circle cx="230" cy="170" r="42" fill="url(#aidCanopyAlt)" />
+      <circle cx="265" cy="170" r="42" fill="url(#aidCanopyAlt)" />
+
+      {/* yellow flower nuclei scattered across canopy */}
+      <circle cx="70" cy="190" r="6" fill="#fdcb46" />
+      <circle cx="100" cy="170" r="7" fill="#fdcb46" />
+      <circle cx="180" cy="100" r="8" fill="#fdcb46" />
+      <circle cx="240" cy="40" r="9" fill="#fdcb46" />
+      <circle cx="300" cy="100" r="8" fill="#fdcb46" />
+      <circle cx="220" cy="125" r="6" fill="#fdcb46" />
+      <circle cx="270" cy="125" r="6" fill="#fdcb46" />
+      <circle cx="170" cy="160" r="6" fill="#fdcb46" />
+      <circle cx="310" cy="160" r="6" fill="#fdcb46" />
+      <circle cx="430" cy="170" r="7" fill="#fdcb46" />
+      <circle cx="395" cy="155" r="6" fill="#fdcb46" />
+    </svg>
+  )
+}
+
+function FlowerBed() {
+  return (
+    <svg viewBox="0 0 320 90" className="aid-flowerbed-svg" aria-hidden>
+      {/* grass tufts */}
+      <path d="M8 82 Q14 60 20 82 M28 84 Q34 62 40 84 M50 82 Q56 60 62 82" stroke="#7ba94f" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path d="M260 84 Q266 62 272 84 M280 82 Q286 60 292 82 M302 84 Q308 62 314 84" stroke="#7ba94f" strokeWidth="3" fill="none" strokeLinecap="round" />
+      {/* red flower 1 */}
+      <g transform="translate(76, 66)">
+        <circle r="9" fill="#fa6255" cx="-10" cy="-3" />
+        <circle r="9" fill="#fa6255" cx="10" cy="-3" />
+        <circle r="9" fill="#fa6255" cx="-6" cy="8" />
+        <circle r="9" fill="#fa6255" cx="6" cy="8" />
+        <circle r="6" fill="#fdcb46" />
+      </g>
+      {/* yellow flower middle */}
+      <g transform="translate(160, 60)">
+        <circle r="11" fill="#fdcb46" cx="-12" cy="-3" />
+        <circle r="11" fill="#fdcb46" cx="12" cy="-3" />
+        <circle r="11" fill="#fdcb46" cx="-7" cy="10" />
+        <circle r="11" fill="#fdcb46" cx="7" cy="10" />
+        <circle r="7" fill="#fa6255" />
+      </g>
+      {/* red flower 2 */}
+      <g transform="translate(244, 66)">
+        <circle r="9" fill="#fa6255" cx="-10" cy="-3" />
+        <circle r="9" fill="#fa6255" cx="10" cy="-3" />
+        <circle r="9" fill="#fa6255" cx="-6" cy="8" />
+        <circle r="9" fill="#fa6255" cx="6" cy="8" />
+        <circle r="6" fill="#fdcb46" />
+      </g>
+      {/* small accent flowers between */}
+      <g transform="translate(118, 76)">
+        <circle r="6" fill="#fc7d70" cx="-7" cy="-2" />
+        <circle r="6" fill="#fc7d70" cx="7" cy="-2" />
+        <circle r="6" fill="#fc7d70" cx="-4" cy="6" />
+        <circle r="6" fill="#fc7d70" cx="4" cy="6" />
+        <circle r="4" fill="#fdcb46" />
+      </g>
+      <g transform="translate(204, 76)">
+        <circle r="6" fill="#fc7d70" cx="-7" cy="-2" />
+        <circle r="6" fill="#fc7d70" cx="7" cy="-2" />
+        <circle r="6" fill="#fc7d70" cx="-4" cy="6" />
+        <circle r="6" fill="#fc7d70" cx="4" cy="6" />
+        <circle r="4" fill="#fdcb46" />
+      </g>
+    </svg>
+  )
+}
+
+function Butterfly() {
+  return (
+    <svg viewBox="0 0 40 30" className="aid-butterfly-svg" aria-hidden>
+      <ellipse cx="20" cy="15" rx="1.2" ry="6" fill="#1a1a1a" />
+      {/* left wings */}
+      <g className="aid-butterfly-wing-l" style={{ transformOrigin: '20px 15px' }}>
+        <ellipse cx="11" cy="11" rx="8" ry="6" fill="#fa6255" />
+        <ellipse cx="13" cy="20" rx="6" ry="4.5" fill="#fc7d70" />
+        <circle cx="9" cy="10" r="1.5" fill="#fdcb46" />
+      </g>
+      {/* right wings */}
+      <g className="aid-butterfly-wing-r" style={{ transformOrigin: '20px 15px' }}>
+        <ellipse cx="29" cy="11" rx="8" ry="6" fill="#fa6255" />
+        <ellipse cx="27" cy="20" rx="6" ry="4.5" fill="#fc7d70" />
+        <circle cx="31" cy="10" r="1.5" fill="#fdcb46" />
+      </g>
+      {/* antennae */}
+      <path d="M20 9 Q19 5 16 4" stroke="#1a1a1a" strokeWidth="0.5" fill="none" />
+      <path d="M20 9 Q21 5 24 4" stroke="#1a1a1a" strokeWidth="0.5" fill="none" />
     </svg>
   )
 }
@@ -78,47 +208,55 @@ function LofiCat() {
     <svg viewBox="0 0 110 70" className="aid-cat-svg" aria-hidden>
       <path
         d="M14 46 Q4 40 8 28 Q10 22 14 22"
-        stroke="#a8b3c4"
+        stroke="#b8a89a"
         strokeWidth="6"
         strokeLinecap="round"
         fill="none"
         className="aid-cat-tail"
       />
-      <ellipse cx="58" cy="48" rx="30" ry="13" fill="#c8d2e0" />
-      <ellipse cx="58" cy="52" rx="24" ry="8" fill="#f0e8dc" />
-      <rect x="36" y="54" width="6" height="13" rx="3" fill="#a8b3c4" className="aid-cat-leg aid-cat-leg-1" />
-      <rect x="48" y="55" width="6" height="12" rx="3" fill="#a8b3c4" className="aid-cat-leg aid-cat-leg-2" />
-      <rect x="68" y="55" width="6" height="12" rx="3" fill="#a8b3c4" className="aid-cat-leg aid-cat-leg-3" />
-      <rect x="80" y="54" width="6" height="13" rx="3" fill="#a8b3c4" className="aid-cat-leg aid-cat-leg-4" />
-      <circle cx="86" cy="38" r="14" fill="#c8d2e0" />
-      <path d="M76 28 L74 18 L84 26 Z" fill="#a8b3c4" />
-      <path d="M96 28 L98 18 L88 26 Z" fill="#a8b3c4" />
-      <path d="M77 26 L78 22 L82 26 Z" fill="#f5b8c4" />
-      <path d="M95 26 L94 22 L90 26 Z" fill="#f5b8c4" />
-      <ellipse cx="80" cy="40" rx="1.6" ry="1.8" fill="#1e3a5f" />
-      <ellipse cx="92" cy="40" rx="1.6" ry="1.8" fill="#1e3a5f" />
+      <ellipse cx="58" cy="48" rx="30" ry="13" fill="#d4c8b8" className="aid-cat-body" />
+      <ellipse cx="58" cy="52" rx="24" ry="8" fill="#f5ebd6" />
+      <rect x="36" y="54" width="6" height="13" rx="3" fill="#b8a89a" className="aid-cat-leg aid-cat-leg-1" />
+      <rect x="48" y="55" width="6" height="12" rx="3" fill="#b8a89a" className="aid-cat-leg aid-cat-leg-2" />
+      <rect x="68" y="55" width="6" height="12" rx="3" fill="#b8a89a" className="aid-cat-leg aid-cat-leg-3" />
+      <rect x="80" y="54" width="6" height="13" rx="3" fill="#b8a89a" className="aid-cat-leg aid-cat-leg-4" />
+      <circle cx="86" cy="38" r="14" fill="#d4c8b8" />
+      <path d="M76 28 L74 18 L84 26 Z" fill="#b8a89a" />
+      <path d="M96 28 L98 18 L88 26 Z" fill="#b8a89a" />
+      <path d="M77 26 L78 22 L82 26 Z" fill="#fa6255" />
+      <path d="M95 26 L94 22 L90 26 Z" fill="#fa6255" />
+      <ellipse cx="80" cy="40" rx="1.6" ry="1.8" fill="#1a1a1a" />
+      <ellipse cx="92" cy="40" rx="1.6" ry="1.8" fill="#1a1a1a" />
       <circle cx="80.5" cy="39.5" r="0.5" fill="#ffffff" />
       <circle cx="92.5" cy="39.5" r="0.5" fill="#ffffff" />
-      <path d="M85 43 L87 43 L86 45 Z" fill="#f5b8c4" />
-      <path d="M86 45 Q84 47.5 82 47" stroke="#1e3a5f" strokeWidth="0.7" fill="none" strokeLinecap="round" />
-      <path d="M86 45 Q88 47.5 90 47" stroke="#1e3a5f" strokeWidth="0.7" fill="none" strokeLinecap="round" />
-      <line x1="72" y1="43" x2="80" y2="43.5" stroke="#a8b3c4" strokeWidth="0.4" />
-      <line x1="72" y1="45" x2="80" y2="45" stroke="#a8b3c4" strokeWidth="0.4" />
-      <line x1="92" y1="43.5" x2="100" y2="43" stroke="#a8b3c4" strokeWidth="0.4" />
-      <line x1="92" y1="45" x2="100" y2="45" stroke="#a8b3c4" strokeWidth="0.4" />
+      <path d="M85 43 L87 43 L86 45 Z" fill="#fa6255" />
+      <path d="M86 45 Q84 47.5 82 47" stroke="#1a1a1a" strokeWidth="0.7" fill="none" strokeLinecap="round" />
+      <path d="M86 45 Q88 47.5 90 47" stroke="#1a1a1a" strokeWidth="0.7" fill="none" strokeLinecap="round" />
+      <line x1="72" y1="43" x2="80" y2="43.5" stroke="#b8a89a" strokeWidth="0.4" />
+      <line x1="72" y1="45" x2="80" y2="45" stroke="#b8a89a" strokeWidth="0.4" />
+      <line x1="92" y1="43.5" x2="100" y2="43" stroke="#b8a89a" strokeWidth="0.4" />
+      <line x1="92" y1="45" x2="100" y2="45" stroke="#b8a89a" strokeWidth="0.4" />
     </svg>
   )
 }
 
-const SNOWFLAKES = Array.from({ length: 18 }, (_, i) => {
-  const left = (i * 5.7) % 100
-  const delay = (i * 0.6) % 7
-  const dur = 7 + ((i * 1.1) % 5)
-  const drift = ((i * 11) % 36) - 18
-  const size = 3 + ((i * 1.3) % 3)
-  const opacity = 0.6 + ((i * 0.05) % 0.3)
-  return { left, delay, dur, drift, size, opacity }
+const PETALS = Array.from({ length: 24 }, (_, i) => {
+  const left = 28 + ((i * 5.3) % 44)        // canopy spread ~28-72% horizontally
+  const startTop = 18 + ((i * 3.1) % 35)    // start within canopy area (18-53% from top)
+  const delay = (i * 0.45) % 7
+  const dur = 8 + ((i * 1.2) % 5)
+  const drift = ((i * 17) % 100) - 50       // sway ±50px while falling
+  const size = 8 + ((i * 1.5) % 6)
+  const variant = i % 3                      // 0=red, 1=red→yellow, 2=yellow
+  const rot = (i * 53) % 360
+  return { left, startTop, delay, dur, drift, size, variant, rot }
 })
+
+const BUTTERFLIES = [
+  { left: 38, bottom: 130, dur: 12, delay: 0 },
+  { left: 56, bottom: 160, dur: 15, delay: -6 },
+  { left: 47, bottom: 200, dur: 18, delay: -3 },
+]
 
 function CatSnowScene() {
   return (
@@ -128,25 +266,41 @@ function CatSnowScene() {
       <div className="aid-cloud aid-cloud-3"><CloudShape /></div>
       <div className="aid-cloud aid-cloud-4"><CloudShape /></div>
       <div className="aid-cloud aid-cloud-5"><CloudShape /></div>
-      <div className="aid-snow-layer">
-        {SNOWFLAKES.map((f, i) => (
+      <div className="aid-petal-layer">
+        {PETALS.map((p, i) => (
           <span
             key={i}
-            className="aid-snowflake"
+            className={`aid-petal aid-petal-v${p.variant}`}
             style={{
-              left: `${f.left}%`,
-              width: `${f.size}px`,
-              height: `${f.size}px`,
-              animationDelay: `${f.delay}s`,
-              animationDuration: `${f.dur}s`,
-              opacity: f.opacity,
-              ['--drift' as string]: `${f.drift}px`,
+              left: `${p.left}%`,
+              top: `${p.startTop}%`,
+              width: `${p.size}px`,
+              height: `${p.size}px`,
+              animationDelay: `${p.delay}s`,
+              animationDuration: `${p.dur}s`,
+              ['--drift' as string]: `${p.drift}px`,
+              ['--rot' as string]: `${p.rot}deg`,
             } as CSSProperties}
           />
         ))}
       </div>
+      {BUTTERFLIES.map((b, i) => (
+        <div
+          key={i}
+          className={`aid-butterfly aid-butterfly-${i + 1}`}
+          style={{
+            left: `${b.left}%`,
+            bottom: `${b.bottom}px`,
+            animationDuration: `${b.dur}s`,
+            animationDelay: `${b.delay}s`,
+          } as CSSProperties}
+        >
+          <Butterfly />
+        </div>
+      ))}
       <div className="aid-ground" />
-      <div className="aid-snowpile"><SnowPile /></div>
+      <div className="aid-tree"><FanhuaTree /></div>
+      <div className="aid-flowerbed"><FlowerBed /></div>
       <div className="aid-cat"><LofiCat /></div>
     </div>
   )
@@ -345,7 +499,7 @@ export default function Landing() {
           <div className="aid-footer-stack">
             <div className="aid-footer-bar">
               <div className="aid-footer-team">
-                <span className="aid-footer-team-label">Bộ Tứ Random BS Go</span>
+                <span className="aid-footer-team-label">Pally team</span>
                 <span className="aid-footer-names">
                   Le Ngo Thanh Toan · Nguyen Tan Phuc Thinh · Vo Phuoc Thinh · Lien Phuc Thinh
                 </span>
@@ -364,7 +518,7 @@ export default function Landing() {
             </div>
             <div className="aid-footer-bottom">
               <p className="aid-footer-copy">
-                © {new Date().getFullYear()} Pally · Bộ Tứ Random BS Go. All rights reserved.
+                © {new Date().getFullYear()} Pally. All rights reserved.
               </p>
               <div className="aid-footer-legal" aria-label="Legal and resources">
                 <Link to={LANDING_UPDATES} className="aid-footer-legal-link">

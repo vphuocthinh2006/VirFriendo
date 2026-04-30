@@ -1,5 +1,5 @@
 # services/agent_service/llm/client.py
-"""LLM client: OpenAI (GPT-4o) hoặc Groq. Dùng cho các agent generate reply."""
+"""LLM client: Claude (Anthropic) / OpenAI / Groq. Dùng cho các agent generate reply."""
 import os
 from typing import Optional, Sequence
 
@@ -15,18 +15,38 @@ def _get_llm():
         return _llm
     groq_key = (os.environ.get("GROQ_API_KEY") or "").strip()
     openai_key = (os.environ.get("OPENAI_API_KEY") or "").strip()
-    provider = (os.environ.get("LLM_PROVIDER") or "openai").strip().lower()
+    anthropic_key = (os.environ.get("ANTHROPIC_API_KEY") or "").strip()
+    provider = (os.environ.get("LLM_PROVIDER") or "auto").strip().lower()
+    max_tokens = int(os.environ.get("LLM_MAX_TOKENS", "1024"))
+    temperature = float(os.environ.get("LLM_TEMPERATURE", "0.7"))
+
+    def _build_claude():
+        if not anthropic_key:
+            return None
+        try:
+            from langchain_anthropic import ChatAnthropic
+            model = os.environ.get("ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022")
+            llm = ChatAnthropic(
+                model=model,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                api_key=anthropic_key,
+            )
+            logger.info("LLM client: using claude ({})", model)
+            return llm
+        except ImportError:
+            logger.warning("langchain-anthropic not installed")
+            return None
 
     def _build_openai():
-        nonlocal openai_key
         if not openai_key:
             return None
         try:
             from langchain_openai import ChatOpenAI
-
             return ChatOpenAI(
-                model=os.environ.get("OPENAI_MODEL", "gpt-4o"),
-                temperature=0.7,
+                model=os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+                temperature=temperature,
+                max_tokens=max_tokens,
                 api_key=openai_key,
             )
         except ImportError:
@@ -34,40 +54,34 @@ def _get_llm():
             return None
 
     def _build_groq():
-        nonlocal groq_key
         if not groq_key:
             return None
         try:
             from langchain_groq import ChatGroq
-
             return ChatGroq(
-                model=os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant"),
-                temperature=0.7,
+                model=os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile"),
+                temperature=temperature,
+                max_tokens=max_tokens,
                 api_key=groq_key,
             )
         except ImportError:
             logger.warning("langchain-groq not installed")
             return None
 
-    selected_provider = ""
-    if provider == "groq":
-        _llm = _build_groq()
-        selected_provider = "groq" if _llm is not None else ""
-        if _llm is None:
-            _llm = _build_openai()
-            selected_provider = "openai" if _llm is not None else ""
+    # Priority order based on LLM_PROVIDER
+    if provider == "claude":
+        _llm = _build_claude() or _build_groq() or _build_openai()
+    elif provider == "openai":
+        _llm = _build_openai() or _build_claude() or _build_groq()
+    elif provider == "groq":
+        _llm = _build_groq() or _build_claude() or _build_openai()
     else:
-        # Default to OpenAI first to match current project setup.
-        _llm = _build_openai()
-        selected_provider = "openai" if _llm is not None else ""
-        if _llm is None:
-            _llm = _build_groq()
-            selected_provider = "groq" if _llm is not None else ""
-    if _llm is not None:
-        logger.info("LLM client: using {}", selected_provider or "unknown")
-        return _llm
-    logger.warning("LLM client: no provider available (set OPENAI_API_KEY or GROQ_API_KEY)")
-    return None
+        # auto: claude > groq > openai
+        _llm = _build_claude() or _build_groq() or _build_openai()
+
+    if _llm is None:
+        logger.warning("LLM client: no provider available")
+    return _llm
 
 
 async def generate(system_prompt: str, user_message: str) -> Optional[str]:
@@ -96,8 +110,9 @@ async def generate(system_prompt: str, user_message: str) -> Optional[str]:
         return None
 
 
-# Số tin nhắn tối đa gửi vào LLM (context window) — trùng với core/context
-MAX_HISTORY_MESSAGES = 20  # aligned with core/context MAX_CONTEXT_MESSAGES
+# Số tin nhắn tối đa gửi vào LLM (context window) — trùng với core/context.
+# Lowered 20 → 12: faster generation, less compute, still keeps recent context.
+MAX_HISTORY_MESSAGES = int(os.environ.get("LLM_MAX_HISTORY", "12"))
 
 
 async def generate_with_history(
