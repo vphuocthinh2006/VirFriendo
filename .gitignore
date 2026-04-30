@@ -30,7 +30,6 @@ pip-delete-this-directory.txt
 
 # Environments
 .env
-.env.example
 .venv
 env/
 venv/
