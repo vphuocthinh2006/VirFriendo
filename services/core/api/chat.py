@@ -1370,8 +1370,29 @@ async def _analyze_web_url(
         import httpx
         from bs4 import BeautifulSoup
         
+        # SSRF protection: block private/internal IPs
+        import ipaddress
+        import urllib.parse
+        try:
+            parsed = urllib.parse.urlparse(web_url)
+            hostname = parsed.hostname or ""
+            # Block private IP ranges
+            try:
+                ip = ipaddress.ip_address(hostname)
+                if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+                    raise HTTPException(status_code=400, detail="URL not allowed")
+            except ValueError:
+                pass  # hostname is a domain, not IP - OK
+            # Block localhost variants
+            if hostname.lower() in ("localhost", "127.0.0.1", "::1", "0.0.0.0"):
+                raise HTTPException(status_code=400, detail="URL not allowed")
+        except HTTPException:
+            raise
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid URL")
+
         # Fetch web content
-        async with httpx.AsyncClient(follow_redirects=True, timeout=10.0) as client:
+        async with httpx.AsyncClient(follow_redirects=False, timeout=10.0) as client:
             response = await client.get(web_url, headers={
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
             })
@@ -1546,7 +1567,7 @@ async def imagine(
                 input={
                     "prompt": prompt,
                     "aspect_ratio": payload.aspect_ratio,
-                    "output_format": "webp",
+                    "output_format": "jpg",
                     "safety_tolerance": 2,
                 },
             )
