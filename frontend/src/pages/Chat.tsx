@@ -3,6 +3,7 @@ import ConnectingVirFriendo from '../components/ConnectingVirFriendo'
 import ChatEntryGate from '../components/ChatEntryGate'
 import ChatRabbitWait from '../components/ChatRabbitWait'
 import AppTopbar from '../components/AppTopbar'
+import Live2DAvatar, { type Live2DEmotion } from '../components/Live2DAvatar'
 import { ChatMarkdown } from '../components/ChatMarkdown'
 import { useNavigate, useSearchParams, Navigate } from 'react-router-dom'
 import { DEPLOYED_AGENTS } from '../data/deployedAgents'
@@ -25,6 +26,19 @@ const SLASH_COMMANDS: { cmd: string; desc: string }[] = [
   { cmd: 'mood sad', desc: 'Set companion mood: sad' },
   { cmd: 'mood idle', desc: 'Set companion mood: idle' },
 ]
+
+/** Map AI's detected_emotion string → Live2D expression set. */
+function mapToLive2DEmotion(detected: string | null | undefined): Live2DEmotion {
+  if (!detected) return 'idle'
+  const t = detected.toLowerCase()
+  if (t.includes('happy') || t.includes('joy') || t.includes('excited') || t.includes('cheerful')) return 'happy'
+  if (t.includes('sad') || t.includes('down') || t.includes('crying')) return 'sad'
+  if (t.includes('angry') || t.includes('mad') || t.includes('frustrated')) return 'angry'
+  if (t.includes('surprised') || t.includes('shocked') || t.includes('amazed')) return 'surprised'
+  if (t.includes('sleepy') || t.includes('tired') || t.includes('bored')) return 'sleepy'
+  if (t.includes('blush') || t.includes('shy') || t.includes('embarrass')) return 'blush'
+  return 'idle'
+}
 
 /** Parse YouTube URL → videoId / playlist listId. Accepts watch?v= and playlist?list= forms. */
 function parseYouTubeUrl(url: string): { videoId?: string; listId?: string } {
@@ -755,6 +769,15 @@ export default function Chat() {
 
   const displayName = agentMeta?.botName ?? 'Pally'
 
+  // Live2D emotion derived from the most recent assistant message's detected_emotion.
+  const live2dEmotion: Live2DEmotion = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const m = messages[i]
+      if (m.role === 'assistant') return mapToLive2DEmotion(m.detected_emotion)
+    }
+    return 'idle'
+  }, [messages])
+
   useEffect(() => {
     if (!authLoading && !isAuth) navigate('/login', { replace: true })
   }, [isAuth, authLoading, navigate])
@@ -1136,12 +1159,49 @@ export default function Chat() {
     const text = input.trim()
     if (!text || loading) return
 
-    // /imagine slash command — text-to-image via Replicate
-    if (text.toLowerCase().startsWith('/imagine ')) {
-      const prompt = text.slice('/imagine '.length).trim()
-      if (prompt) {
-        await imagineFromPrompt(prompt)
+    // Intercept slash commands typed into input (so they don't go to AI as text).
+    if (text.startsWith('/')) {
+      const lower = text.toLowerCase()
+      if (lower === '/clear') {
+        setMessages([])
+        setInput('')
         return
+      }
+      if (lower === '/regen') {
+        setInput('')
+        void regenerateLastReply()
+        return
+      }
+      if (lower === '/continue') {
+        setInput('')
+        void sendText('Please continue.')
+        return
+      }
+      if (lower === '/narrate') {
+        setInput('')
+        void sendText('Reply in a short narrative scene-style description.')
+        return
+      }
+      if (lower.startsWith('/mood ')) {
+        // Live2D emotion is already wired via `emotion` prop derived from messages.
+        // Treat as no-op (don't bother the AI) — clear input.
+        setInput('')
+        return
+      }
+      if (lower.startsWith('/imagine ')) {
+        const prompt = text.slice('/imagine '.length).trim()
+        if (prompt) {
+          await imagineFromPrompt(prompt)
+          return
+        }
+      }
+      if (lower.startsWith('/ooc ')) {
+        const rest = text.slice('/ooc '.length).trim()
+        if (rest) {
+          setInput('')
+          void sendText(`(OOC) ${rest}`)
+          return
+        }
       }
     }
 
@@ -1632,7 +1692,10 @@ export default function Chat() {
             <div className="vf-chat-sidebar-primary">
               <div className={`vf-chat-panel vf-chat-panel--model ${expressionClass}`}>
                 <div className="vf-chat-model-vtuber">
-                  <IconAvatar className="vf-chat-model-icon" />
+                  <Live2DAvatar
+                    emotion={live2dEmotion}
+                    fallback={<IconAvatar className="vf-chat-model-icon" />}
+                  />
                 </div>
               </div>
             </div>

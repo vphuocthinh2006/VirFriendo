@@ -205,7 +205,30 @@ def _conversation_context_for_entertainment(state: AgentState, max_chars: int = 
 async def entertainment_expert_node(state: AgentState) -> dict:
     last_user = state["messages"][-1].content if state.get("messages") else ""
     user_msgs = [m.content for m in state.get("messages", []) if isinstance(m, HumanMessage)]
-    prev_user = user_msgs[-2] if len(user_msgs) >= 2 else ""
+
+    def _is_meaningful_prev(t: str) -> bool:
+        """Skip slash commands, OOC, and trivially short turns when choosing the
+        'previous user message' used to enrich a follow-up retrieval query."""
+        s = (t or "").strip()
+        if not s:
+            return False
+        sl = s.lower()
+        if sl.startswith("/"):
+            return False
+        if sl.startswith("(ooc)"):
+            return False
+        if len(sl.split()) < 3:
+            return False
+        return True
+
+    # Walk backwards through prior user turns (skipping the very last one, which is `last_user`)
+    # to find the most recent topic-bearing message.
+    prev_user = ""
+    for prior in reversed(user_msgs[:-1]):
+        if _is_meaningful_prev(prior):
+            prev_user = prior
+            break
+
     low = (last_user or "").strip().lower()
     # Follow-up queries often omit the entity/topic and need previous user turn.
     needs_prev = (
