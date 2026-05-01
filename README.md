@@ -105,7 +105,7 @@ Chi tiết: [`docs/04-api-overview.md`](./docs/04-api-overview.md)
 
 ## Environment
 
-Copy `.env.example` → `.env`. Xem [`docs/07-security-and-secrets.md`](./docs/07-security-and-secrets.md).
+Copy `.env.example` → `.env`.
 
 ---
 
