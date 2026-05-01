@@ -94,7 +94,7 @@ export function useGoogleSignIn() {
       setError('')
       try {
         await api.loginWithGoogle(credential)
-        navigate('/chat', { replace: true })
+        navigate('/menu', { replace: true })
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Google sign-in failed')
       } finally {

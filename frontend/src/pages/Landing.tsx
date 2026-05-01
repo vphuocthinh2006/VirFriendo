@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useGoogleSignIn } from '../hooks/useGoogleSignIn'
+import { useAuth } from '../hooks/useAuth'
 import GoogleGlyph from '../components/GoogleGlyph'
 import LandingTopbar from '../components/LandingTopbar'
 import { LANDING_CONTACT, LANDING_SIGN_IN, LANDING_SIGN_UP, LANDING_UPDATES } from '../landingRoutes'
@@ -310,6 +311,8 @@ export default function Landing() {
   const whatSectionRef = useRef<HTMLElement>(null)
   const [scrollHintDismissed, setScrollHintDismissed] = useState(false)
   const [whatInView, setWhatInView] = useState(false)
+  const { isAuth } = useAuth()
+  const navigate = useNavigate()
   const {
     ready: googleReady,
     loading: googleLoading,
@@ -317,6 +320,11 @@ export default function Landing() {
     googleMountRef,
     triggerGoogleSignIn,
   } = useGoogleSignIn()
+
+  // Redirect authenticated users to /menu
+  useEffect(() => {
+    if (isAuth) navigate('/menu', { replace: true })
+  }, [isAuth, navigate])
 
   useEffect(() => {
     const el = whatSectionRef.current

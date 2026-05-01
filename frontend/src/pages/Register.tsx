@@ -27,7 +27,7 @@ export default function Register() {
     setLoading(true)
     try {
       await register({ username, email, password })
-      navigate('/chat', { replace: true })
+      navigate('/menu', { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed')
     } finally {
