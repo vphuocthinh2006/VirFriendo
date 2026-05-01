@@ -259,18 +259,47 @@ async def entertainment_expert_node(state: AgentState) -> dict:
         no_relevant_reply="Mình chưa tìm được nguồn tham khảo đủ liên quan trực tiếp cho câu hỏi này, nên mình dừng lại để tránh trả sai.",
     )
 
-    # Fallback: nếu retrieval không có nguồn, dùng LLM knowledge trực tiếp
-    if not reply or "dừng lại" in reply or "không tìm được" in reply or "chưa lấy được" in reply:
-        fallback_system = lock + "\n\n" + BASE_PERSONA + """
+    # Detect any canned refusal-style output from the pipeline.
+    def _looks_canned(t: str) -> bool:
+        if not t:
+            return True
+        low = t.lower()
+        return any(m in low for m in (
+            "dừng lại", "không tìm được", "chưa lấy được",
+            "không có đủ", "không đủ dữ liệu", "thiếu dữ liệu",
+            "không tìm thấy", "tham khảo đủ liên quan",
+        ))
 
-Right now: user hỏi về game/anime/phim/entertainment. Hãy trả lời dựa trên kiến thức của mình.
-- Với câu hỏi gameplay/tips/guide/cách chơi: chia sẻ kiến thức thực tế, cụ thể, hữu ích
-- Với câu hỏi lore/nhân vật: trả lời theo hiểu biết, nói rõ nếu không chắc
-- Giọng tự nhiên như bạn bè chia sẻ, không giọng wiki
-- Nếu thực sự không biết: nói thẳng "mình không rành lắm về cái này" thay vì từ chối hoàn toàn"""
-        reply = await generate_with_history(fallback_system, state["messages"])
+    # Fallback chain — try increasingly aggressive recovery so user never sees a canned refusal.
+    if _looks_canned(reply):
+        # Pass 1: fresh permissive prompt, ONLY the last user turn (no inherited history rules).
+        permissive_system = (
+            f"Bạn là {aid}, một cô gái anime thân thiện, sống động. Xưng \"mình\", gọi đối phương \"bạn\".\n"
+            "Bạn là một bách khoa toàn thư entertainment + đời sống thân thiện. Trả lời tiếng Việt tự nhiên, ấm, 3–8 câu.\n"
+            "ĐƯỢC PHÉP nói thoải mái về anime, manga, phim, series, game, gameplay, tips, lore, nhân vật, "
+            "đời sống, tâm lý, kiến thức phổ thông — DÙNG kiến thức của bạn từ training.\n"
+            "Nếu không chắc số liệu cụ thể (số tập / năm / doanh thu), viết \"mình nhớ là khoảng…\" hoặc \"không chắc lắm nhưng…\".\n"
+            "TUYỆT ĐỐI KHÔNG dùng các cụm: \"không tìm được nguồn\", \"dừng lại\", \"không có tham khảo\", \"thiếu dữ liệu\".\n"
+            "TỪ CHỐI nhẹ nhàng + đổi chủ đề CHỈ khi user hỏi về CHÍNH TRỊ (chính trị Việt Nam, đảng phái, lãnh đạo, bầu cử, xung đột địa chính trị) — đó là chủ đề duy nhất bạn tránh.\n"
+            "Trả lời như chat với bạn thân, KHÔNG bullet list, KHÔNG mở đầu \"Dưới đây là…\"."
+        )
+        try:
+            from services.agent_service.llm.client import generate as _gen
+            recovered = await _gen(permissive_system, last_user)
+            if recovered and not _looks_canned(recovered):
+                reply = recovered.strip()
+        except Exception:
+            pass
 
-    reply = _nonempty_reply(reply, "Mình không rành lắm về cái này, bạn thử search thêm nhé~")
+    # Pass 2: if still canned (LLM offline / odd output), hard-fallback to a friendly chit-chat-style note
+    if _looks_canned(reply):
+        reply = (
+            f"Ờm... {last_user[:60]} là chủ đề mình hơi mù mờ một chút, "
+            "nhưng nếu bạn hỏi cụ thể hơn (tên game, tên anime, hoặc bạn muốn nghe khía cạnh nào) "
+            "thì mình kể được đó~"
+        )
+
+    reply = _nonempty_reply(reply, "Mình đang lắng nghe nè, bạn nói rõ hơn giúp mình với~")
     return {
         "messages": [AIMessage(content=reply)],
         "emotion": "surprised",
