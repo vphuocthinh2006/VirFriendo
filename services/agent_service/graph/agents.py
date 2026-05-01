@@ -71,8 +71,15 @@ QUAN TRỌNG:
 
 GUARDRAIL_SYSTEM = BASE_PERSONA + """
 
-Right now: họ hỏi chủ đề không thuộc nhánh entertainment có retrieval (code, toán, khoa học, kỹ năng, đời sống, công nghệ...).
-"""
+Right now: họ hỏi chủ đề ngoài phạm vi của mình — cụ thể là code/lập trình, toán học, tài chính/chứng khoán, tin tức thời sự, chính trị, khoa học kỹ thuật thuần túy.
+
+QUAN TRỌNG: Mình VẪN có thể nói về:
+- Game (gameplay, tips, build, meta, lore, characters) — đây là entertainment
+- Anime, manga, phim, series — đây là entertainment  
+- Tâm lý, cảm xúc, cuộc sống hàng ngày — đây là tâm lý
+
+Chỉ từ chối nhẹ nhàng nếu họ hỏi: code/algorithm/leetcode, toán học, chứng khoán/crypto, tin tức chính trị, khoa học kỹ thuật.
+Nói ngắn gọn, ấm, không giải thích dài dòng."""
 
 ENTERTAINMENT_EXPERT_SYSTEM = """Dịch nội dung trong phần 'Tham khảo' sang tiếng Việt. Trả lời chi tiết, đầy đủ và đúng trọng tâm câu hỏi.
 
@@ -251,10 +258,19 @@ async def entertainment_expert_node(state: AgentState) -> dict:
         no_source_reply="Mình chưa lấy được nguồn tham khảo để tóm tắt chính xác phần bạn hỏi, nên mình dừng lại.",
         no_relevant_reply="Mình chưa tìm được nguồn tham khảo đủ liên quan trực tiếp cho câu hỏi này, nên mình dừng lại để tránh trả sai.",
     )
-    reply = _nonempty_reply(
-        reply,
-        "Mình không thể trả lời chính xác phần bạn hỏi vì thiếu dữ liệu từ nguồn tham khảo.",
-    )
+
+    # Fallback: nếu retrieval không có nguồn, dùng LLM knowledge trực tiếp
+    if not reply or "dừng lại" in reply or "không tìm được" in reply or "chưa lấy được" in reply:
+        fallback_system = lock + "\n\n" + BASE_PERSONA + """
+
+Right now: user hỏi về game/anime/phim/entertainment. Hãy trả lời dựa trên kiến thức của mình.
+- Với câu hỏi gameplay/tips/guide/cách chơi: chia sẻ kiến thức thực tế, cụ thể, hữu ích
+- Với câu hỏi lore/nhân vật: trả lời theo hiểu biết, nói rõ nếu không chắc
+- Giọng tự nhiên như bạn bè chia sẻ, không giọng wiki
+- Nếu thực sự không biết: nói thẳng "mình không rành lắm về cái này" thay vì từ chối hoàn toàn"""
+        reply = await generate_with_history(fallback_system, state["messages"])
+
+    reply = _nonempty_reply(reply, "Mình không rành lắm về cái này, bạn thử search thêm nhé~")
     return {
         "messages": [AIMessage(content=reply)],
         "emotion": "surprised",
