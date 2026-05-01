@@ -241,22 +241,20 @@ function LofiCat() {
   )
 }
 
-const PETALS = Array.from({ length: 24 }, (_, i) => {
-  const left = 28 + ((i * 5.3) % 44)        // canopy spread ~28-72% horizontally
-  const startTop = 18 + ((i * 3.1) % 35)    // start within canopy area (18-53% from top)
-  const delay = (i * 0.45) % 7
+const PETALS = Array.from({ length: 12 }, (_, i) => {
+  const left = 28 + ((i * 5.3) % 44)
+  const startTop = 18 + ((i * 3.1) % 35)
+  const delay = (i * 0.9) % 7
   const dur = 8 + ((i * 1.2) % 5)
-  const drift = ((i * 17) % 100) - 50       // sway ±50px while falling
+  const drift = ((i * 17) % 100) - 50
   const size = 8 + ((i * 1.5) % 6)
-  const variant = i % 3                      // 0=red, 1=red→yellow, 2=yellow
+  const variant = i % 3
   const rot = (i * 53) % 360
   return { left, startTop, delay, dur, drift, size, variant, rot }
 })
 
 const BUTTERFLIES = [
-  { left: 38, bottom: 130, dur: 12, delay: 0 },
-  { left: 56, bottom: 160, dur: 15, delay: -6 },
-  { left: 47, bottom: 200, dur: 18, delay: -3 },
+  { left: 47, bottom: 160, dur: 15, delay: 0 },
 ]
 
 function CatSnowScene() {
@@ -265,8 +263,6 @@ function CatSnowScene() {
       <div className="aid-cloud aid-cloud-1"><CloudShape /></div>
       <div className="aid-cloud aid-cloud-2"><CloudShape /></div>
       <div className="aid-cloud aid-cloud-3"><CloudShape /></div>
-      <div className="aid-cloud aid-cloud-4"><CloudShape /></div>
-      <div className="aid-cloud aid-cloud-5"><CloudShape /></div>
       <div className="aid-petal-layer">
         {PETALS.map((p, i) => (
           <span

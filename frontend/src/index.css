@@ -7731,6 +7731,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .aid-cat-scene {
   position: absolute;
   inset: 0;
+  contain: strict;
+  overflow: hidden;
+}
   z-index: 1;
   pointer-events: none;
   overflow: hidden;
@@ -7858,7 +7861,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 .aid-butterfly-svg { width: 100%; height: auto; display: block; }
 .aid-butterfly-wing-l, .aid-butterfly-wing-r {
-  animation: aid-butterfly-flap 0.22s ease-in-out infinite;
+  animation: aid-butterfly-flap 0.44s ease-in-out infinite;
 }
 .aid-butterfly-wing-r { animation-delay: -0.11s; }
 @keyframes aid-butterfly-flap {
