@@ -311,7 +311,7 @@ export default function Landing() {
   const whatSectionRef = useRef<HTMLElement>(null)
   const [scrollHintDismissed, setScrollHintDismissed] = useState(false)
   const [whatInView, setWhatInView] = useState(false)
-  const { isAuth } = useAuth()
+  const { isAuth, loading: authLoading } = useAuth()
   const navigate = useNavigate()
   const {
     ready: googleReady,
@@ -323,8 +323,8 @@ export default function Landing() {
 
   // Redirect authenticated users to /menu
   useEffect(() => {
-    if (isAuth) navigate('/menu', { replace: true })
-  }, [isAuth, navigate])
+    if (!authLoading && isAuth) navigate('/menu', { replace: true })
+  }, [isAuth, authLoading, navigate])
 
   useEffect(() => {
     const el = whatSectionRef.current
