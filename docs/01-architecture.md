@@ -2,27 +2,24 @@
 
 ## 1.1 Tóm tắt
 
-VirFriendo là **monorepo**:
+Pally là **monorepo**:
 
-- **Frontend:** React + Vite + TypeScript + Tailwind — giao diện theo phong cách VN (stage, narrative, portrait), **không** phải engine VN riêng.
-- **Backend:** một process **FastAPI** (`services.core`) gọi **LangGraph** trong `services.agent_service` (cùng tiến trình Python, không tách HTTP mặc định).
+- **Frontend:** React + Vite + TypeScript + Tailwind — giao diện theo phong cách VN (stage, narrative, portrait).
+- **Backend:** một process **FastAPI** (`services.core`) gọi **LangGraph** trong `services.agent_service` (cùng tiến trình Python).
 
-Tách microservice là tùy chọn sau (xem [06-roadmap-infra.md](./06-roadmap-infra.md)).
-
-## 1.2 Luồng chat trên UI (đối chiếu code)
+## 1.2 Luồng chat trên UI
 
 | Hành vi | Nơi triển khai |
 |---------|----------------|
-| Tách nội dung assistant thành **khối** (đoạn / câu gộp theo ngữ nghĩa) | `splitIntoSemanticBlocks` trong `frontend/src/pages/Chat.tsx` |
-| Render từng khối **Markdown** | `ChatMarkdown`, variant `narrative` |
-| **WebSocket** stream token (`stream_start` → chunk → `stream_end`) | `Chat.tsx` + handler WS; con trỏ nhấp nháy khi đang stream message cuối |
-| REST fallback khi không có WS | `api.sendMessage` trong `handleSend` |
-| Click khối → popup đọc text khối | `onClick` / `sentencePopup` trên `.vf-chat-narrative-block` |
-| Animation **chữ từng ký tự** (stagger) | Chỉ **`KaraokeQuestion`** trong `ChatEntryGate.tsx` (câu hỏi bước tạo nhân vật), **không** áp dụng cho toàn bộ thoại trong chat |
+| Cắt nội dung assistant thành **khối ngữ nghĩa** | `splitIntoSemanticBlocks` trong `frontend/src/pages/Chat.tsx` |
+| Render **Markdown** | `ChatMarkdown`, variant `narrative` |
+| **WebSocket** stream token | `Chat.tsx` + handler WS |
+| REST fallback | `api.sendMessage` trong `handleSend` |
+| **Voice transcription** | `POST /chat/transcribe` — Deepgram Nova-3 → Groq Whisper |
+| **Vision analysis** | `POST /chat/analyze-media` — Gemini 1.5 Pro → GPT-4o |
+| **Image generation** | `POST /chat/imagine` — Replicate FLUX |
 
-Các field `chunks` / `visibleChunkIndex` trong `MessageItem` (`types/chat.ts`) phục vụ mô hình dữ liệu; **hiển thị thực tế** dùng `splitIntoSemanticBlocks` trên `content` full sau khi stream xong.
-
-## 1.3 Sơ đồ tổng quan (backend + data)
+## 1.3 Sơ đồ tổng quan
 
 ```mermaid
 flowchart TB
@@ -59,36 +56,40 @@ flowchart TB
 
 ## 1.4 Đồ thị LangGraph (intent → node)
 
-Trong `services/agent_service/graph/workflow.py`:
-
-- `intent` (từ classifier) được map sang route:
-  - `greeting_chitchat` → `chit_chat`
-  - `out_of_domain` → `guardrail`
-  - `entertainment_knowledge` → `entertainment_expert`
-  - `psychology_venting` → `comfort`
-  - `psychology_advice_seeking` → `advice`
-  - `crisis_alert` hoặc `emotion == crisis` → `crisis`
-
-Mỗi node kết thúc tại `END`.
+| Intent | Node |
+|--------|------|
+| `greeting_chitchat` | `chit_chat` |
+| `out_of_domain` | `guardrail` |
+| `entertainment_knowledge` | `entertainment_expert` |
+| `psychology_venting` | `comfort` |
+| `psychology_advice_seeking` | `advice` |
+| `crisis_alert` / `emotion == crisis` | `crisis` |
 
 ## 1.5 Thành phần chính
 
-| Thành phần | Đường dẫn / ghi chú |
-|------------|---------------------|
-| Ứng dụng HTTP | `services/core/main.py` — CORS, TrustedHost, lifespan DB |
+| Thành phần | Đường dẫn |
+|------------|-----------|
+| Ứng dụng HTTP | `services/core/main.py` |
 | Auth & user | `services/core/api/auth.py` |
-| Chat & WS | `services/core/api/chat.py` |
-| Game / diary / agents API | `services/core/api/game.py`, `diary.py`, `agents.py`, `caro.py`, `external_game.py`, … |
-| LangGraph | `services/agent_service/graph/workflow.py`, `agents.py`, `state.py` |
-| LLM | `services/agent_service/llm/client.py` — OpenAI hoặc Groq theo biến môi trường |
-| Cấu hình | `services/core/config.py` — `DATABASE_URL`, `SECRET_KEY`, `CORS_ORIGINS`, … |
+| Chat, Voice, Vision, Imagine | `services/core/api/chat.py` |
+| Game / diary / agents | `services/core/api/game.py`, `diary.py`, `agents.py`, `caro.py` |
+| LangGraph | `services/agent_service/graph/workflow.py` |
+| LLM client | `services/agent_service/llm/client.py` |
+| Cấu hình | `services/core/config.py` |
 
-## 1.6 Ranh giới (boundaries)
+## 1.6 LLM Providers
 
-- **`services/core`:** HTTP, persistence, gọi graph khi xử lý tin nhắn.
-- **`services/agent_service`:** intent, emotion, node agent, RAG; không mở cổng HTTP riêng trong setup mặc định.
+| Provider | Dùng cho | Biến môi trường |
+|----------|----------|-----------------|
+| Claude 3.5 Sonnet | Chat (primary) | `ANTHROPIC_API_KEY`, `LLM_PROVIDER=claude` |
+| Groq Llama | Chat (fallback) | `GROQ_API_KEY` |
+| Gemini 1.5 Pro | Vision (primary) | `GEMINI_API_KEY` |
+| GPT-4o | Vision (fallback) | `OPENAI_API_KEY` |
+| Deepgram Nova-3 | Voice (primary) | `DEEPGRAM_API_KEY` |
+| Groq Whisper | Voice (fallback) | `GROQ_API_KEY` |
+| Replicate FLUX | Image generation | `REPLICATE_API_TOKEN` |
 
 ## 1.7 Endpoint kiểm tra nhanh
 
 - `GET /health` — JSON `status`, `project`, `version`.
-- OpenAPI: khi không phải production hoặc `DEBUG=true`, có `/docs` (xem `main.py`).
+- OpenAPI: `/docs` khi `DEBUG=true` hoặc không phải production.

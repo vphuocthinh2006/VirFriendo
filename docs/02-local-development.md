@@ -17,45 +17,58 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-## 2.3 Biến môi trường (`.env` ở thư mục gốc)
+## 2.3 Biến môi trường
 
-**Bắt buộc** (xem `services/core/config.py`):
+Copy `.env.example` → `.env` và điền giá trị thật. **Không commit `.env`.**
+
+**Bắt buộc:**
 
 | Biến | Ý nghĩa |
 |------|---------|
-| `DATABASE_URL` | Chuỗi async SQLAlchemy, ví dụ `postgresql+asyncpg://USER:PASS@localhost:5432/DBNAME` |
-| `SECRET_KEY` | Ký JWT; production: ≥32 ký tự, không dùng chuỗi placeholder |
+| `DATABASE_URL` | `postgresql+asyncpg://USER:PASS@localhost:5432/DBNAME` |
+| `SECRET_KEY` | Ký JWT — sinh bằng `openssl rand -hex 32` |
 
-**Thường dùng:**
+**LLM (cần ít nhất một):**
 
-| Biến | Mặc định / ghi chú |
-|------|-------------------|
-| `APP_ENV` | `development` — `production` bật kiểm tra `SECRET_KEY` chặt hơn |
-| `CORS_ORIGINS` | Mặc định trong code gồm `:5173` (Vite) và `:8081` (UI Docker Compose; kèm `:8080` nếu cần); thêm origin production khi cần |
-| `TRUSTED_HOSTS` | Production: hostname được phép (không gồm scheme) |
-| `GROQ_API_KEY` | Tuỳ chọn — LLM qua Groq nếu cấu hình |
-| `REDIS_URL` | Tuỳ chọn — buffer/quickstart personality; Compose gán `redis://redis:6379/0` cho service `api` |
-| `CHROMA_SERVER_URL` | Tuỳ chọn — HTTP Chroma; Compose gán `http://chromadb:8000` cho `api` |
+| Biến | Ghi chú |
+|------|---------|
+| `ANTHROPIC_API_KEY` | Claude 3.5 Sonnet — primary chat LLM |
+| `GROQ_API_KEY` | Fallback chat + Whisper voice fallback |
+| `OPENAI_API_KEY` | Vision fallback (GPT-4o) |
+| `GEMINI_API_KEY` | Vision primary (Gemini 1.5 Pro) |
+| `DEEPGRAM_API_KEY` | Voice transcription primary |
+| `REPLICATE_API_TOKEN` | Image generation (/imagine) |
+| `LLM_PROVIDER` | `claude` / `groq` / `openai` / `auto` |
 
-Không commit file `.env`.
+**Tùy chọn:**
 
-## 2.4 Docker Compose (stack đầy đủ — Pha 1)
+| Biến | Mặc định |
+|------|---------|
+| `CORS_ORIGINS` | `:5173`, `:8081` |
+| `REDIS_URL` | `redis://localhost:6379/0` |
+| `CHROMA_SERVER_URL` | `http://localhost:8003` |
+| `TAVILY_API_KEY` | Web search trong agent |
 
-File `docker-compose.yml` gồm `database`, `redis`, `chromadb`, `api` (build `Dockerfile` gốc), `web` (build `frontend/Dockerfile`, nginx phục vụ static). Cần `.env` với `POSTGRES_*`, `SECRET_KEY`, và `DATABASE_URL` hợp lệ (Compose vẫn override `DATABASE_URL` / `REDIS_URL` / `CHROMA_SERVER_URL` cho container `api`).
+## 2.4 Docker Compose (stack đầy đủ)
 
 ```bash
 docker compose up --build -d
 ```
 
-- API: `http://localhost:8000` (kể cả `/health`, `/docs`)
-- UI tĩnh (build Vite, `VITE_API_URL=http://localhost:8000`): `http://localhost:8081` (tránh xung đột cổng 8080 trên Windows)
-- Chroma (host): `http://localhost:8003`
+- API: `http://localhost:8000`
+- UI: `http://localhost:8081`
+- Chroma: `http://localhost:8003`
 
-Chỉ chạy DB + Redis + Chroma (không build API/web): `docker compose up -d database redis chromadb`.
-
-## 2.5 Chạy API
+Chỉ chạy DB + Redis + Chroma:
 
 ```bash
+docker compose up -d database redis chromadb
+```
+
+## 2.5 Chạy API (local, không Docker)
+
+```bash
+# Phải chạy từ thư mục gốc project
 uvicorn services.core.main:app --reload --port 8000
 ```
 
@@ -70,8 +83,8 @@ npm run dev
 - UI: `http://localhost:5173`
 - API: `http://localhost:8000`
 
-**WebSocket:** client nên trỏ trực tiếp tới API (`:8000`), không proxy WS qua Vite — xem [08-troubleshooting.md](./08-troubleshooting.md).
+**WebSocket:** client trỏ thẳng tới API (`:8000`), không proxy qua Vite.
 
-## 2.7 Makefile (tuỳ chọn)
+## 2.7 Makefile
 
-`make run-core`, `make dev` / `make down` — trên Windows có thể chạy lệnh tương đương trong PowerShell nếu không có `make`.
+`make run-core`, `make dev`, `make down` — Windows dùng lệnh tương đương trong PowerShell.

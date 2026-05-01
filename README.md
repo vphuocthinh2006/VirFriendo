@@ -1,4 +1,4 @@
-# VirFriendo
+# Pally
 
 Ứng dụng chat **AI companion** giao diện lấy cảm hứng từ **Visual Novel** (layout, thoại dạng narrative, portrait). Backend **FastAPI** + **LangGraph** trong cùng một tiến trình Python; dữ liệu **PostgreSQL**, **Redis**, **ChromaDB** (RAG khi cấu hình).
 
@@ -19,24 +19,30 @@ Toàn bộ tài liệu kỹ thuật nằm trong [`docs/`](./docs/README.md).
 | 06 | [`docs/06-roadmap-infra.md`](./docs/06-roadmap-infra.md) | Roadmap hạ tầng |
 | 07 | [`docs/07-security-and-secrets.md`](./docs/07-security-and-secrets.md) | JWT, CORS, production |
 | 08 | [`docs/08-troubleshooting.md`](./docs/08-troubleshooting.md) | WS, DB, FAQ |
+| 09 | [`docs/09-aws-ecr-ecs.md`](./docs/09-aws-ecr-ecs.md) | AWS ECR + deploy |
+| 10 | [`docs/10-aws-run-app-prep.md`](./docs/10-aws-run-app-prep.md) | Chuẩn bị RDS + Secrets Manager |
 
 ---
 
-## Tính năng (theo code hiện tại)
+## Tính năng
 
 **Frontend (`frontend/src/pages/Chat.tsx`, components liên quan)**
 
-- **Thoại bot:** Nội dung assistant được **cắt thành các khối ngữ nghĩa** (`splitIntoSemanticBlocks`: đoạn văn, câu gộp theo ngưỡng độ dài và heuristics đổi chủ đề), render **Markdown** qua `ChatMarkdown`. **Không** có hiệu ứng “karaoke từng ký tự” trong bubble chat.
-- **Stream:** Ưu tiên **WebSocket** (`stream_start` / token / `stream_end`); khi đang stream, dòng cuối hiển thị **con trỏ nhấp nháy** (`vn-cursor-blink`). Hết stream hoặc fallback **REST** nếu WS không dùng được.
-- **Tương tác khối:** Mỗi khối thoại là vùng có thể **click** → mở **popup** đọc nội dung khối đó (không phải cơ chế “next line” kiểu engine VN cổ điển).
-- **Cổng vào chat (`ChatEntryGate`):** Có component **tiêu đề câu hỏi** tách từng ký tự với animation stagger (`KaraokeQuestion`) — đây là chỗ **duy nhất** trong UI dùng kiểu “karaoke letter” theo code.
-- **Khác:** Sidebar bond (hearts), `avatar_action` đổi style vòng portrait; hub **game** trong chat: Chess, Caro, Tetris, Snake, Ringrealms (RTS nhúng); **diary** qua API khi dùng tab tương ứng.
+- **Thoại bot:** Nội dung assistant được **cắt thành các khối ngữ nghĩa** (`splitIntoSemanticBlocks`), render **Markdown** qua `ChatMarkdown`.
+- **Stream:** Ưu tiên **WebSocket** (`stream_start` / token / `stream_end`); fallback **REST** nếu WS không dùng được.
+- **Voice transcription:** Deepgram Nova-3 (primary) → Groq Whisper (fallback).
+- **Vision analysis:** Gemini 1.5 Pro (primary) → GPT-4o (fallback) — nhận diện nhân vật, vật thể, bối cảnh.
+- **Image generation:** `/imagine` slash command via Replicate FLUX.
+- **Games:** Chess, Caro, Tetris, Snake, Ringrealms (RTS nhúng) trong chat.
+- **Diary, Memory, Relationship** tabs trong chat.
 
 **Backend (`services/core` + `services/agent_service`)**
 
 - **Auth** + **Chat** (REST + WebSocket `/chat/ws`).
-- **LangGraph** (`workflow.py`): `classifier` → `emotion` → một trong các node **`chit_chat`**, **`guardrail`**, **`entertainment_expert`**, **`comfort`**, **`advice`**, **`crisis`** (theo intent map trong `route_intent`).
-- **LLM** (`llm/client.py`): mặc định ưu tiên **OpenAI** (`OPENAI_API_KEY`, model mặc định `gpt-4o` nếu không set `OPENAI_MODEL`); có thể chuyển **Groq** qua `LLM_PROVIDER=groq` và `GROQ_API_KEY`. RAG / retrieval nằm trong `agent_service/llm/` (Chroma khi bật).
+- **LangGraph** (`workflow.py`): `classifier` → `emotion` → node theo intent.
+- **LLM** (`llm/client.py`): Claude 3.5 Sonnet (primary), fallback Groq / OpenAI.
+- **Vision:** Gemini 1.5 Pro, fallback GPT-4o.
+- **Voice:** Deepgram Nova-3, fallback Groq Whisper.
 
 ---
 
@@ -64,25 +70,22 @@ Chi tiết: [`docs/01-architecture.md`](./docs/01-architecture.md).
 ├── services/
 │   ├── core/          # FastAPI — auth, chat, API
 │   └── agent_service/ # LangGraph — agents, RAG, LLM
-├── shared/
 ├── migrations/        # Alembic
 ├── requirements.txt
-├── docker-compose.yml # Postgres, Redis, ChromaDB (local)
+├── docker-compose.yml
 ├── Makefile
 └── README.md
 ```
-
-`scripts/`, `tests/`, `integrations/` có thể local-only — xem [`.gitignore`](./.gitignore).
 
 ---
 
 ## Yêu cầu môi trường
 
 - Python **3.10+**
-- Node.js **18+** (frontend)
-- **Docker** + Docker Compose (PostgreSQL, Redis, ChromaDB)
+- Node.js **18+**
+- **Docker** + Docker Compose
 
-Tạo file **`.env`** ở thư mục gốc (không commit; không có template trong repo). Chi tiết: [`docs/02-local-development.md`](./docs/02-local-development.md) và `services/core/config.py`.
+Copy `.env.example` → `.env` và điền giá trị. Chi tiết: [`docs/02-local-development.md`](./docs/02-local-development.md).
 
 ---
 
@@ -114,16 +117,8 @@ npm run dev
 - UI: **http://localhost:5173**
 - API: **http://localhost:8000** — OpenAPI `/docs` khi bật (môi trường dev).
 
-**WebSocket:** `ws://localhost:8000/chat/ws?token=...` — trong dev, frontend gọi thẳng API (port 8000), không proxy WS qua Vite — [`docs/04-api-overview.md`](./docs/04-api-overview.md), [`docs/08-troubleshooting.md`](./docs/08-troubleshooting.md).
-
----
-
-## Roadmap hạ tầng (DevOps)
-
-[`docs/06-roadmap-infra.md`](./docs/06-roadmap-infra.md).
-
 ---
 
 ## License
 
-MIT (hoặc theo quy định của repo chủ).
+MIT

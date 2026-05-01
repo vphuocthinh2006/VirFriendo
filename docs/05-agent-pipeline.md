@@ -2,33 +2,46 @@
 
 ## 5.1 Vai trò
 
-`services/agent_service` triển khai **phân loại intent** (`intent_classifier`) và **StateGraph** LangGraph trong `graph/workflow.py`: các node **`chit_chat`**, **`guardrail`**, **`entertainment_expert`**, **`comfort`**, **`advice`**, **`crisis`**.
+`services/agent_service` triển khai **phân loại intent** và **StateGraph** LangGraph trong `graph/workflow.py`.
 
 ## 5.2 Luồng trong `workflow.py`
 
-1. `START` → **`classifier`** (`classification_node`) — intent hybrid.
-2. → **`emotion`** (`emotion_node`).
-3. → **`route_intent`** — chọn node theo `intent` (và ưu tiên crisis nếu `emotion == crisis`):
+1. `START` → **`classifier`** — intent hybrid (model + keyword + LLM reason).
+2. → **`emotion`** — phát hiện cảm xúc.
+3. → **`route_intent`** — chọn node:
 
-| Intent (classifier) | Node |
-|---------------------|------|
+| Intent | Node |
+|--------|------|
 | `greeting_chitchat` | `chit_chat` |
 | `out_of_domain` | `guardrail` |
 | `entertainment_knowledge` | `entertainment_expert` |
 | `psychology_venting` | `comfort` |
 | `psychology_advice_seeking` | `advice` |
-| `crisis_alert` | `crisis` |
+| `crisis_alert` / `emotion == crisis` | `crisis` |
 
-4. Mỗi node → `END`. Phản hồi trả về **core** → client. Việc **chia khối hiển thị** là trách nhiệm **frontend** (`splitIntoSemanticBlocks`), không phải output “chunk” cố định từ graph.
+4. Mỗi node → `END`. Phản hồi trả về **core** → client.
 
 ## 5.3 RAG / retrieval
 
-- Có thể dùng retrieval trong các node / module LLM (xem `services/agent_service/llm/`, Chroma khi cấu hình).
+- `entertainment_expert` node dùng agentic retriever: Wiki → Tavily → community search.
+- Vector store: ChromaDB khi `CHROMA_SERVER_URL` được set.
 
-## 5.4 Cấu hình LLM
+## 5.4 LLM providers
 
-- `services/agent_service/llm/client.py`: ưu tiên **OpenAI** (`OPENAI_API_KEY`, mặc định model `gpt-4o` nếu không set `OPENAI_MODEL`); fallback **Groq** (`GROQ_API_KEY`, `LLM_PROVIDER=groq`).
+`services/agent_service/llm/client.py` — priority theo `LLM_PROVIDER`:
 
-## 5.5 Tài liệu sâu hơn
+| `LLM_PROVIDER` | Primary | Fallback |
+|----------------|---------|---------|
+| `claude` | Claude 3.5 Sonnet | Groq → OpenAI |
+| `groq` | Groq Llama 3.3 70B | Claude → OpenAI |
+| `openai` | GPT-4o | Claude → Groq |
+| `auto` | Claude → Groq → OpenAI | — |
 
-- `workflow.py`, `state.py`, `agents.py` khi chỉnh hành vi từng node.
+## 5.5 Memory
+
+- `extract_user_memories` trích facts từ hội thoại → lưu `UserMemory` table.
+- Memories được inject vào system prompt ở các lượt sau.
+
+## 5.6 Quickstart personality
+
+- `append_user_line_and_maybe_summarize` tích lũy style người dùng → summary inject vào context.
