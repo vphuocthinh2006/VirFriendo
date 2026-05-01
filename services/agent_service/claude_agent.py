@@ -163,7 +163,7 @@ async def run_claude_agent(
         max_iterations = 3
         for iteration in range(max_iterations):
             response = await client.messages.create(
-                model=os.environ.get("ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022"),
+                model=os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-20250514"),
                 max_tokens=1024,
                 system=system,
                 messages=anthropic_messages,
