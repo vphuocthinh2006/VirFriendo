@@ -25,11 +25,43 @@ def _technical_followup_suppresses_context(last_message: str) -> bool:
     return any(m in low for m in markers)
 
 
+# Hard-coded greeting/interjection tokens that should always route to chit-chat
+# regardless of whatever the hybrid classifier (model + Groq) decides.
+_GREETING_OVERRIDES = {
+    "alo", "alô", "alooo", "alooooo", "alo alo",
+    "hi", "hii", "hiii", "hihi",
+    "hello", "helo", "hé lô", "hé-lô",
+    "hey", "yo", "yoyo", "yo yo",
+    "chào", "chao", "chào bạn", "chao ban", "chào nha",
+    "halo", "ới", "ê", "ê ơi", "hú", "hú hú",
+    "có ai không", "có ai đó không", "có ai ở đây không",
+    "?", "??", "???", ".", "...", "🙂", "👋",
+}
+
+
+def _force_greeting(text: str) -> bool:
+    """Catch obvious greetings/interjections that the classifier sometimes
+    mis-routes to the entertainment pipeline (which then fails for lack of sources)."""
+    low = (text or "").strip().lower()
+    if not low:
+        return True
+    if low in _GREETING_OVERRIDES:
+        return True
+    # Single word + short → greeting (covers typos like "alooo")
+    words = low.split()
+    if len(words) == 1 and len(low) <= 6 and not any(c.isdigit() for c in low):
+        return True
+    return False
+
+
 async def classification_node(state: AgentState) -> dict:
     """
     Phân loại intent: hybrid (model/keyword + Groq reason), lấy kết quả ổn hơn.
     """
     last_message = state["messages"][-1].content
+    # Hard override: short greetings / interjections always go to chit-chat.
+    if _force_greeting(last_message):
+        return {"intent": "greeting_chitchat"}
     user_msgs = [m.content for m in state.get("messages", []) if isinstance(m, HumanMessage)]
     prev_user = user_msgs[-2] if len(user_msgs) >= 2 else ""
     low = (last_message or "").strip().lower()

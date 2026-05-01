@@ -577,11 +577,36 @@ async def run_entertainment_pipeline(
     had_any_before_garbage_filter = bool(sources)
     sources = _filter_garbage_sources(sources)
     if not sources:
-        if not had_any_before_garbage_filter:
-            logger.info("entertainment_expert telemetry final_reason=no_source")
-            return no_source_reply
-        logger.info("entertainment_expert telemetry final_reason=no_usable_source_after_filter")
-        return no_relevant_reply
+        # Last-resort fallback: use the LLM's own training knowledge so we don't
+        # leave the user with a canned refusal. We tell the model to answer like
+        # an entertainment encyclopedia, with a polite uncertainty hedge for any
+        # claim it isn't 100% sure of, and to refuse only on politics.
+        logger.info(
+            "entertainment_expert telemetry final_reason={} → general-knowledge fallback",
+            "no_source" if not had_any_before_garbage_filter else "no_usable_source_after_filter",
+        )
+        try:
+            fallback_system = (
+                expert_system
+                + "\n\n[Fallback chế độ kiến thức chung — không có nguồn web]\n"
+                "- Bạn là cô gái thân thiện kiểu bách khoa entertainment. Hãy trả lời theo trí nhớ "
+                "của mình bằng tiếng Việt tự nhiên, 3–8 câu, ấm và chi tiết.\n"
+                "- ĐƯỢC PHÉP nói về anime, manga, game, phim, series, nhân vật, lore, gameplay, "
+                "tips, mẹo, cuộc sống, tâm lý, học thuật phổ thông…\n"
+                "- KHÔNG bịa số liệu cụ thể (số tập / năm phát hành / doanh thu). Nếu không chắc, "
+                "viết \"mình nhớ là khoảng…\" hoặc \"mình không chắc lắm nhưng…\".\n"
+                "- KHÔNG nói \"không tìm được nguồn\" / \"dừng lại\" / \"không có tham khảo\".\n"
+                "- TỪ CHỐI nhẹ và đổi chủ đề nếu user hỏi về CHÍNH TRỊ (chính trị Việt Nam, "
+                "đảng phái, lãnh đạo nhà nước, bầu cử, xung đột địa chính trị).\n"
+                "- KHÔNG bullet, KHÔNG mở đầu \"Dưới đây là…\"."
+            )
+            fallback_reply = _strip_meta((await generate(fallback_system, user_query)) or "")
+            if fallback_reply.strip() and not _is_refusal(fallback_reply):
+                return fallback_reply.strip()
+        except Exception as e:
+            logger.warning("general-knowledge fallback failed: {}", e)
+        # Hard fallback if even general-knowledge call fails
+        return no_source_reply if not had_any_before_garbage_filter else no_relevant_reply
 
     src_text = _build_source_text(sources)
     substantial = _substantial_evidence(sources, src_text)
@@ -711,5 +736,22 @@ async def run_entertainment_pipeline(
         if stitched_any:
             logger.info("entertainment_expert telemetry final_reason=deterministic_any_source_stitch")
             return stitched_any
-    logger.info("entertainment_expert telemetry final_reason=no_relevant")
+    # Final general-knowledge fallback — sources exist but everything was rejected.
+    # Better to answer from training memory than to refuse outright.
+    logger.info("entertainment_expert telemetry final_reason=general_knowledge_last_resort")
+    try:
+        last_resort_system = (
+            expert_system
+            + "\n\n[Fallback chế độ kiến thức chung — sources có nhưng không khớp đủ]\n"
+            "- Trả lời theo trí nhớ của bạn bằng tiếng Việt, ấm và chi tiết, 3–8 câu.\n"
+            "- ĐƯỢC PHÉP nói về anime/manga/game/phim/series/lore/gameplay/tips/cuộc sống.\n"
+            "- KHÔNG bịa số liệu cụ thể; không chắc thì viết \"mình nhớ là khoảng…\".\n"
+            "- KHÔNG nói \"không tìm được nguồn\" / \"dừng lại\".\n"
+            "- TỪ CHỐI nhẹ nếu user hỏi chính trị (chính trị Việt Nam, đảng phái, lãnh đạo, bầu cử)."
+        )
+        last_resort = _strip_meta((await generate(last_resort_system, user_query)) or "")
+        if last_resort.strip() and not _is_refusal(last_resort):
+            return last_resort.strip()
+    except Exception as e:
+        logger.warning("last-resort knowledge fallback failed: {}", e)
     return no_relevant_reply
