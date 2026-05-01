@@ -7733,11 +7733,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   inset: 0;
   contain: strict;
   overflow: hidden;
-}
   z-index: 1;
   pointer-events: none;
-  overflow: hidden;
-  contain: layout paint style;
 }
 .aid-hero-content { z-index: 4; }
 
