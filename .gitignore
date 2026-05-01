@@ -91,10 +91,8 @@ Thumbs.db
 ehthumbs.db
 
 # --- Local-only (benchmarks, ad-hoc scripts) ---
-tests/
 .pytest_cache/
 /scripts/
-/pytest.ini
 /run.ps1
 ml/*.jsonl
 
