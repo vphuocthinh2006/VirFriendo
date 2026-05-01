@@ -3563,7 +3563,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 clamp(0.75rem, 3vw, 1.25rem);
+  padding: 1.5rem clamp(0.75rem, 3vw, 1.25rem) 0;
   box-sizing: border-box;
 }
 
@@ -4307,7 +4307,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 
 .ad-hero__banner {
   position: relative;
-  min-height: 220px;
+  min-height: 320px;
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid var(--ad-border);
@@ -4358,7 +4358,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   margin: 0 0 1rem;
   font-size: 0.9rem;
   line-height: 1.55;
-  color: #1a1a1a;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .ad-hero__lede strong {
