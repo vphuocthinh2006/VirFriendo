@@ -14,10 +14,17 @@ permissions:
 env:
   ECR_REPOSITORY_API: virfriendo-api
   ECR_REPOSITORY_WEB: virfriendo-web
+  ECS_CLUSTER: virfriendo-cluster
+  ECS_SERVICE_API: virfriendo-api-svc
+  ECS_TASK_FAMILY_API: virfriendo-api
+  ECS_CONTAINER_API: api
+  API_HEALTHCHECK_URL: https://api.virfriendo.win/health
 
 jobs:
   push-api:
     runs-on: ubuntu-latest
+    outputs:
+      api_image_uri: ${{ steps.vars.outputs.api_image_uri }}
     steps:
       - uses: actions/checkout@v4
 
@@ -39,6 +46,15 @@ jobs:
         id: ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Resolve API image tag
+        id: vars
+        shell: bash
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          REPO_URI="${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_API }}"
+          echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
+          echo "api_image_uri=$REPO_URI:$SHORT_SHA" >> "$GITHUB_OUTPUT"
+
       - id: meta
         uses: docker/metadata-action@v5
         with:
@@ -53,7 +69,9 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ${{ steps.vars.outputs.api_image_uri }}
           labels: ${{ steps.meta.outputs.labels }}
 
   push-web:
@@ -84,7 +102,10 @@ jobs:
         shell: bash
         run: |
           V="${{ vars.VITE_PUBLIC_API_URL }}"
-          if [ -z "$V" ]; then V="http://localhost:8000"; fi
+          if [ -z "$V" ]; then
+            echo "::error::Missing repository variable VITE_PUBLIC_API_URL"
+            exit 1
+          fi
           echo "url=$V" >> "$GITHUB_OUTPUT"
 
       - id: meta
@@ -105,3 +126,93 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VITE_API_URL=${{ steps.vite.outputs.url }}
+
+  deploy-api:
+    name: Deploy API to ECS
+    runs-on: ubuntu-latest
+    needs: [push-api]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Resolve deploy configuration
+        id: cfg
+        shell: bash
+        run: |
+          echo "cluster=${{ vars.ECS_CLUSTER || env.ECS_CLUSTER }}" >> "$GITHUB_OUTPUT"
+          echo "service=${{ vars.ECS_SERVICE_API || env.ECS_SERVICE_API }}" >> "$GITHUB_OUTPUT"
+          echo "task_family=${{ vars.ECS_TASK_FAMILY_API || env.ECS_TASK_FAMILY_API }}" >> "$GITHUB_OUTPUT"
+          echo "container=${{ vars.ECS_CONTAINER_API || env.ECS_CONTAINER_API }}" >> "$GITHUB_OUTPUT"
+          echo "health_url=${{ vars.API_HEALTHCHECK_URL || env.API_HEALTHCHECK_URL }}" >> "$GITHUB_OUTPUT"
+
+      - name: Capture current task definition
+        id: previous
+        shell: bash
+        run: |
+          CURR_TD=$(aws ecs describe-services \
+            --cluster "${{ steps.cfg.outputs.cluster }}" \
+            --services "${{ steps.cfg.outputs.service }}" \
+            --query 'services[0].taskDefinition' \
+            --output text)
+          echo "current_task_definition=$CURR_TD" >> "$GITHUB_OUTPUT"
+
+      - name: Render new task definition with immutable image
+        shell: bash
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition "${{ steps.cfg.outputs.task_family }}" \
+            --query 'taskDefinition' > task-definition.json
+          python .github/scripts/render_taskdef.py \
+            task-definition.json \
+            task-definition.rendered.json \
+            "${{ steps.cfg.outputs.container }}" \
+            "${{ needs.push-api.outputs.api_image_uri }}"
+
+      - name: Register task definition revision
+        id: register
+        shell: bash
+        run: |
+          NEW_TD=$(aws ecs register-task-definition \
+            --cli-input-json file://task-definition.rendered.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          echo "task_definition=$NEW_TD" >> "$GITHUB_OUTPUT"
+
+      - name: Update ECS service
+        shell: bash
+        run: |
+          aws ecs update-service \
+            --cluster "${{ steps.cfg.outputs.cluster }}" \
+            --service "${{ steps.cfg.outputs.service }}" \
+            --task-definition "${{ steps.register.outputs.task_definition }}"
+
+      - name: Wait for service stability
+        shell: bash
+        run: |
+          aws ecs wait services-stable \
+            --cluster "${{ steps.cfg.outputs.cluster }}" \
+            --services "${{ steps.cfg.outputs.service }}"
+
+      - name: Smoke test API health
+        shell: bash
+        run: |
+          curl --fail --silent --show-error "${{ steps.cfg.outputs.health_url }}"
+
+      - name: Rollback to previous task definition on failure
+        if: failure()
+        shell: bash
+        run: |
+          aws ecs update-service \
+            --cluster "${{ steps.cfg.outputs.cluster }}" \
+            --service "${{ steps.cfg.outputs.service }}" \
+            --task-definition "${{ steps.previous.outputs.current_task_definition }}"
+          aws ecs wait services-stable \
+            --cluster "${{ steps.cfg.outputs.cluster }}" \
+            --services "${{ steps.cfg.outputs.service }}"
+          exit 1

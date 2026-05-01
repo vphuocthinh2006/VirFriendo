@@ -38,6 +38,14 @@ jobs:
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
             type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
 
+      - name: Validate Vite API URL variable
+        shell: bash
+        run: |
+          if [ -z "${{ vars.VITE_PUBLIC_API_URL }}" ]; then
+            echo "::error::Missing repository variable VITE_PUBLIC_API_URL"
+            exit 1
+          fi
+
       - uses: docker/build-push-action@v6
         with:
           context: .
@@ -78,4 +86,4 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            VITE_API_URL=http://localhost:8000
+            VITE_API_URL=${{ vars.VITE_PUBLIC_API_URL }}
