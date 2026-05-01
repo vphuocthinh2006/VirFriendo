@@ -1,16 +1,4 @@
-# Build & push lên Amazon ECR (API + web).
-#
-# Chuẩn bị AWS:
-#   1) Tạo 2 repository ECR (cùng region), ví dụ: virfriendo-api, virfriendo-web
-#   2) IAM user (hoặc OIDC — xem docs/09-aws-ecr-ecs.md) có quyền ecr:GetAuthorizationToken + ecr:BatchCheckLayerAvailability + ecr:PutImage + ...
-#   3) GitHub repo → Settings → Secrets and variables → Actions:
-#        AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION (vd. ap-southeast-1)
-#
-# Image: <account>.dkr.ecr.<region>.amazonaws.com/virfriendo-api:<tag>
-#
-# Lỗi "Dockerfile: no such file" hoặc label revision = 6e01f32… : bạn đang **Re-run**
-# job của run **cũ** (trước commit có Dockerfile). Không dùng "Re-run failed jobs" cho run đó.
-# Cách đúng: Actions → **ECR publish** → **Run workflow** → branch **main**; hoặc push commit mới lên main.
+# Build & push to Amazon ECR (API + web).
 
 name: ECR publish
 
@@ -24,8 +12,8 @@ permissions:
   contents: read
 
 env:
-  ECR_REPOSITORY_API: virfriendo-api
-  ECR_REPOSITORY_WEB: virfriendo-web
+  ECR_REPOSITORY_API: pally-api
+  ECR_REPOSITORY_WEB: pally-web
 
 jobs:
   push-api:
@@ -33,10 +21,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check Dockerfile exists (avoid re-run on pre-Docker commits)
+      - name: Check Dockerfile exists
         run: |
           if [ ! -f Dockerfile ]; then
-            echo "::error::Commit ${{ github.sha }} has no root Dockerfile. Do not re-run old workflow runs. Use Actions → Run workflow → main, or push to main (need commit 6391a01 or later)."
+            echo "::error::No Dockerfile found at root."
             exit 1
           fi
 
@@ -76,7 +64,7 @@ jobs:
       - name: Check frontend Dockerfile exists
         run: |
           if [ ! -f frontend/Dockerfile ]; then
-            echo "::error::Commit ${{ github.sha }} has no frontend/Dockerfile. Re-run on current main only."
+            echo "::error::No frontend/Dockerfile found."
             exit 1
           fi
 
@@ -91,7 +79,7 @@ jobs:
         id: ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Vite public API URL (Repository variable VITE_PUBLIC_API_URL, hoặc mặc định localhost)
+      - name: Vite public API URL
         id: vite
         shell: bash
         run: |
