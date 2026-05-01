@@ -601,13 +601,13 @@ async def run_entertainment_pipeline(
                 "- KHÔNG bullet, KHÔNG mở đầu \"Dưới đây là…\"."
             )
             fallback_reply = _strip_meta((await generate(fallback_system, user_query)) or "")
-            if fallback_reply.strip() and not _is_refusal(fallback_reply):
+            if fallback_reply.strip():
                 return fallback_reply.strip()
         except Exception as e:
             logger.warning("general-knowledge fallback failed: {}", e)
-        # Hard fallback if even general-knowledge call fails
-        return no_source_reply if not had_any_before_garbage_filter else no_relevant_reply
-
+        # Hard fallback — friendly, never robotic
+        topic = (user_query or "").strip()[:60]
+        return f"Ờm... mình hơi mù mờ về \"{topic}\" này, bạn hỏi cụ thể hơn được không? Mình sẽ cố trả lời~"
     src_text = _build_source_text(sources)
     substantial = _substantial_evidence(sources, src_text)
     keep_block = _build_keep_terms_block(src_text, user_query)
@@ -750,8 +750,10 @@ async def run_entertainment_pipeline(
             "- TỪ CHỐI nhẹ nếu user hỏi chính trị (chính trị Việt Nam, đảng phái, lãnh đạo, bầu cử)."
         )
         last_resort = _strip_meta((await generate(last_resort_system, user_query)) or "")
-        if last_resort.strip() and not _is_refusal(last_resort):
+        if last_resort.strip():
             return last_resort.strip()
     except Exception as e:
         logger.warning("last-resort knowledge fallback failed: {}", e)
-    return no_relevant_reply
+    # Absolute last resort — friendly, not robotic
+    topic = (user_query or "").strip()[:60]
+    return f"Ờm... mình hơi mù mờ về \"{topic}\" này, bạn hỏi cụ thể hơn được không? Mình sẽ cố trả lời~"
