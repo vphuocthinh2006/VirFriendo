@@ -936,10 +936,8 @@ body {
   font-size: 0.95rem;
   text-transform: uppercase;
   margin-right: 0.6rem;
-  color: #ecb02b;
-  text-shadow:
-    0 1px 0 rgba(26, 26, 26, 0.325),
-    0 0 20px rgba(102, 188, 180, 0.15);
+  color: #4849e8;
+  text-shadow: none;
 }
 
 .aid-topbar-brand-link {
@@ -957,8 +955,8 @@ body {
   font-size: 0.78rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #6b6b6b;
-  opacity: 0.92;
+  color: #1a1a1a;
+  opacity: 1;
   position: relative;
   display: inline-flex;
   align-items: center;
