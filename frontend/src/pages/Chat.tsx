@@ -1,9 +1,8 @@
-import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo, lazy, Suspense } from 'react'
 import ConnectingVirFriendo from '../components/ConnectingVirFriendo'
 import ChatEntryGate from '../components/ChatEntryGate'
 import ChatRabbitWait from '../components/ChatRabbitWait'
 import AppTopbar from '../components/AppTopbar'
-import Live2DAvatar, { type Live2DEmotion } from '../components/Live2DAvatar'
 import { ChatMarkdown } from '../components/ChatMarkdown'
 import { useNavigate, useSearchParams, Navigate } from 'react-router-dom'
 import { DEPLOYED_AGENTS } from '../data/deployedAgents'
@@ -13,6 +12,10 @@ import type { MessageItem } from '../types/chat'
 import type { ConversationSummary } from '../types/chat'
 import TetrisGame from '../games/tetris/TetrisGame'
 import SnakeGame from '../games/snake/SnakeGame'
+import type { Live2DEmotion } from '../components/Live2DAvatar'
+
+// Lazy load Live2D — 1.2MB PIXI.js, only load when needed
+const Live2DAvatar = lazy(() => import('../components/Live2DAvatar'))
 
 
 const SLASH_COMMANDS: { cmd: string; desc: string }[] = [
@@ -1347,7 +1350,7 @@ export default function Chat() {
     return `${msgId}|${idx}`
   }
 
-  function renderAssistantNarrative(msg: MessageItem, index: number) {
+  const renderAssistantNarrative = useCallback(function(msg: MessageItem, index: number) {
     const isLast = index === messages.length - 1
     const streaming = isLast && streamMsgIdRef.current === msg.id
     const text = msg.content || ''
@@ -1403,7 +1406,7 @@ export default function Chat() {
         {streaming ? <span className="vn-cursor-blink vf-chat-narrative-cursor">▌</span> : null}
       </div>
     )
-  }
+  }, [messages.length, activeSentenceKey, sentencePopup, streamMsgIdRef])
 
   async function closeFunFactModal() {
     if (!agentId) {
@@ -1692,10 +1695,12 @@ export default function Chat() {
             <div className="vf-chat-sidebar-primary">
               <div className={`vf-chat-panel vf-chat-panel--model ${expressionClass}`}>
                 <div className="vf-chat-model-vtuber">
-                  <Live2DAvatar
-                    emotion={live2dEmotion}
-                    fallback={<IconAvatar className="vf-chat-model-icon" />}
-                  />
+                  <Suspense fallback={<IconAvatar className="vf-chat-model-icon" />}>
+                    <Live2DAvatar
+                      emotion={live2dEmotion}
+                      fallback={<IconAvatar className="vf-chat-model-icon" />}
+                    />
+                  </Suspense>
                 </div>
               </div>
             </div>
