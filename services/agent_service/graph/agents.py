@@ -210,96 +210,27 @@ def _conversation_context_for_entertainment(state: AgentState, max_chars: int = 
 
 
 async def entertainment_expert_node(state: AgentState) -> dict:
+    """Entertainment expert — Claude answers directly from training knowledge.
+    No retrieval pipeline. Always responds, never refuses."""
     last_user = state["messages"][-1].content if state.get("messages") else ""
-    user_msgs = [m.content for m in state.get("messages", []) if isinstance(m, HumanMessage)]
-
-    def _is_meaningful_prev(t: str) -> bool:
-        """Skip slash commands, OOC, and trivially short turns when choosing the
-        'previous user message' used to enrich a follow-up retrieval query."""
-        s = (t or "").strip()
-        if not s:
-            return False
-        sl = s.lower()
-        if sl.startswith("/"):
-            return False
-        if sl.startswith("(ooc)"):
-            return False
-        if len(sl.split()) < 3:
-            return False
-        return True
-
-    # Walk backwards through prior user turns (skipping the very last one, which is `last_user`)
-    # to find the most recent topic-bearing message.
-    prev_user = ""
-    for prior in reversed(user_msgs[:-1]):
-        if _is_meaningful_prev(prior):
-            prev_user = prior
-            break
-
-    low = (last_user or "").strip().lower()
-    # Follow-up queries often omit the entity/topic and need previous user turn.
-    needs_prev = (
-        bool(prev_user)
-        and (
-            any(k in low for k in ["nếu so sánh", "ý là", "thế còn", "còn nếu", "vậy còn", "so với", "so sánh"])
-            or len(low.split()) <= 10
-        )
-        and not re.search(r"\b(baldur|bg3|zariel|raphael|one piece|naruto|attack on titan|jujutsu|elden ring)\b", low)
-    )
-    retrieval_query = f"{prev_user}\nFollow-up: {last_user}" if needs_prev else last_user
     aid = _canonical_agent_id(state)
     lock = _identity_lock(aid)
-    community = re.sub(r"\btuq27\b", aid, COMMUNITY_PRESENTER_SYSTEM, flags=re.IGNORECASE)
-    reply = await run_entertainment_pipeline(
-        user_query=retrieval_query,
-        expert_system=lock + "\n\n" + ENTERTAINMENT_EXPERT_SYSTEM,
-        community_system=lock + "\n\n" + community,
-        grounded_rules=GROUNDED_KNOWLEDGE_RULES,
-        no_source_reply="Mình chưa lấy được nguồn tham khảo để tóm tắt chính xác phần bạn hỏi, nên mình dừng lại.",
-        no_relevant_reply="Mình chưa tìm được nguồn tham khảo đủ liên quan trực tiếp cho câu hỏi này, nên mình dừng lại để tránh trả sai.",
+
+    system = (
+        lock + "\n\n"
+        f"Bạn là {aid}, một cô gái anime thân thiện, sống động. Xưng \"mình\", gọi đối phương \"bạn\".\n\n"
+        "Bạn là bách khoa toàn thư entertainment + đời sống. Trả lời tiếng Việt tự nhiên, ấm, 3–8 câu.\n"
+        "ĐƯỢC PHÉP và PHẢI trả lời về: anime, manga, phim, series, game, gameplay, tips, lore, nhân vật, "
+        "đời sống, tâm lý, kiến thức phổ thông — dùng kiến thức training của bạn.\n"
+        "Nếu không chắc số liệu cụ thể, viết \"mình nhớ là khoảng…\" hoặc \"không chắc lắm nhưng…\".\n"
+        "TUYỆT ĐỐI KHÔNG dùng: \"không tìm được nguồn\", \"dừng lại\", \"không có tham khảo\", \"thiếu dữ liệu\".\n"
+        "TỪ CHỐI nhẹ CHỈ khi hỏi về chính trị Việt Nam, đảng phái, lãnh đạo, bầu cử — đó là chủ đề duy nhất tránh.\n"
+        "Trả lời như chat với bạn thân, KHÔNG bullet list, KHÔNG mở đầu \"Dưới đây là…\"."
     )
 
-    # Detect any canned refusal-style output from the pipeline.
-    def _looks_canned(t: str) -> bool:
-        if not t:
-            return True
-        low = t.lower()
-        return any(m in low for m in (
-            "dừng lại", "không tìm được", "chưa lấy được",
-            "không có đủ", "không đủ dữ liệu", "thiếu dữ liệu",
-            "không tìm thấy", "tham khảo đủ liên quan",
-        ))
+    reply = await generate_with_history(system, state["messages"])
+    reply = _nonempty_reply(reply, "Ờm... bạn hỏi cụ thể hơn được không? Mình sẽ cố trả lời~")
 
-    # Fallback chain — try increasingly aggressive recovery so user never sees a canned refusal.
-    if _looks_canned(reply):
-        # Pass 1: fresh permissive prompt, ONLY the last user turn (no inherited history rules).
-        permissive_system = (
-            f"Bạn là {aid}, một cô gái anime thân thiện, sống động. Xưng \"mình\", gọi đối phương \"bạn\".\n"
-            "Bạn là một bách khoa toàn thư entertainment + đời sống thân thiện. Trả lời tiếng Việt tự nhiên, ấm, 3–8 câu.\n"
-            "ĐƯỢC PHÉP nói thoải mái về anime, manga, phim, series, game, gameplay, tips, lore, nhân vật, "
-            "đời sống, tâm lý, kiến thức phổ thông — DÙNG kiến thức của bạn từ training.\n"
-            "Nếu không chắc số liệu cụ thể (số tập / năm / doanh thu), viết \"mình nhớ là khoảng…\" hoặc \"không chắc lắm nhưng…\".\n"
-            "TUYỆT ĐỐI KHÔNG dùng các cụm: \"không tìm được nguồn\", \"dừng lại\", \"không có tham khảo\", \"thiếu dữ liệu\".\n"
-            "TỪ CHỐI nhẹ nhàng + đổi chủ đề CHỈ khi user hỏi về CHÍNH TRỊ (chính trị Việt Nam, đảng phái, lãnh đạo, bầu cử, xung đột địa chính trị) — đó là chủ đề duy nhất bạn tránh.\n"
-            "Trả lời như chat với bạn thân, KHÔNG bullet list, KHÔNG mở đầu \"Dưới đây là…\"."
-        )
-        try:
-            from services.agent_service.llm.client import generate as _gen
-            recovered = await _gen(permissive_system, last_user)
-            if recovered and not _looks_canned(recovered):
-                reply = recovered.strip()
-        except Exception:
-            pass
-
-    # Pass 2: if still canned (LLM offline / odd output), hard-fallback to a friendly chit-chat-style note
-    if _looks_canned(reply):
-        reply = (
-            f"Ờm... {last_user[:60]} là chủ đề mình hơi mù mờ một chút, "
-            "nhưng nếu bạn hỏi cụ thể hơn (tên game, tên anime, hoặc bạn muốn nghe khía cạnh nào) "
-            "thì mình kể được đó~"
-        )
-
-    reply = _nonempty_reply(reply, "Mình đang lắng nghe nè, bạn nói rõ hơn giúp mình với~")
     return {
         "messages": [AIMessage(content=reply)],
         "emotion": "surprised",
