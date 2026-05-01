@@ -56,6 +56,21 @@ Trả lời chỉ một từ duy nhất là nhãn (ví dụ: greeting_chitchat h
 
 def _keyword_fallback(text: str) -> IntentType:
     text_lower = text.lower().strip()
+
+    # Very short inputs (≤3 words, no clear title) → always greeting
+    words = text_lower.split()
+    if len(words) <= 3:
+        # Only route to entertainment if it's a clear title/name
+        clear_titles = [
+            "one piece", "naruto", "bleach", "genshin", "valorant", "minecraft",
+            "league of legends", "lol", "elden ring", "zelda", "persona",
+            "attack on titan", "aot", "jujutsu", "demon slayer", "chainsaw man",
+            "death note", "fullmetal", "berserk", "hannibal", "breaking bad",
+            "stranger things", "squid game", "witcher", "cyberpunk",
+        ]
+        if not any(t in text_lower for t in clear_titles):
+            return "greeting_chitchat"
+
     crisis_keywords = ["chết", "tự tử", "không muốn sống", "die", "suicide", "kill myself", "end it all"]
     if any(kw in text_lower for kw in crisis_keywords):
         return "crisis_alert"
@@ -234,29 +249,8 @@ class IntentClassifier:
             return None
 
     async def predict_hybrid_async(self, text: str) -> IntentType:
-        """
-        Hybrid: so sánh intent từ model/keyword với intent từ LLM second-opinion.
-        - Nếu một bên là crisis_alert → luôn chọn crisis_alert (an toàn).
-        - Nếu hai bên trùng → dùng kết quả đó.
-        - Nếu keyword = entertainment_knowledge mà Groq = out_of_domain → tin keyword
-          (Groq hay nhầm tên anime/game niche thành out_of_domain).
-        - Nếu khác → ưu tiên LLM second-opinion.
-        """
-        intent_model = self.predict(text)  # Llama hoặc keyword
-        intent_llm = await self._predict_via_llm(text)
-        if intent_llm is None:
-            return intent_model
-        if intent_model == "crisis_alert" or intent_llm == "crisis_alert":
-            return "crisis_alert"
-        if intent_model == intent_llm:
-            return intent_model
-        # Keyword matched entertainment but LLM thinks out_of_domain — trust keyword.
-        # It's safer to search and find nothing than to wrongly reject an entertainment query.
-        if intent_model == "entertainment_knowledge" and intent_llm == "out_of_domain":
-            logger.debug("Intent hybrid: model={} llm={} -> trust keyword (entertainment override)", intent_model, intent_llm)
-            return intent_model
-        logger.debug("Intent hybrid: model={} llm={} -> choose LLM second-opinion", intent_model, intent_llm)
-        return intent_llm
+        """Keyword-only classification. LLM second-opinion removed — too unreliable."""
+        return self.predict(text)
 
 
 intent_classifier = IntentClassifier()
