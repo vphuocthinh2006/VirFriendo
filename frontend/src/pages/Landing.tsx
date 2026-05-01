@@ -443,31 +443,30 @@ export default function Landing() {
                 <li className="aid-what-item aid-what-item--left">
                   <span className="aid-what-num">1</span>
                   <span className="aid-what-copy">
-                    <span className="aid-what-title">Talk to our AI</span>
+                    <span className="aid-what-title">Deploy our models</span>
                     <span className="aid-what-detail">
-                      Step into a story-style chat that feels like a scene, not a search box. Ask about anime, games, or
-                      just vent after a rough day — your companion stays in character, keeps the tone warm, and meets you
-                      where you are.
+                      Browse the lineup and launch any model into your own chat session — each one ships with its own
+                      personality, tone, and backstory, ready to go the moment you hit play.
                     </span>
                   </span>
                 </li>
                 <li className="aid-what-item aid-what-item--right">
                   <span className="aid-what-num">2</span>
                   <span className="aid-what-copy">
-                    <span className="aid-what-title">Play games</span>
+                    <span className="aid-what-title">Talk to our models</span>
                     <span className="aid-what-detail">
-                      Take a breather from typing and play together: chess, bite-sized quizzes, and more on the way.
-                      Quick rounds, low pressure — perfect between chats or when you just want to goof off for a minute.
+                      Step into a story-style chat that feels like a scene, not a search box. Ask anything, vent after a
+                      rough day, or just hang — your companion stays in character and meets you where you are.
                     </span>
                   </span>
                 </li>
                 <li className="aid-what-item aid-what-item--left">
                   <span className="aid-what-num">3</span>
                   <span className="aid-what-copy">
-                    <span className="aid-what-title">Grow your bond</span>
+                    <span className="aid-what-title">Ask to co-op &amp; upload your models</span>
                     <span className="aid-what-detail">
-                      The more you show up, the more it feels like they remember you. Honest check-ins and longer
-                      hangouts slowly build rapport — less like filling a form, more like leveling trust in a cozy RPG.
+                      Have a character or persona you want to bring to life? Reach out and we'll work together to get
+                      your model on the platform — your creation, our stage.
                     </span>
                   </span>
                 </li>
