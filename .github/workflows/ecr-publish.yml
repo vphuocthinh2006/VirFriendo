@@ -12,8 +12,8 @@ permissions:
   contents: read
 
 env:
-  ECR_REPOSITORY_API: pally-api
-  ECR_REPOSITORY_WEB: pally-web
+  ECR_REPOSITORY_API: virfriendo-api
+  ECR_REPOSITORY_WEB: virfriendo-web
 
 jobs:
   push-api:
