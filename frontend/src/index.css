@@ -4,38 +4,49 @@
 
 html {
   scroll-behavior: smooth;
-  scrollbar-color: rgba(72, 73, 232, 0.6) rgba(232, 239, 255, 0.4);
+  scrollbar-color: rgba(102, 188, 180, 0.65) rgba(245, 230, 208, 0.55);
 }
 
-/* ONME theme: light blue-white BG + vivid indigo-blue + electric lime, black text */
+/* PetZEN theme: warm cream BG + teal primary + orange/yellow accents, dark warm text */
 :root {
-  --bg3-black: #f5f9ff;
-  --bg3-black-rich: #e8efff;
-  --bg3-gold: #4849e8;
-  --bg3-gold-bright: #6c6dee;
-  --bg3-gold-deep: #2e2fc9;
-  --bg3-text: #1a1a1a;
-  --onme-blue: #4849e8;
-  --onme-blue-bright: #6c6dee;
-  --onme-blue-deep: #2e2fc9;
-  --onme-lime: #ddf344;
-  --onme-lime-bright: #ecf566;
-  --onme-periwinkle: #abc4ff;
-  --onme-bg: #f5f9ff;
-  --onme-bg-2: #e8efff;
-  /* legacy fanhua vars kept as ONME aliases for compat */
-  --fanhua-red: #ddf344;
-  --fanhua-red-bright: #ecf566;
-  --fanhua-yellow: #ddf344;
-  --fanhua-cream: #f5f9ff;
-  --fanhua-cream-deep: #e8efff;
+  --bg3-black: #fff8ec;
+  --bg3-black-rich: #f5e6d0;
+  --bg3-gold: #66bcb4;
+  --bg3-gold-bright: #88cec7;
+  --bg3-gold-deep: #3a8b82;
+  --bg3-text: #2a1f12;
+  --petzen-teal: #66bcb4;
+  --petzen-teal-bright: #88cec7;
+  --petzen-teal-deep: #3a8b82;
+  --petzen-orange: #ecb02b;
+  --petzen-orange-bright: #f5c451;
+  --petzen-yellow: #edc55b;
+  --petzen-cream: #fff8ec;
+  --petzen-cream-2: #f5e6d0;
+  --petzen-cream-3: #e8ccad;
+  --petzen-text: #2a1f12;
+  --petzen-text-muted: #8b7355;
+  /* legacy aliases (kept for any leftover usage) */
+  --onme-blue: #66bcb4;
+  --onme-blue-bright: #88cec7;
+  --onme-blue-deep: #3a8b82;
+  --onme-lime: #ecb02b;
+  --onme-lime-bright: #edc55b;
+  --onme-periwinkle: #b0d4cf;
+  --onme-bg: #fff8ec;
+  --onme-bg-2: #f5e6d0;
+  --fanhua-red: #ecb02b;
+  --fanhua-red-bright: #edc55b;
+  --fanhua-yellow: #edc55b;
+  --fanhua-cream: #fff8ec;
+  --fanhua-cream-deep: #f5e6d0;
   --bg3-font-display: "Cinzel", "Georgia", serif;
   --bg3-font-body: "Pixelify Sans", "Courier New", monospace;
 }
 
 ::selection {
-  background: rgba(72, 73, 232, 0.28);
-  color: #1a1a1a;
+  background: rgba(102, 188, 180, 0.32);
+  color: #2a1f12;
 }
 
 ::-webkit-scrollbar {
@@ -44,17 +55,17 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(232, 239, 255, 0.6);
+  background: rgba(245, 230, 208, 0.65);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(108, 109, 238, 0.85), rgba(72, 73, 232, 0.95));
+  background: linear-gradient(180deg, rgba(136, 206, 199, 0.9), rgba(102, 188, 180, 0.98));
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 248, 236, 0.7);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(108, 109, 238, 1), rgba(46, 47, 201, 0.95));
+  background: linear-gradient(180deg, rgba(136, 206, 199, 1), rgba(58, 139, 130, 0.95));
 }
 
 body {
@@ -62,10 +73,10 @@ body {
   color: var(--bg3-text);
   font-family: var(--bg3-font-body);
   background:
-    radial-gradient(ellipse 95% 65% at 50% -18%, rgba(72, 73, 232, 0.12), transparent 58%),
-    radial-gradient(ellipse 55% 48% at 0% 100%, rgba(221, 243, 68, 0.16), transparent 52%),
-    radial-gradient(ellipse 55% 48% at 100% 100%, rgba(171, 196, 255, 0.5), transparent 52%),
-    linear-gradient(180deg, #f5f9ff 0%, #e8efff 55%, #d6deff 100%);
+    radial-gradient(ellipse 95% 65% at 50% -18%, rgba(102, 188, 180, 0.14), transparent 58%),
+    radial-gradient(ellipse 55% 48% at 0% 100%, rgba(236, 176, 43, 0.14), transparent 52%),
+    radial-gradient(ellipse 55% 48% at 100% 100%, rgba(237, 197, 91, 0.18), transparent 52%),
+    linear-gradient(180deg, #fff8ec 0%, #f5e6d0 55%, #e8ccad 100%);
 }
 
 #root {
@@ -120,19 +131,19 @@ body {
   width: min(420px, 100%);
   padding: clamp(1.75rem, 4vw, 2.35rem) clamp(1.35rem, 4vw, 2rem) clamp(2rem, 4vw, 2.5rem);
   border-radius: 3px;
-  border: 1px solid rgba(72, 73, 232, 0.38);
-  background: linear-gradient(165deg, rgba(232, 239, 255, 0.98) 0%, rgba(245, 249, 255, 0.99) 100%);
+  border: 1px solid rgba(102, 188, 180, 0.38);
+  background: linear-gradient(165deg, rgba(245, 230, 208, 0.98) 0%, rgba(255, 248, 236, 0.99) 100%);
   box-shadow:
     inset 0 0 0 1px rgba(26, 26, 26, 0.275),
     inset 0 1px 0 rgba(26, 26, 26, 0.08),
-    0 0 40px rgba(72, 73, 232, 0.06),
+    0 0 40px rgba(102, 188, 180, 0.06),
     0 28px 70px rgba(26, 26, 26, 0.275);
 }
 
 .aid-auth-card__rim {
   position: absolute;
   inset: 5px;
-  border: 1px solid rgba(72, 73, 232, 0.1);
+  border: 1px solid rgba(102, 188, 180, 0.1);
   border-radius: 1px;
   pointer-events: none;
   opacity: 0.85;
@@ -148,10 +159,10 @@ body {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   text-align: center;
-  color: #ddf344;
+  color: #ecb02b;
   text-shadow:
     0 2px 0 rgba(26, 26, 26, 0.225),
-    0 0 24px rgba(72, 73, 232, 0.12);
+    0 0 24px rgba(102, 188, 180, 0.12);
 }
 
 .aid-auth-subtitle {
@@ -239,7 +250,7 @@ body {
 .aid-auth-or__line {
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(72, 73, 232, 0.35), transparent);
+  background: linear-gradient(90deg, transparent, rgba(102, 188, 180, 0.35), transparent);
 }
 
 .aid-auth-or__text {
@@ -284,13 +295,13 @@ body {
   font-family: var(--bg3-font-body);
   font-size: 0.78rem;
   font-style: italic;
-  color: #6c6dee;
+  color: #88cec7;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .aid-auth-forgot:hover {
-  color: #ddf344;
+  color: #ecb02b;
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -299,8 +310,8 @@ body {
   width: 100%;
   box-sizing: border-box;
   border-radius: 3px;
-  border: 1px solid rgba(232, 239, 255, 0.65);
-  background: rgba(232, 239, 255, 0.85);
+  border: 1px solid rgba(245, 230, 208, 0.65);
+  background: rgba(245, 230, 208, 0.85);
   color: #1a1a1a;
   padding: 0.65rem 0.8rem;
   font-family: var(--bg3-font-body);
@@ -317,10 +328,10 @@ body {
 }
 
 .aid-auth-input:focus {
-  border-color: rgba(72, 73, 232, 0.55);
+  border-color: rgba(102, 188, 180, 0.55);
   box-shadow:
     inset 0 2px 6px rgba(26, 26, 26, 0.175),
-    0 0 0 1px rgba(72, 73, 232, 0.2);
+    0 0 0 1px rgba(102, 188, 180, 0.2);
 }
 
 .aid-auth-submit {
@@ -345,7 +356,7 @@ body {
 }
 
 .aid-auth-msg--error {
-  color: #ddf344;
+  color: #ecb02b;
   background: rgba(127, 29, 29, 0.35);
   border: 1px solid rgba(248, 113, 113, 0.35);
 }
@@ -365,7 +376,7 @@ body {
 }
 
 .aid-auth-footer-link {
-  color: #6c6dee;
+  color: #88cec7;
   font-weight: 600;
   letter-spacing: 0.03em;
   text-decoration: none;
@@ -373,7 +384,7 @@ body {
 }
 
 .aid-auth-footer-link:hover {
-  color: #ddf344;
+  color: #ecb02b;
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -415,14 +426,14 @@ body {
 
 /* Home / landing / auth: mỏng — nhìn xuyên rõ body / shell phía sau */
 .vf-connect-overlay--marketing::before {
-  background: rgba(232, 239, 255, 0.2);
+  background: rgba(245, 230, 208, 0.2);
   backdrop-filter: blur(22px) saturate(1.08);
   -webkit-backdrop-filter: blur(22px) saturate(1.08);
 }
 
 /* Trong app (vd. /chat đang auth check): hơi đậm hơn nhưng vẫn kính */
 .vf-connect-overlay--app::before {
-  background: rgba(232, 239, 255, 0.35);
+  background: rgba(245, 230, 208, 0.35);
   backdrop-filter: blur(24px) saturate(1.08);
   -webkit-backdrop-filter: blur(24px) saturate(1.08);
 }
@@ -449,11 +460,11 @@ body {
   width: min(100%, 460px);
   padding: clamp(1rem, 4vw, 1.65rem) clamp(1.1rem, 4vw, 1.85rem);
   border-radius: 14px;
-  border: 1px solid rgba(72, 73, 232, 0.35);
-  background: linear-gradient(168deg, #e8efff, #f5f9ff);
+  border: 1px solid rgba(102, 188, 180, 0.35);
+  background: linear-gradient(168deg, #f5e6d0, #fff8ec);
   box-shadow:
     0 0 0 1px rgba(26, 26, 26, 0.275) inset,
-    0 0 32px rgba(72, 73, 232, 0.06),
+    0 0 32px rgba(102, 188, 180, 0.06),
     0 28px 64px rgba(26, 26, 26, 0.325);
   display: flex;
   flex-direction: column;
@@ -497,7 +508,7 @@ body {
   height: 100%;
   width: 0;
   border-radius: inherit;
-  background: linear-gradient(90deg, #ddf344, #4849e8, #e8efff, #4849e8, #ddf344);
+  background: linear-gradient(90deg, #ecb02b, #66bcb4, #f5e6d0, #66bcb4, #ecb02b);
   background-size: 180% 100%;
   animation: vf-connect-progress-fill var(--vf-connect-load-ms, 3.6s) cubic-bezier(0.18, 0.82, 0.22, 1) forwards;
 }
@@ -548,8 +559,8 @@ body {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 3px solid rgba(72, 73, 232, 0.22);
-  border-top-color: rgba(108, 109, 238, 0.88);
+  border: 3px solid rgba(102, 188, 180, 0.22);
+  border-top-color: rgba(136, 206, 199, 0.88);
   animation: vf-connect-spin 0.8s linear infinite;
 }
 
@@ -562,7 +573,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .vf-connect-css-spinner {
     animation: none;
-    border-color: rgba(108, 109, 238, 0.45);
+    border-color: rgba(136, 206, 199, 0.45);
   }
 }
 
@@ -581,8 +592,8 @@ body {
   width: 100%;
   max-width: 28rem;
   border-radius: 1rem;
-  border: 1px solid rgba(72, 73, 232, 0.22);
-  background: linear-gradient(180deg, #ffffff, #f5f9ff);
+  border: 1px solid rgba(102, 188, 180, 0.22);
+  background: linear-gradient(180deg, #ffffff, #fff8ec);
   box-shadow: 0 24px 60px rgba(26, 26, 26, 0.275);
   padding: 1.25rem;
 }
@@ -590,8 +601,8 @@ body {
 .vf-hero-card {
   width: min(92vw, 960px);
   border-radius: 1.25rem;
-  border: 1px solid rgba(72, 73, 232, 0.18);
-  background: linear-gradient(180deg, #ffffff, #f5f9ff);
+  border: 1px solid rgba(102, 188, 180, 0.18);
+  background: linear-gradient(180deg, #ffffff, #fff8ec);
   box-shadow: 0 30px 80px rgba(26, 26, 26, 0.275);
   padding: clamp(1.25rem, 3vw, 2.2rem);
 }
@@ -599,42 +610,42 @@ body {
 .vf-input {
   width: 100%;
   border-radius: 0.75rem;
-  border: 1px solid rgba(72, 73, 232, 0.72);
-  background: rgba(72, 73, 232, 0.16);
+  border: 1px solid rgba(102, 188, 180, 0.72);
+  background: rgba(102, 188, 180, 0.16);
   color: #1a1a1a;
   padding: 0.65rem 0.8rem;
   outline: none;
 }
 
 .vf-input:focus {
-  border-color: rgba(72, 73, 232, 1.0);
-  box-shadow: 0 0 0 2px rgba(72, 73, 232, 0.32);
+  border-color: rgba(102, 188, 180, 1.0);
+  box-shadow: 0 0 0 2px rgba(102, 188, 180, 0.32);
 }
 
 .vf-btn-primary {
   border-radius: 0.75rem;
-  border: 1px solid rgba(72, 73, 232, 0.88);
-  background: linear-gradient(180deg, #e8efff, #f5f9ff);
+  border: 1px solid rgba(102, 188, 180, 0.88);
+  background: linear-gradient(180deg, #f5e6d0, #fff8ec);
   color: #1a1a1a;
   padding: 0.65rem 0.8rem;
   font-weight: 600;
 }
 
 .vf-btn-primary:hover {
-  background: linear-gradient(180deg, #4849e8, #e8efff);
+  background: linear-gradient(180deg, #66bcb4, #f5e6d0);
 }
 
 .vf-btn-ghost {
   border-radius: 0.75rem;
-  border: 1px solid rgba(72, 73, 232, 0.8);
-  background: rgba(72, 73, 232, 0.16);
+  border: 1px solid rgba(102, 188, 180, 0.8);
+  background: rgba(102, 188, 180, 0.16);
   color: #1a1a1a;
   padding: 0.65rem 0.8rem;
   font-weight: 500;
 }
 
 .vf-btn-ghost:hover {
-  background: rgba(72, 73, 232, 0.4);
+  background: rgba(102, 188, 180, 0.4);
 }
 
 @keyframes vf-fade-inout {
@@ -692,13 +703,13 @@ body {
   border-radius: 999px;
   padding: 0.45rem 0.95rem;
   font-size: 0.78rem;
-  border: 1px solid rgba(72, 73, 232, 0.56);
+  border: 1px solid rgba(102, 188, 180, 0.56);
   transition: 180ms ease;
 }
 
 .vf-top-btn-primary {
   color: #1a1a1a;
-  background: #f5f9ff;
+  background: #fff8ec;
 }
 
 .vf-top-btn-primary:hover {
@@ -707,11 +718,11 @@ body {
 
 .vf-top-btn-ghost {
   color: #1a1a1a;
-  background: rgba(72, 73, 232, 0.16);
+  background: rgba(102, 188, 180, 0.16);
 }
 
 .vf-top-btn-ghost:hover {
-  background: rgba(72, 73, 232, 0.48);
+  background: rgba(102, 188, 180, 0.48);
 }
 
 .vf-landing-main {
@@ -723,17 +734,17 @@ body {
   position: relative;
   min-height: min(74vh, 620px);
   border-radius: 1.35rem;
-  border: 1px solid rgba(72, 73, 232, 0.15);
+  border: 1px solid rgba(102, 188, 180, 0.15);
   overflow: hidden;
-  background: #f5f9ff;
+  background: #fff8ec;
 }
 
 .vf-landing-hero-art {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 20%, rgba(72, 73, 232, 0.12), transparent 45%),
-    #f5f9ff;
+    radial-gradient(circle at 50% 20%, rgba(102, 188, 180, 0.12), transparent 45%),
+    #fff8ec;
   filter: none;
 }
 
@@ -741,7 +752,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(232, 239, 255, 0.65), transparent 42%);
+  background: linear-gradient(90deg, rgba(245, 230, 208, 0.65), transparent 42%);
 }
 
 .vf-landing-overlay-card {
@@ -750,8 +761,8 @@ body {
   width: min(360px, calc(100% - 2rem));
   margin: 2.6rem 0 0 1.4rem;
   border-radius: 1.05rem;
-  border: 1px solid rgba(72, 73, 232, 0.2);
-  background: linear-gradient(180deg, #ffffff, #f5f9ff);
+  border: 1px solid rgba(102, 188, 180, 0.2);
+  background: linear-gradient(180deg, #ffffff, #fff8ec);
   box-shadow: 0 18px 40px rgba(26, 26, 26, 0.275);
   padding: 1.15rem 1rem;
 }
@@ -760,7 +771,7 @@ body {
 .vf-auth-email-btn {
   width: 100%;
   border-radius: 0.7rem;
-  border: 1px solid rgba(72, 73, 232, 0.96);
+  border: 1px solid rgba(102, 188, 180, 0.96);
   padding: 0.62rem 0.72rem;
   font-size: 0.86rem;
   display: inline-flex;
@@ -770,14 +781,14 @@ body {
 }
 
 .vf-auth-google-btn {
-  color: #e8efff;
-  background: #f5f9ff;
-  border-color: rgba(72, 73, 232, 1.0);
+  color: #f5e6d0;
+  background: #fff8ec;
+  border-color: rgba(102, 188, 180, 1.0);
 }
 
 .vf-auth-email-btn {
   color: #1a1a1a;
-  background: rgba(72, 73, 232, 0.2);
+  background: rgba(102, 188, 180, 0.2);
   border-style: solid;
 }
 
@@ -791,7 +802,7 @@ body {
 }
 
 .vf-auth-email-btn:hover {
-  background: rgba(72, 73, 232, 0.48);
+  background: rgba(102, 188, 180, 0.48);
 }
 
 .vf-google-icon {
@@ -808,9 +819,9 @@ body {
   box-sizing: border-box;
   background: transparent;
   color: var(--bg3-text);
-  --aid-gold: #4849e8;
-  --aid-gold-bright: #6c6dee;
-  --aid-gold-deep: #ddf344;
+  --aid-gold: #66bcb4;
+  --aid-gold-bright: #88cec7;
+  --aid-gold-deep: #ecb02b;
   --aid-font-display: var(--bg3-font-display);
   --aid-font-serif: var(--bg3-font-body);
   font-family: var(--aid-font-serif);
@@ -856,8 +867,8 @@ body {
   padding: max(0px, env(safe-area-inset-top, 0)) max(20px, env(safe-area-inset-right, 0)) 0
     max(20px, env(safe-area-inset-left, 0));
   background:
-    linear-gradient(180deg, rgba(232, 239, 255, 0.97) 0%, rgba(245, 249, 255, 0.99) 100%);
-  border-bottom: 1px solid rgba(72, 73, 232, 0.28);
+    linear-gradient(180deg, rgba(245, 230, 208, 0.97) 0%, rgba(255, 248, 236, 0.99) 100%);
+  border-bottom: 1px solid rgba(102, 188, 180, 0.28);
   box-shadow:
     inset 0 -1px 0 rgba(26, 26, 26, 0.225),
     0 8px 28px rgba(26, 26, 26, 0.175);
@@ -878,9 +889,9 @@ body {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(108, 109, 238, 0.35) 20%,
-    rgba(108, 109, 238, 0.55) 50%,
-    rgba(108, 109, 238, 0.35) 80%,
+    rgba(136, 206, 199, 0.35) 20%,
+    rgba(136, 206, 199, 0.55) 50%,
+    rgba(136, 206, 199, 0.35) 80%,
     transparent 100%
   );
   pointer-events: none;
@@ -925,10 +936,10 @@ body {
   font-size: 0.95rem;
   text-transform: uppercase;
   margin-right: 0.6rem;
-  color: #ddf344;
+  color: #ecb02b;
   text-shadow:
     0 1px 0 rgba(26, 26, 26, 0.325),
-    0 0 20px rgba(72, 73, 232, 0.15);
+    0 0 20px rgba(102, 188, 180, 0.15);
 }
 
 .aid-topbar-brand-link {
@@ -970,7 +981,7 @@ body {
 }
 
 .aid-nav-link:hover {
-  color: #ddf344;
+  color: #ecb02b;
   opacity: 1;
   transform: translateY(-1px);
 }
@@ -982,7 +993,7 @@ body {
   right: 0;
   bottom: -10px;
   height: 2px;
-  background: #4849e8;
+  background: #66bcb4;
 }
 
 .aid-signin-btn {
@@ -995,7 +1006,7 @@ body {
   text-transform: uppercase;
   padding: 0.58rem 1rem;
   border-radius: 3px 5px 4px 6px / 4px 3px 5px 4px;
-  border: 2px solid #4849e8;
+  border: 2px solid #66bcb4;
   box-shadow: 2px 3px 0 rgba(26, 26, 26, 0.125);
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
@@ -1008,12 +1019,12 @@ body {
   box-shadow:
     0 0 0 1px rgba(26, 26, 26, 0.45),
     0 12px 36px rgba(26, 26, 26, 0.35);
-  background: #4849e8;
+  background: #66bcb4;
 }
 
 .aid-topbar .aid-signin-btn {
   background: transparent;
-  color: #ddf344;
+  color: #ecb02b;
   border: 2px solid var(--aid-gold-deep);
   box-shadow: none;
 }
@@ -1089,7 +1100,7 @@ body {
   letter-spacing: 0.03em;
   color: #1a1a1a;
   background: rgba(26, 26, 26, 0.21);
-  border: 1px solid rgba(72, 73, 232, 0.28);
+  border: 1px solid rgba(102, 188, 180, 0.28);
   border-radius: 4px;
   outline: none;
   transition:
@@ -1102,8 +1113,8 @@ body {
 }
 
 .aid-app-search:focus {
-  border-color: rgba(108, 109, 238, 0.55);
-  box-shadow: 0 0 0 1px rgba(72, 73, 232, 0.2);
+  border-color: rgba(136, 206, 199, 0.55);
+  box-shadow: 0 0 0 1px rgba(102, 188, 180, 0.2);
 }
 
 .aid-app-topbar-right {
@@ -1126,8 +1137,8 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(26, 26, 26, 0.88);
-  background: rgba(72, 73, 232, 0.2);
-  border: 1px solid rgba(72, 73, 232, 0.28);
+  background: rgba(102, 188, 180, 0.2);
+  border: 1px solid rgba(102, 188, 180, 0.28);
   border-radius: 3px;
   cursor: default;
   transition: border-color 0.2s ease;
@@ -1140,12 +1151,12 @@ body {
 }
 
 .aid-app-premium:hover {
-  border-color: rgba(108, 109, 238, 0.4);
+  border-color: rgba(136, 206, 199, 0.4);
 }
 
 .aid-app-premium-icon {
   font-size: 0.55rem;
-  color: rgba(108, 109, 238, 0.85);
+  color: rgba(136, 206, 199, 0.85);
 }
 
 .aid-app-play {
@@ -1161,11 +1172,11 @@ body {
   text-transform: uppercase;
   text-decoration: none;
   color: #ffffff;
-  background: linear-gradient(180deg, #6c6dee 0%, #4849e8 45%, #ddf344 100%);
-  border: 2px solid rgba(232, 239, 255, 0.95);
+  background: linear-gradient(180deg, #88cec7 0%, #66bcb4 45%, #ecb02b 100%);
+  border: 2px solid rgba(245, 230, 208, 0.95);
   border-radius: 4px;
   box-shadow:
-    0 1px 0 rgba(224, 232, 255, 0.35) inset,
+    0 1px 0 rgba(240, 220, 187, 0.35) inset,
     0 4px 14px rgba(26, 26, 26, 0.2);
   transition:
     transform 0.2s ease,
@@ -1176,15 +1187,15 @@ body {
 .aid-app-play:hover {
   filter: brightness(1.06);
   box-shadow:
-    0 1px 0 rgba(224, 232, 255, 0.45) inset,
+    0 1px 0 rgba(240, 220, 187, 0.45) inset,
     0 0 0 1px rgba(26, 26, 26, 0.35),
     0 8px 24px rgba(26, 26, 26, 0.35);
 }
 
 .aid-app-play--here {
   box-shadow:
-    0 0 0 2px rgba(108, 109, 238, 0.45),
-    0 4px 18px rgba(72, 73, 232, 0.35);
+    0 0 0 2px rgba(136, 206, 199, 0.45),
+    0 4px 18px rgba(102, 188, 180, 0.35);
 }
 
 .aid-app-play-icon {
@@ -1204,7 +1215,7 @@ body {
   height: 2.35rem;
   padding: 0;
   border-radius: 50%;
-  border: 1px solid rgba(72, 73, 232, 0.35);
+  border: 1px solid rgba(102, 188, 180, 0.35);
   background: rgba(26, 26, 26, 0.175);
   color: #1a1a1a;
   cursor: pointer;
@@ -1214,8 +1225,8 @@ body {
 }
 
 .aid-app-user-btn:hover {
-  border-color: rgba(108, 109, 238, 0.55);
-  background: rgba(72, 73, 232, 0.12);
+  border-color: rgba(136, 206, 199, 0.55);
+  background: rgba(102, 188, 180, 0.12);
 }
 
 .aid-app-user-icon {
@@ -1230,8 +1241,8 @@ body {
   min-width: 11rem;
   padding: 0.35rem;
   border-radius: 6px;
-  border: 1px solid rgba(72, 73, 232, 0.28);
-  background: linear-gradient(165deg, rgba(232, 239, 255, 0.98) 0%, rgba(245, 249, 255, 0.99) 100%);
+  border: 1px solid rgba(102, 188, 180, 0.28);
+  background: linear-gradient(165deg, rgba(245, 230, 208, 0.98) 0%, rgba(255, 248, 236, 0.99) 100%);
   box-shadow: 0 16px 40px rgba(26, 26, 26, 0.275);
 }
 
@@ -1253,7 +1264,7 @@ body {
 }
 
 .aid-app-user-dd-item:hover {
-  background: rgba(72, 73, 232, 0.32);
+  background: rgba(102, 188, 180, 0.32);
 }
 
 .aid-app-dd-icon {
@@ -1325,10 +1336,10 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 100% 72% at 50% -12%, rgba(72, 73, 232, 0.2), transparent 58%),
-    radial-gradient(ellipse 58% 48% at 12% 88%, rgba(232, 239, 255, 0.42), transparent 54%),
-    radial-gradient(ellipse 58% 48% at 88% 85%, rgba(224, 232, 255, 0.4), transparent 54%),
-    linear-gradient(180deg, #f5f9ff 0%, #f5f9ff 42%, #e0e8ff 100%);
+    radial-gradient(ellipse 100% 72% at 50% -12%, rgba(102, 188, 180, 0.2), transparent 58%),
+    radial-gradient(ellipse 58% 48% at 12% 88%, rgba(245, 230, 208, 0.42), transparent 54%),
+    radial-gradient(ellipse 58% 48% at 88% 85%, rgba(240, 220, 187, 0.4), transparent 54%),
+    linear-gradient(180deg, #fff8ec 0%, #fff8ec 42%, #f0dcbb 100%);
   transform: scale(1.04);
   animation: aid-bg-pan 18s ease-in-out infinite;
 }
@@ -1350,7 +1361,7 @@ body {
   position: absolute;
   inset: -20%;
   background:
-    radial-gradient(ellipse 58% 46% at 22% 32%, rgba(108, 109, 238, 0.1), transparent 56%),
+    radial-gradient(ellipse 58% 46% at 22% 32%, rgba(136, 206, 199, 0.1), transparent 56%),
     radial-gradient(ellipse 52% 42% at 78% 58%, rgba(107, 107, 107, 0.08), transparent 52%);
   mix-blend-mode: screen;
   opacity: 0.55;
@@ -1373,9 +1384,9 @@ body {
   inset: 0;
   background-image:
     radial-gradient(1.5px 1.5px at 12% 18%, rgba(26, 26, 26, 0.5), transparent),
-    radial-gradient(1px 1px at 55% 42%, rgba(72, 73, 232, 1.0), transparent),
+    radial-gradient(1px 1px at 55% 42%, rgba(102, 188, 180, 1.0), transparent),
     radial-gradient(1px 1px at 78% 22%, rgba(26, 26, 26, 0.38), transparent),
-    radial-gradient(1.5px 1.5px at 30% 68%, rgba(72, 73, 232, 1.0), transparent),
+    radial-gradient(1.5px 1.5px at 30% 68%, rgba(102, 188, 180, 1.0), transparent),
     radial-gradient(1px 1px at 88% 76%, rgba(255, 248, 220, 0.4), transparent),
     radial-gradient(1px 1px at 42% 12%, rgba(26, 26, 26, 0.22), transparent);
   background-size: 100% 100%;
@@ -1447,7 +1458,7 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 2px;
-  border: 1px solid rgba(72, 73, 232, 0.38);
+  border: 1px solid rgba(102, 188, 180, 0.38);
   box-shadow:
     inset 0 0 0 1px rgba(26, 26, 26, 0.275),
     inset 0 1px 0 rgba(26, 26, 26, 0.1),
@@ -1469,12 +1480,12 @@ body {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(108, 109, 238, 0.35) 15%,
+    rgba(136, 206, 199, 0.35) 15%,
     rgba(26, 26, 26, 0.65) 50%,
-    rgba(108, 109, 238, 0.35) 85%,
+    rgba(136, 206, 199, 0.35) 85%,
     transparent
   );
-  box-shadow: 0 0 18px rgba(72, 73, 232, 0.25);
+  box-shadow: 0 0 18px rgba(102, 188, 180, 0.25);
   pointer-events: none;
   z-index: 1;
 }
@@ -1495,11 +1506,11 @@ body {
   letter-spacing: 0.35em;
   text-transform: uppercase;
   margin-bottom: 0.35rem;
-  color: #ddf344;
+  color: #ecb02b;
   text-shadow:
     0 2px 0 rgba(26, 26, 26, 0.18),
-    0 8px 22px rgba(221, 243, 68, 0.35),
-    0 0 28px rgba(221, 243, 68, 0.4);
+    0 8px 22px rgba(236, 176, 43, 0.35),
+    0 0 28px rgba(236, 176, 43, 0.4);
 }
 
 .aid-kicker-scratch {
@@ -1532,7 +1543,7 @@ body {
     1px 0 0 rgba(26, 26, 26, 0.08),
     -1px 0 0 rgba(26, 26, 26, 0.075),
     0 14px 36px rgba(26, 26, 26, 0.19),
-    0 0 48px rgba(72, 73, 232, 0.14);
+    0 0 48px rgba(102, 188, 180, 0.14);
 }
 
 .aid-title-animated {
@@ -1670,12 +1681,12 @@ body {
 .aid-cta-primary {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, #4849e8 0%, #ddf344 100%);
+  background: linear-gradient(180deg, #66bcb4 0%, #ecb02b 100%);
   color: #ffffff;
-  border: 2px solid #4849e8;
+  border: 2px solid #66bcb4;
   box-shadow:
     2px 3px 0 rgba(26, 26, 26, 0.14),
-    inset 0 1px 0 rgba(72, 73, 232, 1.0);
+    inset 0 1px 0 rgba(102, 188, 180, 1.0);
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.35s ease,
@@ -1691,7 +1702,7 @@ body {
   background: linear-gradient(
     105deg,
     transparent 0%,
-    rgba(72, 73, 232, 1.0) 45%,
+    rgba(102, 188, 180, 1.0) 45%,
     transparent 70%
   );
   transform: translateX(-120%) skewX(-12deg);
@@ -1721,7 +1732,7 @@ body {
 }
 
 .aid-cta-secondary {
-  background: linear-gradient(180deg, rgba(232, 239, 255, 0.95) 0%, rgba(232, 239, 255, 0.98) 100%);
+  background: linear-gradient(180deg, rgba(245, 230, 208, 0.95) 0%, rgba(245, 230, 208, 0.98) 100%);
   color: var(--aid-gold-bright);
   border: 2px solid var(--aid-gold-deep);
   box-shadow:
@@ -1737,21 +1748,21 @@ body {
 
 .aid-cta-secondary:hover {
   transform: translateY(-2px);
-  background: linear-gradient(180deg, rgba(232, 239, 255, 0.98) 0%, rgba(232, 239, 255, 0.99) 100%);
+  background: linear-gradient(180deg, rgba(245, 230, 208, 0.98) 0%, rgba(245, 230, 208, 0.99) 100%);
   border-color: var(--aid-gold-bright);
-  color: #ddf344;
+  color: #ecb02b;
   box-shadow:
     2px 5px 0 rgba(26, 26, 26, 0.16),
-    0 12px 36px rgba(72, 73, 232, 0.22);
+    0 12px 36px rgba(102, 188, 180, 0.22);
 }
 
 .aid-cta-google {
-  background: linear-gradient(180deg, #e8efff 0%, #4849e8 100%);
+  background: linear-gradient(180deg, #f5e6d0 0%, #66bcb4 100%);
   color: #1a1a1a;
-  border: 2px solid rgba(232, 239, 255, 0.9);
+  border: 2px solid rgba(245, 230, 208, 0.9);
   box-shadow:
     2px 3px 0 rgba(26, 26, 26, 0.11),
-    inset 0 1px 0 rgba(72, 73, 232, 1.0);
+    inset 0 1px 0 rgba(102, 188, 180, 1.0);
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.35s ease,
@@ -1760,10 +1771,10 @@ body {
 
 .aid-cta-google:hover {
   transform: translateY(-2px);
-  background: linear-gradient(180deg, #1a1a1a 0%, #4849e8 100%);
+  background: linear-gradient(180deg, #1a1a1a 0%, #66bcb4 100%);
   box-shadow:
     2px 5px 0 rgba(26, 26, 26, 0.09),
-    0 14px 40px rgba(72, 73, 232, 0.12);
+    0 14px 40px rgba(102, 188, 180, 0.12);
 }
 
 .aid-cta-google:disabled {
@@ -1786,7 +1797,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(108, 109, 238, 0.75);
+  color: rgba(136, 206, 199, 0.75);
   text-decoration: none;
   transition:
     color 0.25s ease,
@@ -1863,11 +1874,11 @@ body {
   flex-shrink: 0;
   background: linear-gradient(
     180deg,
-    rgba(108, 109, 238, 0.85) 0%,
-    rgba(72, 73, 232, 0.15) 100%
+    rgba(136, 206, 199, 0.85) 0%,
+    rgba(102, 188, 180, 0.15) 100%
   );
   border-radius: 1px;
-  box-shadow: 0 0 8px rgba(72, 73, 232, 0.25);
+  box-shadow: 0 0 8px rgba(102, 188, 180, 0.25);
 }
 
 .aid-scroll-cue-arrow {
@@ -1892,14 +1903,14 @@ body {
 /* What to do — parchment / BG3 black–gold, scroll-driven stagger in/out */
 .aid-what {
   --aid-parchment-font: "Pixelify Sans", "Courier New", monospace;
-  --aid-parchment-bg: linear-gradient(165deg, #e8efff 0%, #e8efff 48%, #e0e8ff 100%);
+  --aid-parchment-bg: linear-gradient(165deg, #f5e6d0 0%, #f5e6d0 48%, #f0dcbb 100%);
   position: relative;
   padding: clamp(2.75rem, 7vw, 5rem) clamp(1rem, 4vw, 2.5rem) 4rem;
   background:
-    radial-gradient(ellipse 80% 45% at 50% 0%, rgba(72, 73, 232, 0.08), transparent 55%),
-    linear-gradient(180deg, #f5f9ff 0%, #e0e8ff 100%);
-  border-top: 1px solid rgba(72, 73, 232, 0.22);
-  box-shadow: inset 0 1px 0 rgba(108, 109, 238, 0.06);
+    radial-gradient(ellipse 80% 45% at 50% 0%, rgba(102, 188, 180, 0.08), transparent 55%),
+    linear-gradient(180deg, #fff8ec 0%, #f0dcbb 100%);
+  border-top: 1px solid rgba(102, 188, 180, 0.22);
+  box-shadow: inset 0 1px 0 rgba(136, 206, 199, 0.06);
 }
 
 .aid-what-inner {
@@ -1919,7 +1930,7 @@ body {
   margin: 0 0 2rem;
   text-shadow:
     0 2px 0 rgba(26, 26, 26, 0.225),
-    0 0 24px rgba(72, 73, 232, 0.1);
+    0 0 24px rgba(102, 188, 180, 0.1);
   opacity: 0.88;
   transform: translateY(8px);
   transition:
@@ -1938,9 +1949,9 @@ body {
   width: 4rem;
   height: 2px;
   margin: 0.9rem auto 0;
-  background: linear-gradient(90deg, transparent, rgba(108, 109, 238, 0.75), transparent);
+  background: linear-gradient(90deg, transparent, rgba(136, 206, 199, 0.75), transparent);
   border-radius: 2px;
-  box-shadow: 0 0 14px rgba(72, 73, 232, 0.35);
+  box-shadow: 0 0 14px rgba(102, 188, 180, 0.35);
 }
 
 .aid-what-list {
@@ -1959,12 +1970,12 @@ body {
   box-sizing: border-box;
   padding: 1.4rem 1.35rem 1.45rem 1.35rem;
   border-radius: 16px;
-  border: 2px solid #2e2fc9;
-  background: linear-gradient(165deg, #6c6dee 0%, #4849e8 55%, #3a3bd8 100%);
+  border: 2px solid #3a8b82;
+  background: linear-gradient(165deg, #88cec7 0%, #66bcb4 55%, #4fa89f 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    0 10px 28px rgba(46, 47, 201, 0.28),
-    0 0 0 4px rgba(245, 249, 255, 0.6);
+    0 10px 28px rgba(58, 139, 130, 0.28),
+    0 0 0 4px rgba(255, 248, 236, 0.6);
   opacity: 0;
   transition-property: opacity, transform;
   transition-duration: 0.58s;
@@ -2031,13 +2042,13 @@ body {
   display: grid;
   place-items: center;
   color: #ffffff;
-  background: linear-gradient(145deg, #6c6dee 0%, #4849e8 55%, #ddf344 100%);
+  background: linear-gradient(145deg, #88cec7 0%, #66bcb4 55%, #ecb02b 100%);
   border-radius: 50%;
-  border: 2px solid rgba(232, 239, 255, 0.95);
+  border: 2px solid rgba(245, 230, 208, 0.95);
   box-shadow:
-    0 1px 0 rgba(224, 232, 255, 0.35) inset,
+    0 1px 0 rgba(240, 220, 187, 0.35) inset,
     0 4px 12px rgba(26, 26, 26, 0.25),
-    0 0 16px rgba(72, 73, 232, 0.25);
+    0 0 16px rgba(102, 188, 180, 0.25);
 }
 
 .aid-what-copy {
@@ -2060,7 +2071,7 @@ body {
   letter-spacing: 0.03em;
   line-height: 1.22;
   color: #1a1a1a;
-  text-shadow: 0 2px 8px rgba(245, 249, 255, 0.6);
+  text-shadow: 0 2px 8px rgba(255, 248, 236, 0.6);
 }
 
 .aid-what-detail {
@@ -2157,9 +2168,9 @@ body {
 .aid-landing-menu-cta {
   padding: clamp(2.5rem, 6vw, 4rem) clamp(1rem, 4vw, 2rem);
   background:
-    radial-gradient(ellipse 65% 40% at 50% 0%, rgba(72, 73, 232, 0.09), transparent 55%),
-    linear-gradient(180deg, #f5f9ff 0%, #e0e8ff 100%);
-  border-top: 1px solid rgba(72, 73, 232, 0.2);
+    radial-gradient(ellipse 65% 40% at 50% 0%, rgba(102, 188, 180, 0.09), transparent 55%),
+    linear-gradient(180deg, #fff8ec 0%, #f0dcbb 100%);
+  border-top: 1px solid rgba(102, 188, 180, 0.2);
 }
 
 .aid-landing-menu-cta-inner {
@@ -2236,10 +2247,10 @@ body {
   position: relative;
   padding: clamp(2.5rem, 6vw, 4.25rem) clamp(1rem, 4vw, 2rem) clamp(2.75rem, 6vw, 4rem);
   background:
-    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(72, 73, 232, 0.07), transparent 55%),
-    linear-gradient(180deg, #e0e8ff 0%, #e0e8ff 100%);
-  border-top: 1px solid rgba(72, 73, 232, 0.2);
-  box-shadow: inset 0 1px 0 rgba(108, 109, 238, 0.05);
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(102, 188, 180, 0.07), transparent 55%),
+    linear-gradient(180deg, #f0dcbb 0%, #f0dcbb 100%);
+  border-top: 1px solid rgba(102, 188, 180, 0.2);
+  box-shadow: inset 0 1px 0 rgba(136, 206, 199, 0.05);
 }
 
 .aid-deployed-inner {
@@ -2273,8 +2284,8 @@ body {
 .aid-deployed-heading-icon {
   width: 1.15rem;
   height: 1.15rem;
-  color: rgba(108, 109, 238, 0.85);
-  filter: drop-shadow(0 0 10px rgba(72, 73, 232, 0.35));
+  color: rgba(136, 206, 199, 0.85);
+  filter: drop-shadow(0 0 10px rgba(102, 188, 180, 0.35));
   flex-shrink: 0;
 }
 
@@ -2301,10 +2312,10 @@ body {
   display: flex;
   flex-direction: column;
   border-radius: 4px;
-  border: 1px solid rgba(72, 73, 232, 0.26);
-  background: linear-gradient(165deg, #e8efff 0%, #e8efff 48%, #e0e8ff 100%);
+  border: 1px solid rgba(102, 188, 180, 0.26);
+  background: linear-gradient(165deg, #f5e6d0 0%, #f5e6d0 48%, #f0dcbb 100%);
   box-shadow:
-    inset 0 1px 0 rgba(108, 109, 238, 0.06),
+    inset 0 1px 0 rgba(136, 206, 199, 0.06),
     0 14px 36px rgba(26, 26, 26, 0.25),
     0 0 0 1px rgba(26, 26, 26, 0.175);
   overflow: hidden;
@@ -2336,11 +2347,11 @@ body {
 }
 
 .aid-ai-card:hover {
-  border-color: rgba(108, 109, 238, 0.38);
+  border-color: rgba(136, 206, 199, 0.38);
   box-shadow:
-    inset 0 1px 0 rgba(108, 109, 238, 0.09),
+    inset 0 1px 0 rgba(136, 206, 199, 0.09),
     0 18px 44px rgba(26, 26, 26, 0.275),
-    0 0 28px rgba(72, 73, 232, 0.12);
+    0 0 28px rgba(102, 188, 180, 0.12);
 }
 
 .aid-ai-card__head {
@@ -2348,7 +2359,7 @@ body {
   align-items: center;
   gap: 0.65rem;
   padding: 0.75rem 0.85rem 0.65rem;
-  border-bottom: 1px solid rgba(72, 73, 232, 0.24);
+  border-bottom: 1px solid rgba(102, 188, 180, 0.24);
 }
 
 .aid-ai-card__author-avatar {
@@ -2356,8 +2367,8 @@ body {
   height: 2.35rem;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(232, 239, 255, 0.95);
-  box-shadow: 0 0 0 1px rgba(72, 73, 232, 0.35);
+  border: 2px solid rgba(245, 230, 208, 0.95);
+  box-shadow: 0 0 0 1px rgba(102, 188, 180, 0.35);
   flex-shrink: 0;
 }
 
@@ -2420,14 +2431,14 @@ body {
 
 .aid-ai-card__menu:hover {
   color: #1a1a1a;
-  background: rgba(72, 73, 232, 0.24);
+  background: rgba(102, 188, 180, 0.24);
 }
 
 .aid-ai-card__media {
   position: relative;
   aspect-ratio: 16 / 9;
-  background: #e8efff;
-  border-bottom: 1px solid rgba(72, 73, 232, 0.12);
+  background: #f5e6d0;
+  border-bottom: 1px solid rgba(102, 188, 180, 0.12);
 }
 
 .aid-ai-card__media img {
@@ -2474,7 +2485,7 @@ body {
   gap: 0.75rem;
   padding: 0.85rem 1rem 1rem;
   margin-top: auto;
-  border-top: 1px solid rgba(72, 73, 232, 0.24);
+  border-top: 1px solid rgba(102, 188, 180, 0.24);
 }
 
 .aid-ai-card__stats {
@@ -2511,7 +2522,7 @@ button.aid-ai-card__like-btn {
 }
 
 button.aid-ai-card__like-btn.is-liked {
-  color: #4849e8;
+  color: #66bcb4;
 }
 
 button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
@@ -2526,8 +2537,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   flex-shrink: 0;
   padding: 0.45rem 0.9rem;
   border-radius: 3px;
-  border: 1px solid rgba(72, 73, 232, 0.45);
-  background: rgba(245, 249, 255, 0.65);
+  border: 1px solid rgba(102, 188, 180, 0.45);
+  background: rgba(255, 248, 236, 0.65);
   color: #1a1a1a;
   font-family: var(--bg3-font-display);
   font-size: 0.72rem;
@@ -2543,10 +2554,10 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .aid-ai-card__chat:hover {
-  border-color: rgba(108, 109, 238, 0.75);
-  background: rgba(72, 73, 232, 0.12);
+  border-color: rgba(136, 206, 199, 0.75);
+  background: rgba(102, 188, 180, 0.12);
   color: #1a1a1a;
-  box-shadow: 0 0 18px rgba(72, 73, 232, 0.2);
+  box-shadow: 0 0 18px rgba(102, 188, 180, 0.2);
 }
 
 .aid-ai-card__chat-icon {
@@ -2564,15 +2575,15 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .aid-deployed-hint-link {
-  color: #6c6dee;
+  color: #88cec7;
   font-weight: 600;
   text-decoration: none;
-  border-bottom: 1px solid rgba(108, 109, 238, 0.35);
+  border-bottom: 1px solid rgba(136, 206, 199, 0.35);
   transition: color 0.2s ease;
 }
 
 .aid-deployed-hint-link:hover {
-  color: #ddf344;
+  color: #ecb02b;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2592,8 +2603,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 
 /* Footer — left: Team TUQ + names; right: VirFriendo | Contact us */
 .aid-footer {
-  background: linear-gradient(180deg, rgba(245, 249, 255, 0.95) 0%, #e0e8ff 100%);
-  border-top: 1px solid rgba(72, 73, 232, 0.22);
+  background: linear-gradient(180deg, rgba(255, 248, 236, 0.95) 0%, #f0dcbb 100%);
+  border-top: 1px solid rgba(102, 188, 180, 0.22);
   box-shadow: inset 0 1px 0 rgba(26, 26, 26, 0.04);
   color: rgba(26, 26, 26, 0.92);
 }
@@ -2618,7 +2629,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   align-items: center;
   gap: 0.65rem 1.25rem;
   padding-top: 0.85rem;
-  border-top: 1px solid rgba(72, 73, 232, 0.14);
+  border-top: 1px solid rgba(102, 188, 180, 0.14);
 }
 
 .aid-footer-copy {
@@ -2648,7 +2659,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .aid-footer-legal-link:hover {
-  color: #6c6dee;
+  color: #88cec7;
 }
 
 .aid-footer-inner {
@@ -2681,7 +2692,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(108, 109, 238, 0.92);
+  color: rgba(136, 206, 199, 0.92);
   white-space: nowrap;
 }
 
@@ -2700,13 +2711,13 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .aid-footer-sep {
-  color: rgba(72, 73, 232, 0.88);
+  color: rgba(102, 188, 180, 0.88);
   font-weight: 300;
   user-select: none;
 }
 
 .aid-footer-inline-link {
-  color: #6c6dee;
+  color: #88cec7;
   text-decoration: none;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -2716,8 +2727,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .aid-footer-inline-link:hover {
-  color: #ddf344;
-  text-shadow: 0 0 12px rgba(72, 73, 232, 0.35);
+  color: #ecb02b;
+  text-shadow: 0 0 12px rgba(102, 188, 180, 0.35);
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -2951,10 +2962,10 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   min-height: 100dvh;
   overflow-x: clip;
   background: transparent;
-  --vf-contact-accent: #4849e8;
-  --vf-contact-muted: #4849e8;
-  --vf-contact-bar: #e8efff;
-  --vf-contact-bar-border: rgba(72, 73, 232, 0.28);
+  --vf-contact-accent: #66bcb4;
+  --vf-contact-muted: #66bcb4;
+  --vf-contact-bar: #f5e6d0;
+  --vf-contact-bar-border: rgba(102, 188, 180, 0.28);
 }
 
 .aid-contact-main {
@@ -3015,8 +3026,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .aid-contact-row-anchor:hover {
-  background: #4849e8;
-  border-color: rgba(108, 109, 238, 0.22);
+  background: #66bcb4;
+  border-color: rgba(136, 206, 199, 0.22);
 }
 
 .aid-contact-icon-tile {
@@ -3027,7 +3038,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   place-items: center;
   background: var(--vf-contact-accent);
   border-radius: 4px;
-  color: #f5f9ff;
+  color: #fff8ec;
 }
 
 .aid-contact-fb-svg {
@@ -3101,7 +3112,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   -webkit-overflow-scrolling: touch;
   text-align: left;
   padding: 0 0 max(1.5rem, env(safe-area-inset-bottom, 0px));
-  scrollbar-color: rgba(108, 109, 238, 0.35) rgba(26, 26, 26, 0.1);
+  scrollbar-color: rgba(136, 206, 199, 0.35) rgba(26, 26, 26, 0.1);
 }
 
 .aid-updates-scroll::-webkit-scrollbar {
@@ -3109,7 +3120,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .aid-updates-scroll::-webkit-scrollbar-thumb {
-  background: rgba(108, 109, 238, 0.28);
+  background: rgba(136, 206, 199, 0.28);
   border-radius: 4px;
 }
 
@@ -3145,13 +3156,13 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   letter-spacing: 0.14em;
   padding: 0.2rem 0.45rem;
   border-radius: 4px;
-  border: 1px solid rgba(72, 73, 232, 0.4);
+  border: 1px solid rgba(102, 188, 180, 0.4);
   color: rgba(26, 26, 26, 0.85);
 }
 
 .aid-updates-kind--release {
   color: var(--vf-contact-accent);
-  border-color: rgba(108, 109, 238, 0.35);
+  border-color: rgba(136, 206, 199, 0.35);
 }
 
 .aid-updates-kind--hotpatch {
@@ -3177,7 +3188,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 
 .aid-updates-kind--chore {
   color: rgba(180, 190, 210, 0.82);
-  border-color: rgba(72, 73, 232, 0.48);
+  border-color: rgba(102, 188, 180, 0.48);
 }
 
 .aid-updates-kind--update {
@@ -3187,7 +3198,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 /* Legacy kinds from older changelog.json */
 .aid-updates-kind--version {
   color: var(--vf-contact-accent);
-  border-color: rgba(108, 109, 238, 0.35);
+  border-color: rgba(136, 206, 199, 0.35);
 }
 
 .aid-updates-kind--commit {
@@ -3199,7 +3210,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: rgba(108, 109, 238, 0.55);
+  color: rgba(136, 206, 199, 0.55);
 }
 
 .aid-updates-subject {
@@ -3231,7 +3242,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   padding: 0.12rem 0.35rem;
   border-radius: 4px;
   background: rgba(26, 26, 26, 0.175);
-  color: rgba(108, 109, 238, 0.65);
+  color: rgba(136, 206, 199, 0.65);
 }
 
 /* Alternate landing frame (legacy, optional) */
@@ -3240,7 +3251,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   position: relative;
   overflow: hidden;
   padding: 0.9rem 1rem 1.2rem;
-  background: radial-gradient(120% 90% at 50% 0%, #e8efff 0%, #e8efff 50%, #f5f9ff 100%);
+  background: radial-gradient(120% 90% at 50% 0%, #f5e6d0 0%, #f5e6d0 50%, #fff8ec 100%);
 }
 
 .vf-ad-ambient {
@@ -3285,7 +3296,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .vf-ad-brand {
-  color: #e8efff;
+  color: #f5e6d0;
   font-size: 1.04rem;
   font-weight: 600;
 }
@@ -3294,7 +3305,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   border-radius: 999px;
   padding: 0.42rem 0.92rem;
   font-size: 0.78rem;
-  border: 1px solid rgba(72, 73, 232, 0.56);
+  border: 1px solid rgba(102, 188, 180, 0.56);
   transition: 180ms ease;
 }
 
@@ -3308,12 +3319,12 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .vf-ad-top-btn-ghost {
-  background: rgba(72, 73, 232, 0.16);
+  background: rgba(102, 188, 180, 0.16);
   color: #e7eefb;
 }
 
 .vf-ad-top-btn-ghost:hover {
-  background: rgba(72, 73, 232, 0.4);
+  background: rgba(102, 188, 180, 0.4);
 }
 
 .vf-ad-main {
@@ -3326,7 +3337,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 .vf-ad-hero-frame {
   min-height: min(78vh, 670px);
   border-radius: 1.4rem;
-  border: 1px solid rgba(72, 73, 232, 0.36);
+  border: 1px solid rgba(102, 188, 180, 0.36);
   overflow: hidden;
   position: relative;
   box-shadow: 0 24px 58px rgba(26, 26, 26, 0.2);
@@ -3338,7 +3349,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   background:
     radial-gradient(circle at 72% 38%, rgba(26, 26, 26, 0.6), transparent 33%),
     radial-gradient(circle at 46% 74%, rgba(107, 107, 107, 0.42), transparent 42%),
-    linear-gradient(180deg, rgba(220, 163, 92, 0.75), rgba(126, 82, 54, 0.68) 56%, rgba(232, 239, 255, 0.72));
+    linear-gradient(180deg, rgba(220, 163, 92, 0.75), rgba(126, 82, 54, 0.68) 56%, rgba(245, 230, 208, 0.72));
   transform: scale(1.04);
   animation: vf-ad-hero-zoom 9s ease-in-out infinite;
 }
@@ -3362,7 +3373,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   top: 1.6rem;
   width: min(360px, calc(100% - 2.4rem));
   border-radius: 1rem;
-  border: 1px solid rgba(72, 73, 232, 0.52);
+  border: 1px solid rgba(102, 188, 180, 0.52);
   background: linear-gradient(180deg, rgba(24, 29, 37, 0.93), rgba(18, 22, 29, 0.95));
   box-shadow: 0 20px 44px rgba(26, 26, 26, 0.175);
   padding: 1.1rem 1rem;
@@ -3437,7 +3448,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 .vn-stage-bg {
   /* cloud sky gradient */
   background:
-    radial-gradient(ellipse 140% 90% at 50% 110%, #4849e8 0%, #e8efff 40%, #f5f9ff 100%);
+    radial-gradient(ellipse 140% 90% at 50% 110%, #66bcb4 0%, #f5e6d0 40%, #fff8ec 100%);
   animation: vn-stage-bg 10s ease-in-out infinite;
 }
 .vn-stage-vignette {
@@ -3491,7 +3502,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
     linear-gradient(180deg, rgba(24,13,15,0.96) 0%, rgba(13,9,12,0.98) 100%);
   box-shadow:
     0 -4px 36px rgba(26, 26, 26, 0.225),
-    inset 0 1px 0 rgba(72, 73, 232, 0.16),
+    inset 0 1px 0 rgba(102, 188, 180, 0.16),
     0 0 24px rgba(255,155,124,0.15);
 }
 .vn-name-tag {
@@ -3521,17 +3532,17 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
    /menu — VirFriendo home: black + antique gold (same tokens as .aid-root)
    ============================================================================= */
 .ad-shell {
-  --aid-gold: #4849e8;
-  --aid-gold-bright: #6c6dee;
-  --aid-gold-deep: #ddf344;
+  --aid-gold: #66bcb4;
+  --aid-gold-bright: #88cec7;
+  --aid-gold-deep: #ecb02b;
   --aid-font-display: var(--bg3-font-display);
   --aid-font-serif: var(--bg3-font-body);
-  --ad-orange: #4849e8;
-  --ad-orange-hover: #6c6dee;
-  --ad-bg: #f5f9ff;
-  --ad-surface: #f5f9ff;
-  --ad-surface-2: #e8efff;
-  --ad-border: rgba(72, 73, 232, 0.22);
+  --ad-orange: #66bcb4;
+  --ad-orange-hover: #88cec7;
+  --ad-bg: #fff8ec;
+  --ad-surface: #fff8ec;
+  --ad-surface-2: #f5e6d0;
+  --ad-border: rgba(102, 188, 180, 0.22);
   --ad-text: var(--bg3-text);
   --ad-muted: rgba(154, 154, 154, 0.88);
   min-height: 100vh;
@@ -3539,10 +3550,10 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   display: flex;
   flex-direction: column;
   background:
-    radial-gradient(ellipse 95% 65% at 50% -18%, rgba(72, 73, 232, 0.12), transparent 58%),
-    radial-gradient(ellipse 55% 48% at 0% 100%, rgba(224, 232, 255, 0.45), transparent 52%),
-    radial-gradient(ellipse 55% 48% at 100% 100%, rgba(224, 232, 255, 0.42), transparent 52%),
-    linear-gradient(180deg, var(--bg3-black-rich) 0%, var(--bg3-black) 55%, #e0e8ff 100%);
+    radial-gradient(ellipse 95% 65% at 50% -18%, rgba(102, 188, 180, 0.12), transparent 58%),
+    radial-gradient(ellipse 55% 48% at 0% 100%, rgba(240, 220, 187, 0.45), transparent 52%),
+    radial-gradient(ellipse 55% 48% at 100% 100%, rgba(240, 220, 187, 0.42), transparent 52%),
+    linear-gradient(180deg, var(--bg3-black-rich) 0%, var(--bg3-black) 55%, #f0dcbb 100%);
   color: var(--ad-text);
   font-family: var(--aid-font-serif);
 }
@@ -3569,7 +3580,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 
 .ad-card__main-link:focus-visible,
 .aid-ai-card__main-link:focus-visible {
-  outline: 2px solid var(--ad-orange, #4849e8);
+  outline: 2px solid var(--ad-orange, #66bcb4);
   outline-offset: 2px;
   border-radius: 8px;
 }
@@ -3585,12 +3596,12 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
-  --vf-gold: #4849e8;
-  --vf-gold-bright: #6c6dee;
-  --vf-gold-deep: #ddf344;
-  --vf-gold-mid: #4849e8;
-  --vf-ink: #e8efff;
-  --vf-cream: #ddf344;
+  --vf-gold: #66bcb4;
+  --vf-gold-bright: #88cec7;
+  --vf-gold-deep: #ecb02b;
+  --vf-gold-mid: #66bcb4;
+  --vf-ink: #f5e6d0;
+  --vf-cream: #ecb02b;
 }
 
 .ad-agent-detail__toolbar {
@@ -3616,11 +3627,11 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   margin: 0 0 0;
   border-radius: 4px 4px 0 0;
   overflow: hidden;
-  border: 1px solid rgba(221, 243, 68, 0.45);
+  border: 1px solid rgba(236, 176, 43, 0.45);
   border-bottom: none;
   background: var(--vf-ink);
   box-shadow:
-    inset 0 0 0 1px rgba(108, 109, 238, 0.08),
+    inset 0 0 0 1px rgba(136, 206, 199, 0.08),
     0 0 40px rgba(26, 26, 26, 0.225);
 }
 
@@ -3643,8 +3654,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(245, 249, 255, 0.92) 0%,
-    rgba(232, 239, 255, 0.55) 38%,
+    rgba(255, 248, 236, 0.92) 0%,
+    rgba(245, 230, 208, 0.55) 38%,
     transparent 68%
   );
   pointer-events: none;
@@ -3665,7 +3676,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   color: var(--vf-cream);
   text-shadow:
     0 0 28px rgba(26, 26, 26, 0.425),
-    0 0 1px rgba(108, 109, 238, 0.35);
+    0 0 1px rgba(136, 206, 199, 0.35);
   z-index: 1;
 }
 
@@ -3677,11 +3688,11 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   gap: 0.75rem 1rem;
   margin-top: 0;
   padding: 0.65rem 0.85rem;
-  background: linear-gradient(180deg, rgba(232, 239, 255, 0.98) 0%, rgba(245, 249, 255, 0.99) 100%);
-  border: 1px solid rgba(221, 243, 68, 0.4);
+  background: linear-gradient(180deg, rgba(245, 230, 208, 0.98) 0%, rgba(255, 248, 236, 0.99) 100%);
+  border: 1px solid rgba(236, 176, 43, 0.4);
   border-top: none;
   border-radius: 0 0 4px 4px;
-  box-shadow: inset 0 1px 0 rgba(108, 109, 238, 0.06);
+  box-shadow: inset 0 1px 0 rgba(136, 206, 199, 0.06);
 }
 
 .ad-agent-detail__engage {
@@ -3714,7 +3725,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-agent-detail__engage-btn:hover {
-  background: rgba(108, 109, 238, 0.08);
+  background: rgba(136, 206, 199, 0.08);
   color: var(--vf-cream);
 }
 
@@ -3751,11 +3762,11 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   min-width: 200px;
   padding: 0.35rem 0;
   border-radius: 4px;
-  border: 1px solid rgba(221, 243, 68, 0.55);
-  background: linear-gradient(165deg, #e8efff 0%, #e8efff 100%);
+  border: 1px solid rgba(236, 176, 43, 0.55);
+  background: linear-gradient(165deg, #f5e6d0 0%, #f5e6d0 100%);
   box-shadow:
     0 12px 32px rgba(26, 26, 26, 0.275),
-    inset 0 0 0 1px rgba(108, 109, 238, 0.06);
+    inset 0 0 0 1px rgba(136, 206, 199, 0.06);
 }
 
 .ad-agent-detail__more-item {
@@ -3772,7 +3783,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-agent-detail__more-item:hover {
-  background: rgba(108, 109, 238, 0.08);
+  background: rgba(136, 206, 199, 0.08);
   color: var(--vf-cream);
 }
 
@@ -3786,7 +3797,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   min-height: 2.65rem;
   border-radius: 3px;
   border: 2px solid var(--vf-gold-deep);
-  background: linear-gradient(180deg, #4849e8 0%, var(--vf-gold-mid) 55%, var(--vf-gold-deep) 100%);
+  background: linear-gradient(180deg, #66bcb4 0%, var(--vf-gold-mid) 55%, var(--vf-gold-deep) 100%);
   color: #ffffff;
   font-size: 0.72rem;
   font-weight: 800;
@@ -3796,7 +3807,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-family: var(--bg3-font-display, "Cinzel", Georgia, serif);
   box-shadow:
     2px 3px 0 rgba(26, 26, 26, 0.175),
-    0 0 24px rgba(108, 109, 238, 0.18);
+    0 0 24px rgba(136, 206, 199, 0.18);
   transition:
     filter 0.15s ease,
     transform 0.15s ease;
@@ -3820,14 +3831,14 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-agent-detail__tab {
-  border: 1px solid rgba(221, 243, 68, 0.45);
+  border: 1px solid rgba(236, 176, 43, 0.45);
   border-radius: 3px;
   padding: 0.42rem 0.9rem;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  background: rgba(245, 249, 255, 0.65);
+  background: rgba(255, 248, 236, 0.65);
   color: rgba(154, 154, 154, 0.9);
   cursor: pointer;
   font-family: var(--bg3-font-display, "Cinzel", Georgia, serif);
@@ -3838,15 +3849,15 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-agent-detail__tab:hover {
-  border-color: rgba(108, 109, 238, 0.45);
+  border-color: rgba(136, 206, 199, 0.45);
   color: var(--vf-cream);
 }
 
 .ad-agent-detail__tab--active {
-  background: rgba(232, 239, 255, 0.95);
+  background: rgba(245, 230, 208, 0.95);
   color: var(--vf-gold-bright);
-  border-color: rgba(108, 109, 238, 0.65);
-  box-shadow: inset 0 0 0 1px rgba(108, 109, 238, 0.12);
+  border-color: rgba(136, 206, 199, 0.65);
+  box-shadow: inset 0 0 0 1px rgba(136, 206, 199, 0.12);
 }
 
 .ad-agent-detail__tab-count {
@@ -3917,7 +3928,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   display: inline-block;
   padding: 0.2rem 0.55rem;
   border-radius: 3px;
-  border: 1px solid rgba(108, 109, 238, 0.35);
+  border: 1px solid rgba(136, 206, 199, 0.35);
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--vf-gold-bright);
@@ -3927,10 +3938,10 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 .ad-agent-detail__prompt {
   padding: 0.85rem 1rem;
   border-radius: 4px;
-  background: linear-gradient(165deg, rgba(232, 239, 255, 0.55) 0%, rgba(245, 249, 255, 0.85) 100%);
-  border: 1px solid rgba(221, 243, 68, 0.4);
+  background: linear-gradient(165deg, rgba(245, 230, 208, 0.55) 0%, rgba(255, 248, 236, 0.85) 100%);
+  border: 1px solid rgba(236, 176, 43, 0.4);
   margin-bottom: 1.25rem;
-  box-shadow: inset 0 0 0 1px rgba(108, 109, 238, 0.05);
+  box-shadow: inset 0 0 0 1px rgba(136, 206, 199, 0.05);
 }
 
 .ad-agent-detail__prompt-label {
@@ -3957,10 +3968,10 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   top: 72px;
   padding: 0.75rem 0.85rem;
   border-radius: 4px;
-  background: linear-gradient(165deg, rgba(232, 239, 255, 0.75) 0%, rgba(245, 249, 255, 0.95) 100%);
-  border: 1px solid rgba(221, 243, 68, 0.4);
+  background: linear-gradient(165deg, rgba(245, 230, 208, 0.75) 0%, rgba(255, 248, 236, 0.95) 100%);
+  border: 1px solid rgba(236, 176, 43, 0.4);
   box-shadow:
-    inset 0 0 0 1px rgba(108, 109, 238, 0.06),
+    inset 0 0 0 1px rgba(136, 206, 199, 0.06),
     0 12px 36px rgba(26, 26, 26, 0.175);
 }
 
@@ -3975,7 +3986,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   gap: 0.55rem;
   align-items: flex-start;
   padding: 0.55rem 0;
-  border-bottom: 1px solid rgba(72, 73, 232, 0.12);
+  border-bottom: 1px solid rgba(102, 188, 180, 0.12);
 }
 
 .ad-agent-detail__meta-list li:last-child .ad-agent-detail__meta-row {
@@ -3988,7 +3999,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   flex-shrink: 0;
   font-size: 0.75rem;
   line-height: 1.4;
-  color: rgba(108, 109, 238, 0.55);
+  color: rgba(136, 206, 199, 0.55);
 }
 
 .ad-agent-detail__meta-row > div {
@@ -4040,8 +4051,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   gap: clamp(0.5rem, 2vw, 1rem);
   min-height: 56px;
   padding: max(6px, env(safe-area-inset-top, 0)) clamp(12px, 2vw, 20px) 8px;
-  background: #f5f9ff;
-  border-bottom: 1px solid #e8efff;
+  background: #fff8ec;
+  border-bottom: 1px solid #f5e6d0;
 }
 
 .ad-topbar__left {
@@ -4140,7 +4151,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   padding: 0.5rem 0.65rem 0.5rem 2.25rem;
   font-size: 0.85rem;
   color: #1a1a1a;
-  background: #4849e8;
+  background: #66bcb4;
   border: 1px solid #333;
   border-radius: 9999px;
   outline: none;
@@ -4174,7 +4185,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
-  color: #f5f9ff;
+  color: #fff8ec;
   background: var(--ad-orange);
   border: none;
   border-radius: 4px;
@@ -4183,7 +4194,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 
 .ad-topbar__play:hover {
   background: var(--ad-orange-hover);
-  color: #f5f9ff;
+  color: #fff8ec;
 }
 
 .ad-topbar__play--active {
@@ -4206,15 +4217,15 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   height: 2.25rem;
   padding: 0;
   border-radius: 50%;
-  border: 1px solid #4849e8;
-  background: #e8efff;
+  border: 1px solid #66bcb4;
+  background: #f5e6d0;
   color: #1a1a1a;
   cursor: pointer;
 }
 
 .ad-topbar__user-btn:hover {
   border-color: #9a9a9a;
-  background: #4849e8;
+  background: #66bcb4;
 }
 
 .ad-user-icon {
@@ -4228,7 +4239,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   top: calc(100% + 6px);
   min-width: 10rem;
   padding: 0.35rem;
-  background: #e8efff;
+  background: #f5e6d0;
   border: 1px solid #333;
   border-radius: 8px;
   box-shadow: 0 16px 40px rgba(26, 26, 26, 0.3);
@@ -4250,7 +4261,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-topbar__dd-item:hover {
-  background: #4849e8;
+  background: #66bcb4;
 }
 
 .ad-dd-icon {
@@ -4364,7 +4375,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-decoration: none;
-  color: #f5f9ff;
+  color: #fff8ec;
   background: var(--ad-orange);
   border-radius: 6px;
 }
@@ -4411,7 +4422,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-hero__rail-item--link:hover {
-  border-color: #4849e8;
+  border-color: #66bcb4;
   background: var(--ad-surface-2);
 }
 
@@ -4498,7 +4509,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   gap: 0.35rem;
   padding: 0.4rem 0.75rem;
   border-radius: 999px;
-  border: 1px solid rgba(72, 73, 232, 0.28);
+  border: 1px solid rgba(102, 188, 180, 0.28);
   background: rgba(26, 26, 26, 0.175);
   color: #1a1a1a;
   font-size: clamp(0.55rem, 1.35vw, 0.62rem);
@@ -4517,16 +4528,16 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-menu-filters__pill:hover {
-  border-color: rgba(108, 109, 238, 0.4);
-  background: rgba(72, 73, 232, 0.1);
+  border-color: rgba(136, 206, 199, 0.4);
+  background: rgba(102, 188, 180, 0.1);
 }
 
 .ad-menu-filters__pill--active {
-  background: linear-gradient(180deg, #6c6dee 0%, #4849e8 45%, #ddf344 100%);
+  background: linear-gradient(180deg, #88cec7 0%, #66bcb4 45%, #ecb02b 100%);
   color: #ffffff;
   border-color: rgba(26, 26, 26, 0.85);
   box-shadow:
-    0 1px 0 rgba(224, 232, 255, 0.35) inset,
+    0 1px 0 rgba(240, 220, 187, 0.35) inset,
     0 4px 14px rgba(26, 26, 26, 0.175);
 }
 
@@ -4561,7 +4572,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   appearance: none;
   padding: 0.42rem 1.75rem 0.42rem 0.65rem;
   border-radius: 8px;
-  border: 1px solid rgba(72, 73, 232, 0.28);
+  border: 1px solid rgba(102, 188, 180, 0.28);
   background: rgba(26, 26, 26, 0.175);
   color: #1a1a1a;
   font-size: 0.62rem;
@@ -4594,7 +4605,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   gap: 0.35rem;
   padding: 0.42rem 0.65rem;
   border-radius: 8px;
-  border: 1px solid rgba(72, 73, 232, 0.28);
+  border: 1px solid rgba(102, 188, 180, 0.28);
   background: rgba(26, 26, 26, 0.175);
   color: #1a1a1a;
   font-size: 0.62rem;
@@ -4606,7 +4617,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-menu-filters__filters-btn:hover {
-  border-color: #4849e8;
+  border-color: #66bcb4;
 }
 
 .ad-menu-filters__filters-icon {
@@ -4630,7 +4641,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   padding: 0.75rem;
   border-radius: 8px;
   border: 1px solid #333;
-  background: #e8efff;
+  background: #f5e6d0;
   box-shadow: 0 12px 32px rgba(26, 26, 26, 0.225);
 }
 
@@ -4645,7 +4656,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   display: inline-flex;
   border-radius: 8px;
   border: 1px solid #333;
-  background: #e8efff;
+  background: #f5e6d0;
   overflow: hidden;
 }
 
@@ -4663,7 +4674,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-menu-filters__view-btn--active {
-  background: #4849e8;
+  background: #66bcb4;
   color: #1a1a1a;
 }
 
@@ -4742,7 +4753,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-card:hover {
-  border-color: #4849e8;
+  border-color: #66bcb4;
 }
 
 .ad-card__head {
@@ -4750,7 +4761,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   align-items: center;
   gap: 0.6rem;
   padding: 0.65rem 0.75rem;
-  border-bottom: 1px solid #4849e8;
+  border-bottom: 1px solid #66bcb4;
   flex-shrink: 0;
 }
 
@@ -4813,14 +4824,14 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 
 .ad-card__menu:hover {
   color: #1a1a1a;
-  background: #4849e8;
+  background: #66bcb4;
 }
 
 .ad-card__media {
   position: relative;
   aspect-ratio: 16 / 9;
   flex-shrink: 0;
-  background: #f5f9ff;
+  background: #fff8ec;
 }
 
 .ad-card__media img {
@@ -4865,8 +4876,8 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   padding: 0.65rem 0.75rem 0.75rem;
   margin-top: auto;
   flex-shrink: 0;
-  border-top: 1px solid #4849e8;
-  background: #e8efff;
+  border-top: 1px solid #66bcb4;
+  background: #f5e6d0;
 }
 
 .ad-card__stats {
@@ -4902,7 +4913,7 @@ button.ad-card__like-btn {
 }
 
 button.ad-card__like-btn.is-liked {
-  color: #6c6dee;
+  color: #88cec7;
 }
 
 button.ad-card__like-btn.is-liked .ad-card__stat-icon {
@@ -4920,12 +4931,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   text-transform: uppercase;
   text-decoration: none;
   color: #ffffff;
-  background: linear-gradient(180deg, #6c6dee 0%, #4849e8 45%, #ddf344 100%);
-  border: 2px solid rgba(232, 239, 255, 0.9);
+  background: linear-gradient(180deg, #88cec7 0%, #66bcb4 45%, #ecb02b 100%);
+  border: 2px solid rgba(245, 230, 208, 0.9);
   border-radius: 4px;
   flex-shrink: 0;
   box-shadow:
-    0 1px 0 rgba(224, 232, 255, 0.35) inset,
+    0 1px 0 rgba(240, 220, 187, 0.35) inset,
     0 4px 14px rgba(26, 26, 26, 0.175);
   transition:
     filter 0.15s ease,
@@ -4934,10 +4945,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .ad-card__chat:hover {
   filter: brightness(1.06);
-  border-color: rgba(108, 109, 238, 0.55);
+  border-color: rgba(136, 206, 199, 0.55);
   color: #ffffff;
   box-shadow:
-    0 1px 0 rgba(224, 232, 255, 0.45) inset,
+    0 1px 0 rgba(240, 220, 187, 0.45) inset,
     0 0 0 1px rgba(26, 26, 26, 0.25),
     0 8px 24px rgba(26, 26, 26, 0.25);
 }
@@ -4977,8 +4988,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .ad-page-footer {
   margin-top: auto;
   padding: 1.25rem 1rem 1.5rem;
-  border-top: 1px solid rgba(72, 73, 232, 0.22);
-  background: linear-gradient(180deg, rgba(245, 249, 255, 0.98) 0%, #e0e8ff 100%);
+  border-top: 1px solid rgba(102, 188, 180, 0.22);
+  background: linear-gradient(180deg, rgba(255, 248, 236, 0.98) 0%, #f0dcbb 100%);
 }
 
 .ad-page-footer__inner {
@@ -5035,7 +5046,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   align-items: center;
   gap: 0.75rem;
   padding-top: 1rem;
-  border-top: 1px solid #e8efff;
+  border-top: 1px solid #f5e6d0;
   font-size: 0.75rem;
   color: #6b6b6b;
 }
@@ -5072,12 +5083,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   flex-direction: column;
   --aid-font-display: var(--bg3-font-display);
   --aid-font-serif: var(--bg3-font-body);
-  --aid-gold: #4849e8;
-  --aid-gold-bright: #6c6dee;
-  --aid-gold-deep: #ddf344;
+  --aid-gold: #66bcb4;
+  --aid-gold-bright: #88cec7;
+  --aid-gold-deep: #ecb02b;
   background:
-    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(72, 73, 232, 0.12), transparent 55%),
-    linear-gradient(180deg, #e8efff 0%, #f5f9ff 45%, #e0e8ff 100%);
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(102, 188, 180, 0.12), transparent 55%),
+    linear-gradient(180deg, #f5e6d0 0%, #fff8ec 45%, #f0dcbb 100%);
   color: var(--bg3-text);
 }
 
@@ -5113,7 +5124,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 600;
   letter-spacing: 0.12em;
   color: var(--bg3-gold-bright);
-  text-shadow: 0 0 20px rgba(72, 73, 232, 0.25);
+  text-shadow: 0 0 20px rgba(102, 188, 180, 0.25);
 }
 
 .chat-entry-cards {
@@ -5132,8 +5143,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   min-height: 112px;
   padding: 1.1rem 1.25rem;
   border-radius: 10px;
-  border: 1px solid rgba(72, 73, 232, 0.28);
-  background: linear-gradient(165deg, rgba(232, 239, 255, 0.92) 0%, rgba(245, 249, 255, 0.96) 100%);
+  border: 1px solid rgba(102, 188, 180, 0.28);
+  background: linear-gradient(165deg, rgba(245, 230, 208, 0.92) 0%, rgba(255, 248, 236, 0.96) 100%);
   box-shadow:
     inset 0 1px 0 rgba(26, 26, 26, 0.06),
     0 12px 36px rgba(26, 26, 26, 0.225);
@@ -5146,10 +5157,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .chat-entry-card:hover {
-  border-color: rgba(108, 109, 238, 0.45);
+  border-color: rgba(136, 206, 199, 0.45);
   box-shadow:
     inset 0 1px 0 rgba(26, 26, 26, 0.1),
-    0 0 0 1px rgba(72, 73, 232, 0.15),
+    0 0 0 1px rgba(102, 188, 180, 0.15),
     0 16px 44px rgba(26, 26, 26, 0.25);
   transform: translateY(-2px);
 }
@@ -5167,7 +5178,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #ddf344;
+  color: #ecb02b;
 }
 
 .chat-entry-back {
@@ -5187,8 +5198,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: min(440px, 100%);
   padding: 1.25rem 1.15rem 1.35rem;
   border-radius: 10px;
-  border: 1px solid rgba(72, 73, 232, 0.32);
-  background: linear-gradient(165deg, rgba(232, 239, 255, 0.97) 0%, rgba(245, 249, 255, 0.99) 100%);
+  border: 1px solid rgba(102, 188, 180, 0.32);
+  background: linear-gradient(165deg, rgba(245, 230, 208, 0.97) 0%, rgba(255, 248, 236, 0.99) 100%);
   box-shadow: 0 24px 60px rgba(26, 26, 26, 0.275);
 }
 
@@ -5211,7 +5222,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #ddf344;
+  color: #ecb02b;
 }
 
 .chat-entry-subbox-close {
@@ -5228,7 +5239,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .chat-entry-subbox-close:hover {
   color: var(--bg3-gold-bright);
-  background: rgba(72, 73, 232, 0.24);
+  background: rgba(102, 188, 180, 0.24);
 }
 
 .chat-entry-subbox-hint {
@@ -5287,9 +5298,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: relative;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid rgba(72, 73, 232, 0.22);
+  border: 1px solid rgba(102, 188, 180, 0.22);
   aspect-ratio: 16 / 10;
-  background: #e8efff;
+  background: #f5e6d0;
 }
 
 .chat-entry-game-img-wrap .chat-entry-game-thumb {
@@ -5323,7 +5334,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: 100%;
   padding: 0.55rem;
   border-radius: 6px;
-  border: 1px solid rgba(72, 73, 232, 0.35);
+  border: 1px solid rgba(102, 188, 180, 0.35);
   background: rgba(26, 26, 26, 0.175);
   color: #1a1a1a;
   font-family: var(--bg3-font-display);
@@ -5336,8 +5347,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .chat-entry-subbox-done:hover {
-  border-color: rgba(108, 109, 238, 0.5);
-  background: rgba(72, 73, 232, 0.1);
+  border-color: rgba(136, 206, 199, 0.5);
+  background: rgba(102, 188, 180, 0.1);
 }
 
 .chat-entry-step-badge {
@@ -5346,7 +5357,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(108, 109, 238, 0.75);
+  color: rgba(136, 206, 199, 0.75);
 }
 
 .chat-entry-field-block {
@@ -5367,7 +5378,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   box-sizing: border-box;
   padding: 0.55rem 0.65rem;
   border-radius: 6px;
-  border: 1px solid rgba(72, 73, 232, 0.28);
+  border: 1px solid rgba(102, 188, 180, 0.28);
   background: rgba(26, 26, 26, 0.2);
   color: #1a1a1a;
   font-family: var(--bg3-font-body);
@@ -5378,8 +5389,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .chat-entry-input:focus,
 .chat-entry-textarea:focus {
-  border-color: rgba(108, 109, 238, 0.5);
-  box-shadow: 0 0 0 1px rgba(72, 73, 232, 0.15);
+  border-color: rgba(136, 206, 199, 0.5);
+  box-shadow: 0 0 0 1px rgba(102, 188, 180, 0.15);
 }
 
 .chat-entry-input--mt {
@@ -5403,7 +5414,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   min-width: 5rem;
   padding: 0.5rem 0.65rem;
   border-radius: 6px;
-  border: 1px solid rgba(72, 73, 232, 0.28);
+  border: 1px solid rgba(102, 188, 180, 0.28);
   background: rgba(26, 26, 26, 0.175);
   color: #1a1a1a;
   font-family: var(--bg3-font-display);
@@ -5416,12 +5427,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .chat-entry-gender-btn:hover {
-  border-color: rgba(108, 109, 238, 0.4);
+  border-color: rgba(136, 206, 199, 0.4);
 }
 
 .chat-entry-gender-btn--active {
-  border-color: rgba(108, 109, 238, 0.55);
-  background: rgba(72, 73, 232, 0.15);
+  border-color: rgba(136, 206, 199, 0.55);
+  background: rgba(102, 188, 180, 0.15);
   color: #1a1a1a;
 }
 
@@ -5447,11 +5458,11 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .chat-entry-btn-primary {
-  border: 2px solid rgba(232, 239, 255, 0.95);
-  background: linear-gradient(180deg, #6c6dee 0%, #4849e8 45%, #ddf344 100%);
+  border: 2px solid rgba(245, 230, 208, 0.95);
+  background: linear-gradient(180deg, #88cec7 0%, #66bcb4 45%, #ecb02b 100%);
   color: #ffffff;
   box-shadow:
-    0 1px 0 rgba(224, 232, 255, 0.35) inset,
+    0 1px 0 rgba(240, 220, 187, 0.35) inset,
     0 4px 14px rgba(26, 26, 26, 0.175);
 }
 
@@ -5460,14 +5471,14 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .chat-entry-btn-secondary {
-  border: 1px solid rgba(72, 73, 232, 0.35);
+  border: 1px solid rgba(102, 188, 180, 0.35);
   background: transparent;
   color: rgba(26, 26, 26, 0.95);
 }
 
 .chat-entry-btn-secondary:hover {
-  border-color: rgba(108, 109, 238, 0.45);
-  background: rgba(72, 73, 232, 0.24);
+  border-color: rgba(136, 206, 199, 0.45);
+  background: rgba(102, 188, 180, 0.24);
 }
 
 /* Create character — minimal wizard: fade-in + karaoke title */
@@ -5508,7 +5519,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .chat-entry-char-close:hover {
   color: var(--bg3-gold-bright);
-  background: rgba(72, 73, 232, 0.24);
+  background: rgba(102, 188, 180, 0.24);
 }
 
 .chat-entry-char-backlink {
@@ -5630,7 +5641,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .chat-entry-char-input:focus,
 .chat-entry-char-textarea:focus {
-  border-bottom-color: rgba(72, 73, 232, 0.55);
+  border-bottom-color: rgba(102, 188, 180, 0.55);
 }
 
 .chat-entry-char-input--mt {
@@ -5664,8 +5675,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   min-width: 11rem;
   padding: 0.65rem 1.5rem;
   border-radius: 999px;
-  border: 1px solid rgba(232, 239, 255, 0.9);
-  background: linear-gradient(180deg, #e8efff 0%, #4849e8 100%);
+  border: 1px solid rgba(245, 230, 208, 0.9);
+  background: linear-gradient(180deg, #f5e6d0 0%, #66bcb4 100%);
   color: #1a1a1a;
   font-family: var(--bg3-font-display);
   font-size: 0.72rem;
@@ -5681,10 +5692,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .chat-entry-char-next:hover {
-  border-color: rgba(72, 73, 232, 0.45);
+  border-color: rgba(102, 188, 180, 0.45);
   color: #1a1a1a;
   box-shadow:
-    0 0 0 1px rgba(72, 73, 232, 0.15),
+    0 0 0 1px rgba(102, 188, 180, 0.15),
     0 8px 28px rgba(26, 26, 26, 0.225);
 }
 
@@ -5784,7 +5795,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-chat-sidebar-bond {
   padding: 0.5rem 0 0.35rem;
-  border-bottom: 1px solid rgba(72, 73, 232, 0.1);
+  border-bottom: 1px solid rgba(102, 188, 180, 0.1);
   margin-bottom: 0.15rem;
 }
 
@@ -5866,9 +5877,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: min(14rem, 48vw);
   height: min(14rem, 48vw);
   max-width: 100%;
-  color: #6c6dee;
+  color: #88cec7;
   opacity: 0.95;
-  filter: drop-shadow(0 8px 22px rgba(72, 73, 232, 0.35));
+  filter: drop-shadow(0 8px 22px rgba(102, 188, 180, 0.35));
 }
 
 .vf-chat-model-hint {
@@ -5931,7 +5942,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   background: var(--ad-surface-2);
   box-shadow:
     0 12px 40px rgba(26, 26, 26, 0.19),
-    inset 0 0 0 1px rgba(72, 73, 232, 0.08);
+    inset 0 0 0 1px rgba(102, 188, 180, 0.08);
 }
 
 .vf-chat-tabs {
@@ -5941,8 +5952,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.45rem 0.55rem;
-  background: linear-gradient(180deg, rgba(232, 239, 255, 0.92) 0%, rgba(232, 239, 255, 0.88) 100%);
-  border-bottom: 1px solid rgba(72, 73, 232, 0.12);
+  background: linear-gradient(180deg, rgba(245, 230, 208, 0.92) 0%, rgba(245, 230, 208, 0.88) 100%);
+  border-bottom: 1px solid rgba(102, 188, 180, 0.12);
   font-family: var(--aid-font-display);
   overflow-x: auto;
   scrollbar-width: thin;
@@ -5983,12 +5994,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-chat-tab:hover {
   color: #1a1a1a;
-  background: rgba(72, 73, 232, 0.12);
+  background: rgba(102, 188, 180, 0.12);
 }
 
 .vf-chat-tab--active {
   color: #1a1a1a;
-  background: linear-gradient(180deg, #6c6dee, #4849e8);
+  background: linear-gradient(180deg, #88cec7, #66bcb4);
 }
 
 .vf-chat-tab--ghost {
@@ -6034,11 +6045,11 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .vf-chat-bubble--user {
   background: linear-gradient(
     168deg,
-    rgba(232, 239, 255, 0.97) 0%,
-    rgba(232, 239, 255, 0.99) 55%,
-    rgba(232, 239, 255, 0.96) 100%
+    rgba(245, 230, 208, 0.97) 0%,
+    rgba(245, 230, 208, 0.99) 55%,
+    rgba(245, 230, 208, 0.96) 100%
   );
-  border: 1px solid rgba(72, 73, 232, 0.2);
+  border: 1px solid rgba(102, 188, 180, 0.2);
   color: #1a1a1a;
   box-shadow:
     0 0 0 1px rgba(26, 26, 26, 0.175),
@@ -6046,8 +6057,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-bubble--assistant {
-  background: rgba(232, 239, 255, 0.94);
-  border: 1px solid rgba(72, 73, 232, 0.24);
+  background: rgba(245, 230, 208, 0.94);
+  border: 1px solid rgba(102, 188, 180, 0.24);
   color: rgba(26, 26, 26, 0.96);
 }
 
@@ -6056,7 +6067,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: rgba(72, 73, 232, 0.72);
+  color: rgba(102, 188, 180, 0.72);
   margin-bottom: 0;
 }
 
@@ -6112,11 +6123,11 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(155deg, rgba(232, 239, 255, 0.98), rgba(232, 239, 255, 0.99));
-  border: 1px solid rgba(72, 73, 232, 0.28);
+  background: linear-gradient(155deg, rgba(245, 230, 208, 0.98), rgba(245, 230, 208, 0.99));
+  border: 1px solid rgba(102, 188, 180, 0.28);
   box-shadow:
     0 0 0 1px rgba(26, 26, 26, 0.2),
-    inset 0 1px 0 rgba(72, 73, 232, 0.16);
+    inset 0 1px 0 rgba(102, 188, 180, 0.16);
 }
 
 .vf-chat-user-avatar-wrap--inline {
@@ -6289,12 +6300,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   transform: translate(-50%, -50%);
   border-radius: 50%;
   background: rgba(26, 26, 26, 0.14);
-  box-shadow: 0 0 0 1px rgba(72, 73, 232, 1.0);
+  box-shadow: 0 0 0 1px rgba(102, 188, 180, 1.0);
   pointer-events: none;
   z-index: 2;
 }
 .vf-chess-square--dark .vf-chess-hint-dot {
-  background: rgba(72, 73, 232, 1.0);
+  background: rgba(102, 188, 180, 1.0);
   box-shadow: 0 0 0 1px rgba(26, 26, 26, 0.1);
 }
 /* Ăn quân: vòng lớn thay vì chấm */
@@ -6303,12 +6314,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   inset: 6%;
   border-radius: 4px;
   border: 3px solid rgba(26, 26, 26, 0.19);
-  box-shadow: 0 0 0 1px rgba(72, 73, 232, 1.0);
+  box-shadow: 0 0 0 1px rgba(102, 188, 180, 1.0);
   pointer-events: none;
   z-index: 2;
 }
 .vf-chess-square--dark .vf-chess-hint-capture {
-  border-color: rgba(72, 73, 232, 1.0);
+  border-color: rgba(102, 188, 180, 1.0);
   box-shadow: 0 0 0 1px rgba(26, 26, 26, 0.125);
 }
 .vf-chess-selected {
@@ -6374,7 +6385,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   padding: 0.12em 0.38em;
   border-radius: 0.28rem;
   background: rgba(26, 26, 26, 0.14);
-  border: 1px solid rgba(72, 73, 232, 0.32);
+  border: 1px solid rgba(102, 188, 180, 0.32);
 }
 
 .vf-chat-md--user .vf-chat-md__code--inline {
@@ -6479,7 +6490,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
-  background: rgba(245, 249, 255, 0.72);
+  background: rgba(255, 248, 236, 0.72);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   animation: vf-chat-popup-in 0.22s ease-out;
@@ -6491,7 +6502,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   max-width: min(36rem, 100%);
   padding: 1.35rem 1.5rem 2.75rem;
   border-radius: 0.65rem;
-  background: rgba(232, 239, 255, 0.96);
+  background: rgba(245, 230, 208, 0.96);
   border: 1px solid rgba(232, 226, 208, 0.85);
   box-shadow:
     0 0 0 1px rgba(26, 26, 26, 0.2),
@@ -6578,8 +6589,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-rheart--on {
-  color: #6c6dee;
-  filter: drop-shadow(0 0 8px rgba(108, 109, 238, 0.5));
+  color: #88cec7;
+  filter: drop-shadow(0 0 8px rgba(136, 206, 199, 0.5));
 }
 
 .vf-chat-rheart--off {
@@ -6621,10 +6632,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-heart {
-  color: #6c6dee;
+  color: #88cec7;
   font-size: 0.95rem;
   line-height: 1;
-  text-shadow: 0 0 12px rgba(108, 109, 238, 0.45);
+  text-shadow: 0 0 12px rgba(136, 206, 199, 0.45);
 }
 
 @media (max-width: 900px) {
@@ -6661,7 +6672,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-memory-head-gold {
-  color: #6c6dee;
+  color: #88cec7;
   font-weight: 800;
 }
 
@@ -6695,8 +6706,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   justify-content: center;
   flex-direction: column;
   background:
-    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(72, 73, 232, 0.12), transparent 62%),
-    linear-gradient(180deg, rgba(232, 239, 255, 0.92) 0%, rgba(245, 249, 255, 0.96) 100%);
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(102, 188, 180, 0.12), transparent 62%),
+    linear-gradient(180deg, rgba(245, 230, 208, 0.92) 0%, rgba(255, 248, 236, 0.96) 100%);
   backdrop-filter: blur(6px);
 }
 
@@ -6712,10 +6723,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: min(200px, 52vw);
   height: min(200px, 52vw);
   border-radius: 50%;
-  border: 2px dashed rgba(72, 73, 232, 0.38);
+  border: 2px dashed rgba(102, 188, 180, 0.38);
   box-shadow:
     inset 0 0 0 1px rgba(26, 26, 26, 0.175),
-    0 0 40px rgba(72, 73, 232, 0.08);
+    0 0 40px rgba(102, 188, 180, 0.08);
   position: relative;
 }
 
@@ -6836,11 +6847,11 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: 100%;
   padding: 1rem 1rem 1.25rem;
   border-radius: 4px;
-  border: 1px solid rgba(72, 73, 232, 0.42);
-  background: linear-gradient(165deg, rgba(232, 239, 255, 0.98) 0%, rgba(232, 239, 255, 0.99) 100%);
+  border: 1px solid rgba(102, 188, 180, 0.42);
+  background: linear-gradient(165deg, rgba(245, 230, 208, 0.98) 0%, rgba(245, 230, 208, 0.99) 100%);
   box-shadow:
     inset 0 0 0 1px rgba(26, 26, 26, 0.275),
-    0 0 32px rgba(72, 73, 232, 0.06),
+    0 0 32px rgba(102, 188, 180, 0.06),
     0 28px 56px rgba(26, 26, 26, 0.225);
 }
 
@@ -6863,7 +6874,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #6c6dee;
+  color: #88cec7;
   text-shadow: 0 2px 0 rgba(26, 26, 26, 0.225);
 }
 
@@ -6875,7 +6886,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   border: none;
   border-radius: 4px;
   background: transparent;
-  color: rgba(108, 109, 238, 0.85);
+  color: rgba(136, 206, 199, 0.85);
   font-size: 1.15rem;
   line-height: 1;
   cursor: pointer;
@@ -6883,8 +6894,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-game-hub__close:hover {
-  color: #ddf344;
-  background: rgba(72, 73, 232, 0.12);
+  color: #ecb02b;
+  background: rgba(102, 188, 180, 0.12);
 }
 
 .vf-game-hub__sub {
@@ -6893,7 +6904,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: 0.78rem;
   line-height: 1.45;
   letter-spacing: 0.02em;
-  color: rgba(72, 73, 232, 0.78);
+  color: rgba(102, 188, 180, 0.78);
 }
 
 @media (min-width: 640px) {
@@ -6936,7 +6947,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-game-card:focus-visible {
-  outline: 2px solid rgba(108, 109, 238, 0.65);
+  outline: 2px solid rgba(136, 206, 199, 0.65);
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -6946,7 +6957,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: 100%;
   aspect-ratio: 4 / 3;
   border-radius: 14px;
-  border: 1px solid rgba(72, 73, 232, 0.45);
+  border: 1px solid rgba(102, 188, 180, 0.45);
   box-shadow: inset 0 0 0 1px rgba(26, 26, 26, 0.175);
   overflow: hidden;
   display: flex;
@@ -6966,8 +6977,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-game-card__art--chess {
   background:
-    radial-gradient(ellipse 80% 70% at 50% 40%, rgba(232, 239, 255, 0.55), transparent 55%),
-    linear-gradient(155deg, #e8efff 0%, #f5f9ff 100%);
+    radial-gradient(ellipse 80% 70% at 50% 40%, rgba(245, 230, 208, 0.55), transparent 55%),
+    linear-gradient(155deg, #f5e6d0 0%, #fff8ec 100%);
 }
 
 .vf-game-card__art--chess::after {
@@ -6977,15 +6988,15 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-game-card__art--caro {
   background:
-    repeating-linear-gradient(0deg, #e8efff 0px, #e8efff 8px, #e0e8ff 8px, #e0e8ff 16px),
-    repeating-linear-gradient(90deg, #e8efff 0px, #e8efff 8px, #e0e8ff 8px, #e0e8ff 16px);
+    repeating-linear-gradient(0deg, #f5e6d0 0px, #f5e6d0 8px, #f0dcbb 8px, #f0dcbb 16px),
+    repeating-linear-gradient(90deg, #f5e6d0 0px, #f5e6d0 8px, #f0dcbb 8px, #f0dcbb 16px);
   background-blend-mode: normal;
 }
 
 .vf-game-card__art--caro::after {
   content: "▦";
   font-size: clamp(1.5rem, 4vw, 2rem);
-  color: rgba(72, 73, 232, 0.75);
+  color: rgba(102, 188, 180, 0.75);
 }
 
 .vf-game-card__art--tetris {
@@ -7014,33 +7025,33 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-game-card__art--story::after {
   content: "✦";
-  color: rgba(108, 109, 238, 0.88);
+  color: rgba(136, 206, 199, 0.88);
 }
 
 /* Ringrealms (hub art id ringrealms) — ancient / bronze tile */
 .vf-game-card__art--ringrealms {
   background:
-    radial-gradient(ellipse 85% 70% at 40% 25%, rgba(72, 73, 232, 0.22), transparent 55%),
-    linear-gradient(165deg, #e8efff 0%, #ffffff 55%, #f5f9ff 100%);
+    radial-gradient(ellipse 85% 70% at 40% 25%, rgba(102, 188, 180, 0.22), transparent 55%),
+    linear-gradient(165deg, #f5e6d0 0%, #ffffff 55%, #fff8ec 100%);
 }
 
 .vf-game-card__art--ringrealms::after {
   content: "⚔";
   font-size: clamp(1.45rem, 4vw, 2rem);
-  color: rgba(108, 109, 238, 0.88);
+  color: rgba(136, 206, 199, 0.88);
 }
 
 /* Back-compat hub art id */
 .vf-game-card__art--zeroad {
   background:
-    radial-gradient(ellipse 85% 70% at 40% 25%, rgba(72, 73, 232, 0.22), transparent 55%),
-    linear-gradient(165deg, #e8efff 0%, #ffffff 55%, #f5f9ff 100%);
+    radial-gradient(ellipse 85% 70% at 40% 25%, rgba(102, 188, 180, 0.22), transparent 55%),
+    linear-gradient(165deg, #f5e6d0 0%, #ffffff 55%, #fff8ec 100%);
 }
 
 .vf-game-card__art--zeroad::after {
   content: "⚔";
   font-size: clamp(1.45rem, 4vw, 2rem);
-  color: rgba(108, 109, 238, 0.88);
+  color: rgba(136, 206, 199, 0.88);
 }
 
 .vf-game-card__label {
@@ -7049,7 +7060,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(108, 109, 238, 0.92);
+  color: rgba(136, 206, 199, 0.92);
   line-height: 1.25;
   pointer-events: none;
 }
@@ -7083,7 +7094,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: clamp(1.55rem, 4.2vw, 2.05rem);
   font-weight: 700;
   letter-spacing: 0.04em;
-  background: linear-gradient(118deg, #e8efff 0%, #6c6dee 48%, #ddf344 100%);
+  background: linear-gradient(118deg, #f5e6d0 0%, #88cec7 48%, #ecb02b 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -7098,14 +7109,14 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-arcade__btn--ghost {
-  border: 1px solid rgba(72, 73, 232, 0.56);
-  background: rgba(72, 73, 232, 0.24);
+  border: 1px solid rgba(102, 188, 180, 0.56);
+  background: rgba(102, 188, 180, 0.24);
   color: rgba(26, 26, 26, 0.96);
 }
 
 .vf-arcade__btn--ghost:hover {
-  background: rgba(72, 73, 232, 0.44);
-  border-color: rgba(72, 73, 232, 0.88);
+  background: rgba(102, 188, 180, 0.44);
+  border-color: rgba(102, 188, 180, 0.88);
 }
 
 .vf-arcade__btn--dim {
@@ -7116,13 +7127,13 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-arcade__btn--dim:hover {
   color: rgba(26, 26, 26, 0.95);
-  background: rgba(72, 73, 232, 0.24);
+  background: rgba(102, 188, 180, 0.24);
 }
 
 .vf-arcade__btn--primary {
   border: none;
-  background: linear-gradient(135deg, #4849e8 0%, #ddf344 100%);
-  color: #f5f9ff;
+  background: linear-gradient(135deg, #66bcb4 0%, #ecb02b 100%);
+  color: #fff8ec;
   box-shadow: 0 0 0 1px rgba(26, 26, 26, 0.175) inset;
 }
 
@@ -7138,7 +7149,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: absolute;
   inset: -12% -8% auto -8%;
   height: 55%;
-  background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(72, 73, 232, 0.14), transparent 62%);
+  background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(102, 188, 180, 0.14), transparent 62%);
   z-index: 0;
 }
 
@@ -7157,12 +7168,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(72, 73, 232, 0.15) 12%,
-    rgba(108, 109, 238, 0.85) 50%,
-    rgba(72, 73, 232, 0.15) 88%,
+    rgba(102, 188, 180, 0.15) 12%,
+    rgba(136, 206, 199, 0.85) 50%,
+    rgba(102, 188, 180, 0.15) 88%,
     transparent
   );
-  box-shadow: 0 0 12px rgba(108, 109, 238, 0.2);
+  box-shadow: 0 0 12px rgba(136, 206, 199, 0.2);
 }
 
 .vf-caro-play__title {
@@ -7171,8 +7182,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(108, 109, 238, 0.96);
-  text-shadow: 0 0 28px rgba(72, 73, 232, 0.18);
+  color: rgba(136, 206, 199, 0.96);
+  text-shadow: 0 0 28px rgba(102, 188, 180, 0.18);
   margin: 0;
 }
 
@@ -7188,9 +7199,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .vf-caro-play__exit {
   padding: 0.45rem 1rem;
   border-radius: 2px;
-  border: 1px solid rgba(72, 73, 232, 0.35);
+  border: 1px solid rgba(102, 188, 180, 0.35);
   background: rgba(26, 26, 26, 0.175);
-  color: rgba(108, 109, 238, 0.88);
+  color: rgba(136, 206, 199, 0.88);
   font-family: var(--bg3-font-body, Georgia, serif);
   font-size: 0.8rem;
   letter-spacing: 0.06em;
@@ -7201,16 +7212,16 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-caro-play__exit:hover {
-  border-color: rgba(108, 109, 238, 0.55);
-  background: rgba(72, 73, 232, 0.08);
-  color: var(--bg3-gold-bright, #6c6dee);
+  border-color: rgba(136, 206, 199, 0.55);
+  background: rgba(102, 188, 180, 0.08);
+  color: var(--bg3-gold-bright, #88cec7);
 }
 
 .vf-caro-panel {
   position: relative;
   border-radius: 3px;
-  border: 1px solid rgba(72, 73, 232, 0.38);
-  background: linear-gradient(165deg, rgba(232, 239, 255, 0.97) 0%, rgba(232, 239, 255, 0.99) 100%);
+  border: 1px solid rgba(102, 188, 180, 0.38);
+  background: linear-gradient(165deg, rgba(245, 230, 208, 0.97) 0%, rgba(245, 230, 208, 0.99) 100%);
   box-shadow:
     inset 0 0 0 1px rgba(26, 26, 26, 0.275),
     inset 0 1px 0 rgba(26, 26, 26, 0.06),
@@ -7228,8 +7239,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
     -12deg,
     transparent,
     transparent 18px,
-    rgba(72, 73, 232, 0.025) 18px,
-    rgba(72, 73, 232, 0.025) 19px
+    rgba(102, 188, 180, 0.025) 18px,
+    rgba(102, 188, 180, 0.025) 19px
   );
   pointer-events: none;
 }
@@ -7243,7 +7254,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: absolute;
   width: 14px;
   height: 14px;
-  border-color: rgba(108, 109, 238, 0.45);
+  border-color: rgba(136, 206, 199, 0.45);
   border-style: solid;
   z-index: 2;
   pointer-events: none;
@@ -7279,7 +7290,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(108, 109, 238, 0.62);
+  color: rgba(136, 206, 199, 0.62);
   margin: 0 0 0.65rem;
 }
 
@@ -7301,7 +7312,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   min-width: 3.35rem;
   padding: 0.45rem 0.65rem;
   border-radius: 2px;
-  border: 1px solid rgba(72, 73, 232, 0.28);
+  border: 1px solid rgba(102, 188, 180, 0.28);
   background: rgba(26, 26, 26, 0.19);
   color: rgba(26, 26, 26, 0.88);
   font-family: ui-monospace, monospace;
@@ -7314,16 +7325,16 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-caro-grid-pill:hover {
-  border-color: rgba(108, 109, 238, 0.45);
-  background: rgba(72, 73, 232, 0.07);
+  border-color: rgba(136, 206, 199, 0.45);
+  background: rgba(102, 188, 180, 0.07);
 }
 
 .vf-caro-grid-pill--on {
-  border-color: rgba(108, 109, 238, 0.65);
-  background: linear-gradient(180deg, rgba(72, 73, 232, 0.2) 0%, rgba(232, 239, 255, 0.35) 100%);
-  color: var(--bg3-gold-bright, #6c6dee);
+  border-color: rgba(136, 206, 199, 0.65);
+  background: linear-gradient(180deg, rgba(102, 188, 180, 0.2) 0%, rgba(245, 230, 208, 0.35) 100%);
+  color: var(--bg3-gold-bright, #88cec7);
   box-shadow:
-    0 0 0 1px rgba(72, 73, 232, 0.15),
+    0 0 0 1px rgba(102, 188, 180, 0.15),
     0 4px 18px rgba(26, 26, 26, 0.175);
 }
 
@@ -7335,7 +7346,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   gap: 0.25rem;
   padding: 0.65rem 0.5rem;
   border-radius: 2px;
-  border: 1px solid rgba(72, 73, 232, 0.28);
+  border: 1px solid rgba(102, 188, 180, 0.28);
   background: rgba(26, 26, 26, 0.175);
   color: rgba(26, 26, 26, 0.9);
   transition:
@@ -7345,8 +7356,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-caro-stone:hover {
-  border-color: rgba(108, 109, 238, 0.4);
-  background: rgba(72, 73, 232, 0.06);
+  border-color: rgba(136, 206, 199, 0.4);
+  background: rgba(102, 188, 180, 0.06);
 }
 
 .vf-caro-stone--on {
@@ -7382,7 +7393,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #1a1a1a;
-  background: linear-gradient(180deg, #6c6dee 0%, #4849e8 48%, #6b5420 100%);
+  background: linear-gradient(180deg, #88cec7 0%, #66bcb4 48%, #6b5420 100%);
   box-shadow:
     inset 0 1px 0 rgba(26, 26, 26, 0.35),
     0 6px 22px rgba(26, 26, 26, 0.225);
@@ -7414,17 +7425,17 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   height: 4px;
   margin: 0 0.5rem;
   border-radius: 50%;
-  background: rgba(108, 109, 238, 0.65);
+  background: rgba(136, 206, 199, 0.65);
   vertical-align: middle;
-  box-shadow: 0 0 8px rgba(108, 109, 238, 0.45);
+  box-shadow: 0 0 8px rgba(136, 206, 199, 0.45);
 }
 
 .vf-caro-secondary-btn {
   padding: 0.4rem 0.85rem;
   border-radius: 2px;
-  border: 1px solid rgba(72, 73, 232, 0.35);
+  border: 1px solid rgba(102, 188, 180, 0.35);
   background: rgba(26, 26, 26, 0.175);
-  color: rgba(108, 109, 238, 0.9);
+  color: rgba(136, 206, 199, 0.9);
   font-size: 0.75rem;
   letter-spacing: 0.05em;
   transition:
@@ -7433,8 +7444,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-caro-secondary-btn:hover:not(:disabled) {
-  background: rgba(72, 73, 232, 0.1);
-  border-color: rgba(108, 109, 238, 0.5);
+  background: rgba(102, 188, 180, 0.1);
+  border-color: rgba(136, 206, 199, 0.5);
 }
 
 .vf-caro-secondary-btn:disabled {
@@ -7444,10 +7455,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .vf-caro-board-frame {
   padding: 0.55rem;
   border-radius: 2px;
-  border: 1px solid rgba(72, 73, 232, 0.22);
+  border: 1px solid rgba(102, 188, 180, 0.22);
   background:
-    linear-gradient(145deg, rgba(232, 239, 255, 0.95), rgba(245, 249, 255, 0.98)),
-    repeating-linear-gradient(90deg, #e8efff 0px, #e8efff 7px, #e0e8ff 7px, #e0e8ff 14px);
+    linear-gradient(145deg, rgba(245, 230, 208, 0.95), rgba(255, 248, 236, 0.98)),
+    repeating-linear-gradient(90deg, #f5e6d0 0px, #f5e6d0 7px, #f0dcbb 7px, #f0dcbb 14px);
   box-shadow: inset 0 0 24px rgba(26, 26, 26, 0.275);
 }
 
@@ -7466,8 +7477,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   align-items: center;
   justify-content: center;
   border-radius: 2px;
-  border: 1px solid rgba(232, 239, 255, 0.85);
-  background: linear-gradient(165deg, rgba(232, 239, 255, 0.92) 0%, rgba(232, 239, 255, 0.96) 100%);
+  border: 1px solid rgba(245, 230, 208, 0.85);
+  background: linear-gradient(165deg, rgba(245, 230, 208, 0.92) 0%, rgba(245, 230, 208, 0.96) 100%);
   cursor: default;
   transition:
     background 0.15s ease,
@@ -7476,9 +7487,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-caro-cell--empty:hover:not(:disabled) {
-  border-color: rgba(108, 109, 238, 0.35);
-  background: rgba(72, 73, 232, 0.08);
-  box-shadow: inset 0 0 12px rgba(108, 109, 238, 0.08);
+  border-color: rgba(136, 206, 199, 0.35);
+  background: rgba(102, 188, 180, 0.08);
+  box-shadow: inset 0 0 12px rgba(136, 206, 199, 0.08);
   cursor: pointer;
 }
 
@@ -7494,7 +7505,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-caro-cell--foe {
   border-color: rgba(210, 165, 94, 0.4);
-  background: linear-gradient(165deg, rgba(232, 239, 255, 0.55) 0%, rgba(232, 239, 255, 0.88) 100%);
+  background: linear-gradient(165deg, rgba(245, 230, 208, 0.55) 0%, rgba(245, 230, 208, 0.88) 100%);
   box-shadow: inset 0 0 10px rgba(210, 165, 94, 0.1);
 }
 
@@ -7521,13 +7532,13 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   gap: 0.5rem;
   margin-bottom: 1rem;
   padding-bottom: 0.65rem;
-  border-bottom: 1px solid rgba(72, 73, 232, 0.2);
+  border-bottom: 1px solid rgba(102, 188, 180, 0.2);
 }
 
 .vf-caro-aside-icon {
   font-size: 0.85rem;
-  color: rgba(108, 109, 238, 0.65);
-  text-shadow: 0 0 12px rgba(108, 109, 238, 0.25);
+  color: rgba(136, 206, 199, 0.65);
+  text-shadow: 0 0 12px rgba(136, 206, 199, 0.25);
 }
 
 .vf-caro-aside-title {
@@ -7536,7 +7547,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(108, 109, 238, 0.88);
+  color: rgba(136, 206, 199, 0.88);
   margin: 0;
 }
 
@@ -7550,10 +7561,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   height: 4.5rem;
   margin: 0 auto 1rem;
   border-radius: 2px;
-  border: 1px dashed rgba(72, 73, 232, 0.28);
+  border: 1px dashed rgba(102, 188, 180, 0.28);
   background:
-    linear-gradient(0deg, transparent 46%, rgba(72, 73, 232, 0.12) 47%, rgba(72, 73, 232, 0.12) 53%, transparent 54%),
-    linear-gradient(90deg, transparent 46%, rgba(72, 73, 232, 0.12) 47%, rgba(72, 73, 232, 0.12) 53%, transparent 54%);
+    linear-gradient(0deg, transparent 46%, rgba(102, 188, 180, 0.12) 47%, rgba(102, 188, 180, 0.12) 53%, transparent 54%),
+    linear-gradient(90deg, transparent 46%, rgba(102, 188, 180, 0.12) 47%, rgba(102, 188, 180, 0.12) 53%, transparent 54%);
   opacity: 0.85;
 }
 
@@ -7574,7 +7585,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.4rem 0;
-  border-bottom: 1px solid rgba(72, 73, 232, 0.1);
+  border-bottom: 1px solid rgba(102, 188, 180, 0.1);
   font-family: var(--bg3-font-body, Georgia, serif);
   font-size: 0.8rem;
 }
@@ -7605,7 +7616,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .vf-caro-badge--live {
   background: rgba(107, 107, 107, 0.22);
   color: rgba(26, 26, 26, 0.95);
-  border: 1px solid rgba(108, 109, 238, 0.25);
+  border: 1px solid rgba(136, 206, 199, 0.25);
 }
 
 .vf-caro-badge--done {
@@ -7618,7 +7629,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   margin-top: 0.85rem;
   padding: 0.65rem 0.75rem;
   border-radius: 2px;
-  border: 1px solid rgba(72, 73, 232, 0.15);
+  border: 1px solid rgba(102, 188, 180, 0.15);
   background: rgba(26, 26, 26, 0.175);
   max-height: 9rem;
   overflow-y: auto;
@@ -7629,7 +7640,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: 0.52rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(108, 109, 238, 0.45);
+  color: rgba(136, 206, 199, 0.45);
   margin: 0 0 0.45rem;
 }
 
@@ -7646,9 +7657,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   margin-top: 0.85rem;
   padding: 0.65rem 0.85rem;
   border-radius: 2px;
-  border: 1px solid rgba(72, 73, 232, 0.38);
-  background: rgba(72, 73, 232, 0.06);
-  color: rgba(108, 109, 238, 0.95);
+  border: 1px solid rgba(102, 188, 180, 0.38);
+  background: rgba(102, 188, 180, 0.06);
+  color: rgba(136, 206, 199, 0.95);
   font-family: var(--bg3-font-body, Georgia, serif);
   font-size: 0.8rem;
   letter-spacing: 0.03em;
@@ -7658,8 +7669,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-caro-review-btn:hover:not(:disabled) {
-  background: rgba(72, 73, 232, 0.12);
-  border-color: rgba(108, 109, 238, 0.5);
+  background: rgba(102, 188, 180, 0.12);
+  border-color: rgba(136, 206, 199, 0.5);
 }
 
 .vf-caro-review-btn:disabled {
@@ -7676,7 +7687,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(108, 109, 238, 0.72);
+  color: rgba(136, 206, 199, 0.72);
   margin: 0 0 0.75rem;
 }
 
@@ -7698,7 +7709,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .vf-caro-stat {
   padding: 0.45rem 0.5rem;
   border-radius: 2px;
-  border: 1px solid rgba(72, 73, 232, 0.18);
+  border: 1px solid rgba(102, 188, 180, 0.18);
   background: rgba(26, 26, 26, 0.14);
   display: flex;
   flex-direction: column;
@@ -7757,15 +7768,15 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: absolute;
   display: block;
   border-radius: 50% 0 50% 50%;
-  background: #ddf344;
+  background: #ecb02b;
   will-change: transform, opacity;
   animation-name: aid-petal-fall;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
 }
-.aid-petal-v0 { background: linear-gradient(135deg, #ddf344 0%, #ecf566 100%); }
-.aid-petal-v1 { background: linear-gradient(135deg, #ecf566 0%, #ddf344 100%); }
-.aid-petal-v2 { background: linear-gradient(135deg, #ddf344 0%, #abc4ff 100%); }
+.aid-petal-v0 { background: linear-gradient(135deg, #ecb02b 0%, #f5c451 100%); }
+.aid-petal-v1 { background: linear-gradient(135deg, #edc55b 0%, #fff8ec 100%); }
+.aid-petal-v2 { background: linear-gradient(135deg, #88cec7 0%, #66bcb4 100%); }
 @keyframes aid-petal-fall {
   0%   { transform: translate3d(0, 0, 0) rotate(var(--rot, 0deg)); opacity: 0; }
   10%  { opacity: 0.95; }
@@ -7779,8 +7790,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   left: 0; right: 0; bottom: 0;
   height: 78px;
   background:
-    linear-gradient(180deg, transparent 0%, rgba(72, 73, 232, 0.5) 30%, #4849e8 60%, #2e2fc9 100%);
-  border-top: 1px solid rgba(46, 47, 201, 0.5);
+    linear-gradient(180deg, transparent 0%, rgba(102, 188, 180, 0.5) 30%, #66bcb4 60%, #3a8b82 100%);
+  border-top: 1px solid rgba(58, 139, 130, 0.5);
 }
 .aid-ground::before {
   /* grass tuft texture */
@@ -7788,18 +7799,18 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: absolute;
   top: 6px; left: 0; right: 0; height: 14px;
   background-image:
-    radial-gradient(circle at 4% 100%, #2e2fc9 1.5px, transparent 2px),
-    radial-gradient(circle at 11% 100%, #2e2fc9 1.5px, transparent 2px),
-    radial-gradient(circle at 19% 100%, #2e2fc9 1.5px, transparent 2px),
-    radial-gradient(circle at 27% 100%, #2e2fc9 1.5px, transparent 2px),
-    radial-gradient(circle at 35% 100%, #2e2fc9 1.5px, transparent 2px),
-    radial-gradient(circle at 43% 100%, #2e2fc9 1.5px, transparent 2px),
-    radial-gradient(circle at 56% 100%, #2e2fc9 1.5px, transparent 2px),
-    radial-gradient(circle at 64% 100%, #2e2fc9 1.5px, transparent 2px),
-    radial-gradient(circle at 72% 100%, #2e2fc9 1.5px, transparent 2px),
-    radial-gradient(circle at 81% 100%, #2e2fc9 1.5px, transparent 2px),
-    radial-gradient(circle at 89% 100%, #2e2fc9 1.5px, transparent 2px),
-    radial-gradient(circle at 96% 100%, #2e2fc9 1.5px, transparent 2px);
+    radial-gradient(circle at 4% 100%, #3a8b82 1.5px, transparent 2px),
+    radial-gradient(circle at 11% 100%, #3a8b82 1.5px, transparent 2px),
+    radial-gradient(circle at 19% 100%, #3a8b82 1.5px, transparent 2px),
+    radial-gradient(circle at 27% 100%, #3a8b82 1.5px, transparent 2px),
+    radial-gradient(circle at 35% 100%, #3a8b82 1.5px, transparent 2px),
+    radial-gradient(circle at 43% 100%, #3a8b82 1.5px, transparent 2px),
+    radial-gradient(circle at 56% 100%, #3a8b82 1.5px, transparent 2px),
+    radial-gradient(circle at 64% 100%, #3a8b82 1.5px, transparent 2px),
+    radial-gradient(circle at 72% 100%, #3a8b82 1.5px, transparent 2px),
+    radial-gradient(circle at 81% 100%, #3a8b82 1.5px, transparent 2px),
+    radial-gradient(circle at 89% 100%, #3a8b82 1.5px, transparent 2px),
+    radial-gradient(circle at 96% 100%, #3a8b82 1.5px, transparent 2px);
   background-size: 100% 100%;
   opacity: 0.85;
 }
@@ -7952,9 +7963,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 /* ===== Cozy Companion Room — Chat page Phase 1 ===== */
 .vf-chat-cozy {
   background:
-    radial-gradient(ellipse 90% 65% at 50% -10%, rgba(108, 109, 238, 0.18), transparent 60%),
-    radial-gradient(ellipse 70% 55% at 50% 110%, rgba(224, 232, 255, 0.45), transparent 60%),
-    linear-gradient(180deg, #f5f9ff 0%, #e8efff 60%, #e0e8ff 100%);
+    radial-gradient(ellipse 90% 65% at 50% -10%, rgba(136, 206, 199, 0.18), transparent 60%),
+    radial-gradient(ellipse 70% 55% at 50% 110%, rgba(240, 220, 187, 0.45), transparent 60%),
+    linear-gradient(180deg, #fff8ec 0%, #f5e6d0 60%, #f0dcbb 100%);
 }
 
 .vf-chat-cozy .vf-chat-stage {
@@ -7978,7 +7989,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: min(420px, 50vw);
   height: min(320px, 38vh);
   transform: translateX(-50%);
-  background: radial-gradient(ellipse 80% 70% at 50% 30%, rgba(224, 232, 255, 0.65) 0%, rgba(232, 239, 255, 0.35) 50%, transparent 80%);
+  background: radial-gradient(ellipse 80% 70% at 50% 30%, rgba(240, 220, 187, 0.65) 0%, rgba(245, 230, 208, 0.35) 50%, transparent 80%);
   filter: blur(20px);
   z-index: 0;
 }
@@ -8020,7 +8031,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 /* Glassmorph the side panels + main pane */
 .vf-chat-cozy .vf-chat-sidebar-frame {
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.62) 0%, rgba(232, 239, 255, 0.45) 100%);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.62) 0%, rgba(245, 230, 208, 0.45) 100%);
   backdrop-filter: blur(18px) saturate(1.2);
   -webkit-backdrop-filter: blur(18px) saturate(1.2);
   border-radius: 22px;
@@ -8034,16 +8045,16 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-cozy .vf-chat-sidebar-bond {
-  border-bottom-color: rgba(108, 109, 238, 0.22);
+  border-bottom-color: rgba(136, 206, 199, 0.22);
 }
 
 /* Avatar card: bigger, halo glow, breathing */
 .vf-chat-cozy .vf-chat-sidebar-primary {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(224, 232, 255, 0.3) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(240, 220, 187, 0.3) 100%);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.8);
   box-shadow:
-    0 12px 32px rgba(72, 73, 232, 0.18),
+    0 12px 32px rgba(102, 188, 180, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   position: relative;
   overflow: hidden;
@@ -8052,7 +8063,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 70% 50% at 50% 35%, rgba(108, 109, 238, 0.22) 0%, transparent 70%);
+  background: radial-gradient(ellipse 70% 50% at 50% 35%, rgba(136, 206, 199, 0.22) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
   animation: vf-cozy-halo 6s ease-in-out infinite;
@@ -8079,7 +8090,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 /* Main chat pane: glass frame */
 .vf-chat-cozy .vf-chat-main {
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.55) 0%, rgba(232, 239, 255, 0.42) 100%);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.55) 0%, rgba(245, 230, 208, 0.42) 100%);
   backdrop-filter: blur(20px) saturate(1.15);
   -webkit-backdrop-filter: blur(20px) saturate(1.15);
   border-radius: 22px;
@@ -8092,19 +8103,19 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-cozy .vf-chat-tabs {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(232, 239, 255, 0.4) 100%);
-  border-bottom: 1px solid rgba(108, 109, 238, 0.2);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(245, 230, 208, 0.4) 100%);
+  border-bottom: 1px solid rgba(136, 206, 199, 0.2);
   backdrop-filter: blur(8px);
 }
 .vf-chat-cozy .vf-chat-tab--active {
-  background: linear-gradient(180deg, #6c6dee, #4849e8);
+  background: linear-gradient(180deg, #88cec7, #66bcb4);
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(72, 73, 232, 0.35);
+  box-shadow: 0 4px 12px rgba(102, 188, 180, 0.35);
 }
 
 /* Glass chat bubbles */
 .vf-chat-cozy .vf-chat-bubble--user {
-  background: linear-gradient(168deg, rgba(255, 255, 255, 0.78) 0%, rgba(232, 239, 255, 0.7) 100%);
+  background: linear-gradient(168deg, rgba(255, 255, 255, 0.78) 0%, rgba(245, 230, 208, 0.7) 100%);
   backdrop-filter: blur(14px) saturate(1.2);
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
   border: 1px solid rgba(255, 255, 255, 0.85);
@@ -8115,7 +8126,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   border-radius: 1.2rem;
 }
 .vf-chat-cozy .vf-chat-bubble--assistant {
-  background: linear-gradient(168deg, rgba(224, 232, 255, 0.65) 0%, rgba(232, 239, 255, 0.55) 100%);
+  background: linear-gradient(168deg, rgba(240, 220, 187, 0.65) 0%, rgba(245, 230, 208, 0.55) 100%);
   backdrop-filter: blur(14px) saturate(1.2);
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
   border: 1px solid rgba(255, 255, 255, 0.7);
@@ -8129,10 +8140,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 /* Message input area: glass dock */
 .vf-chat-cozy .vf-chat-composer-row,
 .vf-chat-cozy .vf-chat-input-wrap {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.62) 0%, rgba(232, 239, 255, 0.5) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.62) 0%, rgba(245, 230, 208, 0.5) 100%);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(108, 109, 238, 0.22);
+  border-top: 1px solid rgba(136, 206, 199, 0.22);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -8150,7 +8161,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: 32px;
   height: 32px;
   border-radius: 9999px;
-  border: 1px solid rgba(72, 73, 232, 0.4);
+  border: 1px solid rgba(102, 188, 180, 0.4);
   background: rgba(255, 255, 255, 0.6);
   color: #1a1a1a;
   cursor: pointer;
@@ -8158,7 +8169,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   transition: background 0.18s, transform 0.18s;
 }
 .vf-chat-gear:hover {
-  background: rgba(72, 73, 232, 0.4);
+  background: rgba(102, 188, 180, 0.4);
   transform: rotate(40deg);
 }
 
@@ -8175,8 +8186,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .vf-chat-settings-drawer {
   width: min(380px, 92vw);
   height: 100%;
-  background: linear-gradient(180deg, #f5f9ff 0%, #e8efff 100%);
-  border-left: 1px solid #4849e8;
+  background: linear-gradient(180deg, #fff8ec 0%, #f5e6d0 100%);
+  border-left: 1px solid #66bcb4;
   box-shadow: -10px 0 40px rgba(26, 26, 26, 0.16);
   padding: 1.25rem 1.25rem 2rem;
   overflow-y: auto;
@@ -8192,7 +8203,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 2px solid #4849e8;
+  border-bottom: 2px solid #66bcb4;
   padding-bottom: 0.6rem;
   margin-bottom: 0.4rem;
 }
@@ -8212,7 +8223,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   cursor: pointer;
   padding: 0 0.35rem;
 }
-.vf-chat-settings-close:hover { color: #ddf344; }
+.vf-chat-settings-close:hover { color: #ecb02b; }
 
 .vf-chat-settings-section {
   display: flex;
@@ -8226,7 +8237,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   text-transform: uppercase;
   color: #1a1a1a;
 }
-.vf-chat-settings-val { color: #ddf344; font-weight: 700; }
+.vf-chat-settings-val { color: #ecb02b; font-weight: 700; }
 
 .vf-chat-mood-grid {
   display: grid;
@@ -8239,7 +8250,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   gap: 0.5rem;
   padding: 0.5rem 0.7rem;
   border-radius: 12px;
-  border: 2px solid #4849e8;
+  border: 2px solid #66bcb4;
   background: rgba(255, 255, 255, 0.7);
   font-family: var(--bg3-font-body);
   font-size: 0.78rem;
@@ -8249,11 +8260,11 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
 }
-.vf-chat-mood-chip:hover { background: #f5f9ff; transform: translateY(-1px); }
+.vf-chat-mood-chip:hover { background: #fff8ec; transform: translateY(-1px); }
 .vf-chat-mood-chip.is-active {
-  background: linear-gradient(180deg, #6c6dee, #4849e8);
-  border-color: #2e2fc9;
-  box-shadow: 0 4px 12px rgba(46, 47, 201, 0.35);
+  background: linear-gradient(180deg, #88cec7, #66bcb4);
+  border-color: #3a8b82;
+  box-shadow: 0 4px 12px rgba(58, 139, 130, 0.35);
 }
 .vf-chat-mood-swatch {
   width: 18px;
@@ -8262,15 +8273,15 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   border: 1.5px solid rgba(26, 26, 26, 0.18);
   flex-shrink: 0;
 }
-.vf-chat-mood-chip--cozy   .vf-chat-mood-swatch { background: linear-gradient(180deg, #f5f9ff, #ddf344); }
-.vf-chat-mood-chip--cafe   .vf-chat-mood-swatch { background: linear-gradient(180deg, #6c6dee, #8b5e3c); }
-.vf-chat-mood-chip--garden .vf-chat-mood-swatch { background: linear-gradient(180deg, #6c6dee, #4849e8); }
+.vf-chat-mood-chip--cozy   .vf-chat-mood-swatch { background: linear-gradient(180deg, #fff8ec, #ecb02b); }
+.vf-chat-mood-chip--cafe   .vf-chat-mood-swatch { background: linear-gradient(180deg, #88cec7, #8b5e3c); }
+.vf-chat-mood-chip--garden .vf-chat-mood-swatch { background: linear-gradient(180deg, #88cec7, #66bcb4); }
 .vf-chat-mood-chip--library .vf-chat-mood-swatch { background: linear-gradient(180deg, #c4b5f0, #6b4828); }
-.vf-chat-mood-chip--beach  .vf-chat-mood-swatch { background: linear-gradient(180deg, #91dcf8, #e0e8ff); }
+.vf-chat-mood-chip--beach  .vf-chat-mood-swatch { background: linear-gradient(180deg, #91dcf8, #f0dcbb); }
 
 .vf-chat-settings-range {
   width: 100%;
-  accent-color: #ddf344;
+  accent-color: #ecb02b;
 }
 .vf-chat-settings-toggle {
   display: flex;
@@ -8281,7 +8292,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   color: #1a1a1a;
   cursor: pointer;
 }
-.vf-chat-settings-toggle input { accent-color: #4849e8; transform: scale(1.15); }
+.vf-chat-settings-toggle input { accent-color: #66bcb4; transform: scale(1.15); }
 
 .vf-chat-settings-foot {
   margin-top: auto;
@@ -8294,34 +8305,34 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   margin: 0;
 }
 .vf-chat-settings-hint code {
-  background: #e8efff;
-  border: 1px solid #4849e8;
+  background: #f5e6d0;
+  border: 1px solid #66bcb4;
   border-radius: 4px;
   padding: 0 0.32rem;
-  color: #ddf344;
+  color: #ecb02b;
   font-family: ui-monospace, monospace;
 }
 
 .vf-chat-shell[data-mood="cafe"] {
   background:
     radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212, 165, 116, 0.25), transparent 60%),
-    linear-gradient(180deg, #e8efff 0%, #abc4ff 50%, #6c6dee 100%);
+    linear-gradient(180deg, #f5e6d0 0%, #b0d4cf 50%, #88cec7 100%);
 }
 .vf-chat-shell[data-mood="garden"] {
   background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(108, 109, 238, 0.4), transparent 60%),
-    linear-gradient(180deg, #e8efff 0%, #abc4ff 50%, #4849e8 100%);
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(136, 206, 199, 0.4), transparent 60%),
+    linear-gradient(180deg, #f5e6d0 0%, #b0d4cf 50%, #66bcb4 100%);
 }
 .vf-chat-shell[data-mood="library"] {
   background:
     radial-gradient(ellipse 80% 60% at 50% 0%, rgba(196, 181, 240, 0.3), transparent 60%),
-    linear-gradient(180deg, #e8efff 0%, #abc4ff 50%, #2e2fc9 100%);
+    linear-gradient(180deg, #f5e6d0 0%, #b0d4cf 50%, #3a8b82 100%);
 }
 .vf-chat-shell[data-mood="beach"] {
   background:
     radial-gradient(ellipse 90% 65% at 50% -10%, rgba(145, 220, 248, 0.35), transparent 60%),
-    radial-gradient(ellipse 60% 50% at 50% 110%, rgba(224, 232, 255, 0.5), transparent 60%),
-    linear-gradient(180deg, #f5f9ff 0%, #f5f9ff 60%, #e0e8ff 100%);
+    radial-gradient(ellipse 60% 50% at 50% 110%, rgba(240, 220, 187, 0.5), transparent 60%),
+    linear-gradient(180deg, #fff8ec 0%, #fff8ec 60%, #f0dcbb 100%);
 }
 
 .vf-chat-slash-palette {
@@ -8329,8 +8340,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   bottom: calc(100% + 8px);
   left: 0.5rem;
   right: 0.5rem;
-  background: linear-gradient(180deg, #ffffff 0%, #f5f9ff 100%);
-  border: 2px solid #4849e8;
+  background: linear-gradient(180deg, #ffffff 0%, #fff8ec 100%);
+  border: 2px solid #66bcb4;
   border-radius: 14px;
   box-shadow: 0 12px 32px rgba(26, 26, 26, 0.18);
   padding: 0.4rem;
@@ -8355,10 +8366,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   text-align: left;
   font-family: var(--bg3-font-body);
 }
-.vf-chat-slash-item:hover { background: #e8efff; }
+.vf-chat-slash-item:hover { background: #f5e6d0; }
 .vf-chat-slash-cmd {
   font-family: ui-monospace, "Cascadia Code", monospace;
-  color: #ddf344;
+  color: #ecb02b;
   font-weight: 700;
   font-size: 0.85rem;
   min-width: 110px;
@@ -8385,7 +8396,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   gap: 0.35rem;
   padding: 0.42rem 0.85rem;
   border-radius: 9999px;
-  border: 2px solid #4849e8;
+  border: 2px solid #66bcb4;
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(8px);
   font-family: var(--bg3-font-body);
@@ -8395,9 +8406,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
 }
 .vf-chat-suggest-chip:hover {
-  background: #f5f9ff;
+  background: #fff8ec;
   transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(46, 47, 201, 0.25);
+  box-shadow: 0 6px 14px rgba(58, 139, 130, 0.25);
 }
 
 .vf-chat-msg-row { position: relative; }
@@ -8420,23 +8431,23 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: 28px;
   height: 28px;
   border-radius: 9999px;
-  border: 1px solid rgba(72, 73, 232, 0.5);
+  border: 1px solid rgba(102, 188, 180, 0.5);
   background: rgba(255, 255, 255, 0.85);
   color: #1a1a1a;
   cursor: pointer;
   backdrop-filter: blur(8px);
 }
 .vf-chat-msg-actions-btn:hover {
-  background: #f5f9ff;
-  color: #ddf344;
+  background: #fff8ec;
+  color: #ecb02b;
 }
 .vf-chat-msg-actions-menu {
   position: absolute;
   right: 0;
   top: calc(100% + 6px);
   min-width: 140px;
-  background: linear-gradient(180deg, #ffffff 0%, #f5f9ff 100%);
-  border: 2px solid #4849e8;
+  background: linear-gradient(180deg, #ffffff 0%, #fff8ec 100%);
+  border: 2px solid #66bcb4;
   border-radius: 12px;
   box-shadow: 0 10px 26px rgba(26, 26, 26, 0.2);
   padding: 0.3rem;
@@ -8457,7 +8468,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: 0.78rem;
   color: #1a1a1a;
 }
-.vf-chat-msg-actions-menu button:hover { background: #e8efff; }
+.vf-chat-msg-actions-menu button:hover { background: #f5e6d0; }
 .vf-chat-msg-action-disabled { opacity: 0.55; cursor: not-allowed !important; }
 
 .vf-chat-settings-actions {
@@ -8471,7 +8482,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   gap: 0.6rem;
   padding: 0.55rem 0.8rem;
   border-radius: 10px;
-  border: 1.5px solid #4849e8;
+  border: 1.5px solid #66bcb4;
   background: rgba(255, 255, 255, 0.7);
   font-family: var(--bg3-font-body);
   font-size: 0.82rem;
@@ -8482,10 +8493,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   transition: background 0.15s, transform 0.15s;
 }
 .vf-chat-settings-action:hover {
-  background: #f5f9ff;
+  background: #fff8ec;
   transform: translateX(2px);
 }
-.vf-chat-settings-action svg { color: #ddf344; flex-shrink: 0; }
+.vf-chat-settings-action svg { color: #ecb02b; flex-shrink: 0; }
 
 .vf-chat-tab-current {
   display: inline-flex;
@@ -8494,14 +8505,14 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: 0.7rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #ddf344;
+  color: #ecb02b;
   margin-left: 0.4rem;
   opacity: 0.92;
 }
 .vf-chat-settings-action.is-active {
-  background: linear-gradient(180deg, #6c6dee, #4849e8);
-  border-color: #2e2fc9;
-  box-shadow: 0 4px 10px rgba(46, 47, 201, 0.3);
+  background: linear-gradient(180deg, #88cec7, #66bcb4);
+  border-color: #3a8b82;
+  box-shadow: 0 4px 10px rgba(58, 139, 130, 0.3);
 }
 .vf-chat-settings-action-icon {
   font-size: 1rem;
@@ -8531,8 +8542,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   gap: 0.55rem;
   padding: 0.55rem 0.7rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, #f5f9ff 0%, #e8efff 100%);
-  border: 1.5px solid #4849e8;
+  background: linear-gradient(135deg, #fff8ec 0%, #f5e6d0 100%);
+  border: 1.5px solid #66bcb4;
   font-family: var(--bg3-font-body);
   font-size: 0.78rem;
   color: #1a1a1a;
@@ -8560,7 +8571,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1.5px solid #4849e8;
+  border: 1.5px solid #66bcb4;
   background: #ffffff;
   font-size: 0.95rem;
   color: #1a1a1a;
@@ -8568,25 +8579,25 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   transition: background 0.15s, transform 0.1s;
 }
 .vf-music-btn:hover {
-  background: #f5f9ff;
+  background: #fff8ec;
   transform: scale(1.05);
 }
 .vf-music-btn.is-active {
-  background: linear-gradient(180deg, #6c6dee, #4849e8);
-  border-color: #2e2fc9;
+  background: linear-gradient(180deg, #88cec7, #66bcb4);
+  border-color: #3a8b82;
   color: #1a1a1a;
-  box-shadow: 0 2px 6px rgba(46, 47, 201, 0.3);
+  box-shadow: 0 2px 6px rgba(58, 139, 130, 0.3);
 }
 .vf-music-btn--play {
   width: 44px;
   height: 44px;
   font-size: 1.05rem;
-  background: linear-gradient(180deg, #ddf344, #aacf2c);
-  border-color: #aacf2c;
+  background: linear-gradient(180deg, #ecb02b, #d49a1a);
+  border-color: #d49a1a;
   color: #ffffff;
 }
 .vf-music-btn--play:hover {
-  background: linear-gradient(180deg, #ecf566, #ddf344);
+  background: linear-gradient(180deg, #edc55b, #ecb02b);
 }
 
 .vf-music-volume {
@@ -8614,7 +8625,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   min-width: 0;
   padding: 0.42rem 0.65rem;
   border-radius: 8px;
-  border: 1.5px solid #4849e8;
+  border: 1.5px solid #66bcb4;
   background: #ffffff;
   font-family: var(--bg3-font-body);
   font-size: 0.78rem;
@@ -8622,14 +8633,14 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   outline: none;
 }
 .vf-music-url-input:focus {
-  border-color: #ddf344;
-  box-shadow: 0 0 0 3px rgba(221, 243, 68, 0.18);
+  border-color: #ecb02b;
+  box-shadow: 0 0 0 3px rgba(236, 176, 43, 0.18);
 }
 .vf-music-url-load {
   padding: 0.42rem 0.85rem;
   border-radius: 8px;
-  border: 1.5px solid #ddf344;
-  background: linear-gradient(180deg, #ddf344, #aacf2c);
+  border: 1.5px solid #ecb02b;
+  background: linear-gradient(180deg, #ecb02b, #d49a1a);
   color: #ffffff;
   font-family: var(--bg3-font-body);
   font-size: 0.78rem;
@@ -8654,7 +8665,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   transition: background 0.15s, color 0.15s;
 }
 .vf-music-default-btn:hover:not(:disabled) {
-  background: #f5f9ff;
+  background: #fff8ec;
   color: #1a1a1a;
 }
 .vf-music-default-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -8675,8 +8686,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   gap: 0.5rem;
   padding: 1.6rem 2rem;
   border-radius: 22px;
-  border: 2px dashed rgba(72, 73, 232, 0.55);
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.7) 0%, rgba(232, 239, 255, 0.7) 100%);
+  border: 2px dashed rgba(102, 188, 180, 0.55);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.7) 0%, rgba(245, 230, 208, 0.7) 100%);
   backdrop-filter: blur(8px);
   text-align: center;
   max-width: 420px;
@@ -8695,7 +8706,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-family: var(--bg3-font-body);
   font-size: 1.1rem;
   font-weight: 700;
-  color: #ddf344;
+  color: #ecb02b;
   margin: 0;
   letter-spacing: 0.04em;
 }
@@ -8722,8 +8733,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 2.5px solid rgba(72, 73, 232, 0.35);
-  border-top-color: #ddf344;
+  border: 2.5px solid rgba(102, 188, 180, 0.35);
+  border-top-color: #ecb02b;
   animation: vf-chat-spin 0.85s linear infinite;
   flex-shrink: 0;
 }
@@ -8736,10 +8747,10 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   display: inline-block;
   border-radius: 14px;
   overflow: hidden;
-  border: 2px solid #4849e8;
-  box-shadow: 0 6px 18px rgba(46, 47, 201, 0.25);
+  border: 2px solid #66bcb4;
+  box-shadow: 0 6px 18px rgba(58, 139, 130, 0.25);
   max-width: 360px;
-  background: #f5f9ff;
+  background: #fff8ec;
 }
 .vf-chat-imagine-img {
   display: block;
