@@ -21,7 +21,7 @@ from jose import jwt
 from loguru import logger
 
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
-from services.agent_service.graph.workflow import graph_app
+from services.agent_service.claude_agent import run_claude_agent
 from services.core.context import get_conversation_context, MAX_CONTEXT_MESSAGES
 from services.agent_service.llm.memory import extract_user_memories
 from services.core.quickstart_personality import (
@@ -348,17 +348,15 @@ async def chat(
 
     lc_messages = await _build_lc_messages(db, conversation.id, user_uuid, request.message, session)
     aid = _session_agent_id(session)
-    final_state = await graph_app.ainvoke({"messages": lc_messages, "agent_id": aid})
-    
-    # Lấy tin nhắn cuối cùng do AI sinh ra (nằm ở cuối list messages)
-    bot_reply_message = final_state["messages"][-1]
-    bot_reply = _sanitize_agent_handle_typo(_extract_assistant_content(bot_reply_message), aid)
+    result = await run_claude_agent(lc_messages, agent_id=aid)
+
+    bot_reply = _sanitize_agent_handle_typo(result["reply"], aid)
     bot_reply = _ensure_assistant_reply(bot_reply)
-    
-    intent = final_state.get("intent")
-    emotion = final_state.get("emotion")
-    avatar_action = final_state.get("avatar_action")
-    bibliotherapy = final_state.get("bibliotherapy_suggestion")
+
+    intent = result.get("intent")
+    emotion = result.get("emotion")
+    avatar_action = result.get("avatar_action")
+    bibliotherapy = result.get("bibliotherapy_suggestion")
 
     # BƯỚC 4: Lưu phản hồi bot vào DB
     bot_msg = Message(
@@ -730,15 +728,15 @@ async def _process_ws_message(
     # 3) Build LangChain messages (same as POST /chat)
     lc_messages = await _build_lc_messages(db, conversation.id, user_uuid, content, session)
 
-    # 4) Invoke LangGraph
+    # 4) Invoke Claude agent
     aid = _session_agent_id(session)
-    final_state = await graph_app.ainvoke({"messages": lc_messages, "agent_id": aid})
+    result = await run_claude_agent(lc_messages, agent_id=aid)
 
-    bot_reply = _sanitize_agent_handle_typo(_extract_assistant_content(final_state["messages"][-1]), aid)
+    bot_reply = _sanitize_agent_handle_typo(result["reply"], aid)
     bot_reply = _ensure_assistant_reply(bot_reply)
-    intent = final_state.get("intent")
-    emotion = final_state.get("emotion")
-    avatar_action = final_state.get("avatar_action")
+    intent = result.get("intent")
+    emotion = result.get("emotion")
+    avatar_action = result.get("avatar_action")
 
     # 5) Save bot message
     bot_msg = Message(
