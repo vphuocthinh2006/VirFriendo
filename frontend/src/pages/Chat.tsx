@@ -1937,7 +1937,6 @@ export default function Chat() {
                     <div className="vf-chat-empty-bubble">
                       <span className="vf-chat-empty-emoji" aria-hidden>👂</span>
                       <p className="vf-chat-empty-line">đang nghe nè</p>
-                      <p className="vf-chat-empty-sub">Nhắn gì cũng được — kể chuyện, hỏi, xả stress hay rủ chơi game đều ok.</p>
                     </div>
                   </div>
                 )}
