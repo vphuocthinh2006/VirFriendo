@@ -121,8 +121,11 @@ async def run_claude_agent(
       - emotion: str
       - avatar_action: str
     """
+    provider = (os.environ.get("LLM_PROVIDER") or "auto").strip().lower()
     anthropic_key = (os.environ.get("ANTHROPIC_API_KEY") or "").strip()
-    if not anthropic_key:
+    use_claude = provider in {"claude", "auto"} and bool(anthropic_key)
+
+    if not use_claude:
         # Fallback to langchain client
         from services.agent_service.llm.client import generate_with_history
         system = _build_system(agent_id, memories)
