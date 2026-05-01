@@ -421,12 +421,21 @@ class MessageResponse(BaseModel):
 async def get_conversations(
     request: Request,
     current_user_id: str = Depends(get_current_user_id),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    limit: int = 50,
+    offset: int = 0,
 ):
-    """Lấy danh sách tất cả conversations của user hiện tại"""
+    """Lấy danh sách conversations của user (có pagination)"""
     logger.info("chat.refresh ip={} user_id={}", _client_ip(request), current_user_id)
     user_uuid = UUID(current_user_id)
-    query = select(Conversation).where(Conversation.user_id == user_uuid)
+    limit = max(1, min(limit, 100))  # clamp 1-100
+    query = (
+        select(Conversation)
+        .where(Conversation.user_id == user_uuid)
+        .order_by(Conversation.created_at.desc())
+        .limit(limit)
+        .offset(offset)
+    )
     result = await db.execute(query)
     conversations = result.scalars().all()
     return [ConversationSummary.model_validate(conv) for conv in conversations]

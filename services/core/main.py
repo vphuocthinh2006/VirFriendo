@@ -1,5 +1,8 @@
 # Chạy được dù uvicorn start từ đâu; load .env từ project root (để GROQ_API_KEY có khi gọi LLM)
 import sys
+import time
+import asyncio
+from collections import defaultdict
 from pathlib import Path
 _root = Path(__file__).resolve().parent.parent.parent
 if str(_root) not in sys.path:
@@ -12,13 +15,39 @@ except Exception:
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from services.core.config import settings
 from services.core.api import agents, auth, chat, diary, external_game, game
 from services.core.api.caro import router as caro_router
+
+# ---------------------------------------------------------------------------
+# Simple in-memory rate limiter (no extra deps)
+# ---------------------------------------------------------------------------
+_rate_store: dict[str, list[float]] = defaultdict(list)
+_rate_lock = asyncio.Lock()
+
+async def _is_rate_limited(key: str, max_calls: int, window_s: int) -> bool:
+    now = time.monotonic()
+    async with _rate_lock:
+        calls = _rate_store[key]
+        # Remove expired
+        _rate_store[key] = [t for t in calls if now - t < window_s]
+        if len(_rate_store[key]) >= max_calls:
+            return True
+        _rate_store[key].append(now)
+        return False
+
+def _client_ip(request: Request) -> str:
+    xff = (request.headers.get("x-forwarded-for") or "").strip()
+    if xff:
+        return xff.split(",")[0].strip()
+    if request.client and request.client.host:
+        return request.client.host
+    return "unknown"
 
 
 @asynccontextmanager
@@ -62,7 +91,16 @@ app.add_middleware(
 
 
 @app.middleware("http")
-async def security_headers(request, call_next):
+async def security_headers(request: Request, call_next):
+    # Rate limit auth endpoints: 10 requests/minute per IP
+    if request.url.path in ("/auth/login", "/auth/register", "/auth/google"):
+        ip = _client_ip(request)
+        if await _is_rate_limited(f"auth:{ip}", max_calls=10, window_s=60):
+            return JSONResponse(
+                status_code=429,
+                content={"detail": "Too many requests. Please try again later."},
+            )
+
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"

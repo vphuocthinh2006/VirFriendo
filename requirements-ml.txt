@@ -1,0 +1,10 @@
+# Optional ML dependencies for local intent model inference
+# Only needed when ENABLE_INTENT_MODEL_RUNTIME=true and INTENT_MODEL_PATH is set
+# Install: pip install -r requirements-ml.txt
+transformers
+torch
+accelerate
+sentencepiece
+safetensors
+peft
+bitsandbytes

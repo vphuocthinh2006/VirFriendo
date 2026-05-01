@@ -20,13 +20,6 @@ replicate>=1.0.0
 youtube-transcript-api>=0.6.0
 beautifulsoup4>=4.12.0
 
-transformers
-torch
-accelerate
-sentencepiece
-safetensors
-peft
-bitsandbytes
 sqlalchemy
 asyncpg
 psycopg2-binary
@@ -38,5 +31,3 @@ passlib[bcrypt]
 python-jose[cryptography]
 
 openpyxl>=3.1.0
-
-
