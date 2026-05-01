@@ -4295,6 +4295,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   gap: 1rem;
   margin: 1.25rem 0 1.75rem;
   align-items: stretch;
+  min-height: 320px;
 }
 
 @media (max-width: 900px) {
@@ -4324,7 +4325,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 .ad-hero__banner-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(105deg, rgba(26, 26, 26, 0.44) 0%, rgba(26, 26, 26, 0.225) 55%, transparent 100%);
+  background: linear-gradient(105deg, rgba(72, 73, 232, 0.08) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -4341,7 +4342,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-weight: 800;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--ad-orange);
+  color: #4849e8;
 }
 
 .ad-hero__headline {
@@ -4349,18 +4350,18 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   font-size: clamp(1.35rem, 3.5vw, 1.85rem);
   font-weight: 800;
   line-height: 1.15;
-  color: #fff;
+  color: #1a1a1a;
 }
 
 .ad-hero__lede {
   margin: 0 0 1rem;
   font-size: 0.9rem;
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.9);
+  color: #3a3a3a;
 }
 
 .ad-hero__lede strong {
-  color: #fff;
+  color: #4849e8;
   font-weight: 700;
 }
 
