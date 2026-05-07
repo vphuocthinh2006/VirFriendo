@@ -24,7 +24,7 @@ jobs:
   push-api:
     runs-on: ubuntu-latest
     outputs:
-      api_image_uri: ${{ steps.vars.outputs.api_image_uri }}
+      api_image_tag: ${{ steps.vars.outputs.short_sha }}
     steps:
       - uses: actions/checkout@v4
 
@@ -162,14 +162,19 @@ jobs:
             --output text)
           echo "current_task_definition=$CURR_TD" >> "$GITHUB_OUTPUT"
 
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Render new task definition with immutable image
         shell: bash
         run: |
-          API_IMAGE_URI="${{ needs['push-api'].outputs.api_image_uri }}"
-          if [ -z "$API_IMAGE_URI" ]; then
-            echo "::error::Missing needs.push-api.outputs.api_image_uri (empty image URI)."
+          API_IMAGE_TAG="${{ needs['push-api'].outputs.api_image_tag }}"
+          if [ -z "$API_IMAGE_TAG" ]; then
+            echo "::error::Missing needs.push-api.outputs.api_image_tag (empty image tag)."
             exit 1
           fi
+          API_IMAGE_URI="${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_API }}:$API_IMAGE_TAG"
           aws ecs describe-task-definition \
             --task-definition "${{ steps.cfg.outputs.task_family }}" \
             --query 'taskDefinition' > task-definition.json
