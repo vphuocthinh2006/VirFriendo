@@ -18,7 +18,10 @@ def main() -> int:
     input_path = Path(sys.argv[1])
     output_path = Path(sys.argv[2])
     container_name = sys.argv[3]
-    image_uri = sys.argv[4]
+    image_uri = sys.argv[4].strip()
+    if not image_uri:
+        print("Image URI is empty. Refusing to render task definition.", file=sys.stderr)
+        return 1
 
     task = json.loads(input_path.read_text(encoding="utf-8"))
     containers = task.get("containerDefinitions", [])
@@ -33,6 +36,17 @@ def main() -> int:
     if not changed:
         print(f"Container '{container_name}' not found in task definition.", file=sys.stderr)
         return 1
+
+    # Guardrail: ECS rejects registration if any container image is empty.
+    for container in containers:
+        cname = str(container.get("name") or "<unnamed>")
+        cimage = str(container.get("image") or "").strip()
+        if not cimage:
+            print(
+                f"Container '{cname}' has empty image in rendered task definition.",
+                file=sys.stderr,
+            )
+            return 1
 
     for key in (
         "taskDefinitionArn",
