@@ -165,7 +165,7 @@ jobs:
       - name: Render new task definition with immutable image
         shell: bash
         run: |
-          API_IMAGE_URI="${{ needs.push-api.outputs.api_image_uri }}"
+          API_IMAGE_URI="${{ needs['push-api'].outputs.api_image_uri }}"
           if [ -z "$API_IMAGE_URI" ]; then
             echo "::error::Missing needs.push-api.outputs.api_image_uri (empty image URI)."
             exit 1
