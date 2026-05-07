@@ -1,8 +1,9 @@
-﻿fastapi==0.110.0
+fastapi==0.110.0
 python-multipart>=0.0.9
 uvicorn[standard]==0.27.1
 pydantic-settings==2.2.1
 httpx
+boto3>=1.34.0
 python-dotenv
 python-chess
 
@@ -19,6 +20,7 @@ deepgram-sdk>=3.0.0
 replicate>=1.0.0
 youtube-transcript-api>=0.6.0
 beautifulsoup4>=4.12.0
+opencv-python-headless>=4.10.0
 
 sqlalchemy
 asyncpg

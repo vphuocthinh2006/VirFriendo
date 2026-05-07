@@ -57,9 +57,9 @@ export function createChatWs(onMessage: (msg: WsMessage) => void, onClose?: () =
   const httpBase =
     API_BASE || (import.meta.env.DEV ? 'http://localhost:8000' : window.location.origin)
   const wsBase = httpBase.replace(/^http/, 'ws')
-  const url = `${wsBase}/chat/ws?token=${encodeURIComponent(token)}`
+  const url = `${wsBase}/chat/ws`
 
-  const ws = new WebSocket(url)
+  const ws = new WebSocket(url, ['bearer', token])
   ws.onmessage = (ev) => {
     try {
       onMessage(JSON.parse(ev.data))
@@ -553,6 +553,8 @@ export type MediaAnalysisResponse = {
   relationship_level: number | null
   relationship_level_up: boolean
   new_relationship_level: number | null
+  /** Presigned HTTPS when S3_MEDIA_BUCKET is set and upload succeeded */
+  stored_media_url?: string | null
 }
 
 export async function analyzeMedia(

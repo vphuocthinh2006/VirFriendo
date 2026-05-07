@@ -130,7 +130,7 @@ async def test_chat_post_mocked(client: AsyncClient):
     token = await _register_and_login(client, "chatpostuser")
 
     mock_state = {
-        "messages": [type("Msg", (), {"content": "Hello from mock!"})()],
+        "reply": "Hello from mock!",
         "intent": "greeting_chitchat",
         "emotion": "happy",
         "avatar_action": "wave",
@@ -138,7 +138,7 @@ async def test_chat_post_mocked(client: AsyncClient):
     }
 
     with patch(
-        "services.agent_service.graph.workflow.graph_app.ainvoke",
+        "services.core.api.chat._invoke_agent",
         new=AsyncMock(return_value=mock_state),
     ):
         res = await client.post(
@@ -160,7 +160,7 @@ async def test_chat_post_creates_conversation(client: AsyncClient):
     token = await _register_and_login(client, "convuser")
 
     mock_state = {
-        "messages": [type("Msg", (), {"content": "reply"})()],
+        "reply": "reply",
         "intent": "greeting_chitchat",
         "emotion": "idle",
         "avatar_action": None,
@@ -168,7 +168,7 @@ async def test_chat_post_creates_conversation(client: AsyncClient):
     }
 
     with patch(
-        "services.agent_service.graph.workflow.graph_app.ainvoke",
+        "services.core.api.chat._invoke_agent",
         new=AsyncMock(return_value=mock_state),
     ):
         r1 = await client.post(

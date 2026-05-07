@@ -8,9 +8,12 @@ import json
 import re
 import base64
 import os
+import tempfile
+import ipaddress
+import urllib.parse
 from typing import Any, Mapping
 from pathlib import Path
-
+import httpx
 from services.core.database import get_db, AsyncSessionLocal
 from services.core.models import Conversation, Message, UserMemory, UserAgentRelationship
 from services.core.security import get_current_user_id
@@ -19,14 +22,17 @@ from pydantic import BaseModel
 from pydantic import ConfigDict
 from jose import jwt
 from loguru import logger
-
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
-from services.agent_service.claude_agent import run_claude_agent
 from services.core.context import get_conversation_context, MAX_CONTEXT_MESSAGES
 from services.agent_service.llm.memory import extract_user_memories
 from services.core.quickstart_personality import (
     append_user_line_and_maybe_summarize,
     get_quickstart_summary,
+)
+from services.core.s3_media import (
+    expand_s3_uris_to_presigned,
+    fetch_and_store_generated_image,
+    upload_bytes_to_media_bucket,
 )
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
@@ -79,6 +85,41 @@ def _extract_assistant_content(msg: Any) -> str:
     return str(c or "")
 
 
+def _serialize_lc_message(msg: Any) -> dict[str, str]:
+    if isinstance(msg, SystemMessage):
+        return {"role": "system", "content": msg.content}
+    if isinstance(msg, AIMessage):
+        return {"role": "assistant", "content": msg.content}
+    return {"role": "user", "content": getattr(msg, "content", "")}
+
+
+async def _invoke_agent(lc_messages: list[Any], agent_id: str) -> dict[str, Any]:
+    """
+    Microservice-first agent invocation.
+    If AGENT_SERVICE_URL is configured, call remote service; otherwise fallback local.
+    """
+    service_url = (settings.AGENT_SERVICE_URL or os.environ.get("AGENT_SERVICE_URL") or "").strip()
+    if service_url:
+        payload = {
+            "agent_id": agent_id,
+            "messages": [_serialize_lc_message(m) for m in lc_messages],
+        }
+        try:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(25.0, connect=5.0)) as client:
+                resp = await client.post(service_url.rstrip("/") + "/run", json=payload)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if isinstance(data, dict) and "reply" in data:
+                        return data
+                logger.warning("agent-service non-200: {}", resp.status_code)
+        except Exception as e:
+            logger.warning("agent-service unavailable, fallback local: {}", e)
+
+    from services.agent_service.claude_agent import run_claude_agent
+
+    return await run_claude_agent(lc_messages, agent_id=agent_id)
+
+
 _FALLBACK_EMPTY_REPLY = (
     "Mình chưa tạo được câu trả lời (lỗi model hoặc mạng). Bạn gửi lại giúp mình một lần nữa nhé~"
 )
@@ -87,6 +128,128 @@ _FALLBACK_EMPTY_REPLY = (
 def _ensure_assistant_reply(text: str) -> str:
     t = (text or "").strip()
     return t if t else _FALLBACK_EMPTY_REPLY
+
+
+def _extract_ws_token(ws: WebSocket) -> str | None:
+    """
+    Prefer token from WebSocket subprotocols (bearer,<token>) to avoid URL leaks.
+    Keep query-param fallback for backward compatibility.
+    """
+    proto_hdr = (ws.headers.get("sec-websocket-protocol") or "").strip()
+    if proto_hdr:
+        offered = [p.strip() for p in proto_hdr.split(",") if p.strip()]
+        if len(offered) >= 2 and offered[0].lower() == "bearer":
+            return offered[1]
+    token = (ws.query_params.get("token") or "").strip()
+    return token or None
+
+
+async def _validate_public_web_url(web_url: str) -> None:
+    """
+    SSRF guard:
+    - only allow http/https
+    - reject localhost/private/reserved ip literals
+    - resolve domain and reject private/local/reserved destination IPs
+    """
+    parsed = urllib.parse.urlparse(web_url)
+    if parsed.scheme not in {"http", "https"}:
+        raise HTTPException(status_code=400, detail="Only http/https URLs are allowed")
+    hostname = (parsed.hostname or "").strip()
+    if not hostname:
+        raise HTTPException(status_code=400, detail="Invalid URL")
+    if hostname.lower() in {"localhost", "127.0.0.1", "::1", "0.0.0.0"}:
+        raise HTTPException(status_code=400, detail="URL not allowed")
+
+    def _is_blocked_ip(raw: str) -> bool:
+        ip = ipaddress.ip_address(raw)
+        return any(
+            [
+                ip.is_private,
+                ip.is_loopback,
+                ip.is_link_local,
+                ip.is_reserved,
+                ip.is_multicast,
+                ip.is_unspecified,
+            ]
+        )
+
+    try:
+        if _is_blocked_ip(hostname):
+            raise HTTPException(status_code=400, detail="URL not allowed")
+        return
+    except ValueError:
+        pass
+
+    loop = asyncio.get_running_loop()
+    try:
+        addr_info = await loop.getaddrinfo(hostname, parsed.port or 80, type=0)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid URL")
+
+    for item in addr_info:
+        sockaddr = item[4]
+        if not sockaddr:
+            continue
+        resolved_ip = str(sockaddr[0])
+        try:
+            if _is_blocked_ip(resolved_ip):
+                raise HTTPException(status_code=400, detail="URL not allowed")
+        except ValueError:
+            continue
+
+
+def _extract_video_keyframes_as_data_urls(
+    content: bytes, mime_type: str, max_frames: int = 6
+) -> list[str]:
+    """
+    Extract evenly-distributed keyframes and convert to JPEG data URLs.
+    Used as fallback for video analysis when provider doesn't accept raw video bytes.
+    """
+    try:
+        import cv2  # type: ignore[import-not-found]
+    except Exception as e:
+        raise RuntimeError(
+            "Video fallback requires opencv-python-headless (cv2) to extract keyframes"
+        ) from e
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=Path(f"x.{mime_type.split('/')[-1]}").suffix or ".mp4") as tmp:
+        tmp.write(content)
+        tmp_path = tmp.name
+
+    frames: list[str] = []
+    try:
+        cap = cv2.VideoCapture(tmp_path)
+        if not cap.isOpened():
+            raise RuntimeError("Cannot open uploaded video")
+
+        total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+        if total <= 0:
+            total = 180
+        picks = sorted({max(0, min(total - 1, int(i * total / max_frames))) for i in range(max_frames)})
+
+        for idx in picks:
+            cap.set(cv2.CAP_PROP_POS_FRAMES, float(idx))
+            ok, frame = cap.read()
+            if not ok or frame is None:
+                continue
+            ok, enc = cv2.imencode(".jpg", frame)
+            if not ok:
+                continue
+            b64 = base64.b64encode(enc.tobytes()).decode("utf-8")
+            frames.append(f"data:image/jpeg;base64,{b64}")
+    finally:
+        try:
+            cap.release()  # type: ignore[name-defined]
+        except Exception:
+            pass
+        try:
+            os.unlink(tmp_path)
+        except Exception:
+            pass
+
+    if not frames:
+        raise RuntimeError("Failed to extract keyframes from video")
+    return frames
 
 
 # Schema nhận tin nhắn
@@ -348,7 +511,7 @@ async def chat(
 
     lc_messages = await _build_lc_messages(db, conversation.id, user_uuid, request.message, session)
     aid = _session_agent_id(session)
-    result = await run_claude_agent(lc_messages, agent_id=aid)
+    result = await _invoke_agent(lc_messages, aid)
 
     bot_reply = _sanitize_agent_handle_typo(result["reply"], aid)
     bot_reply = _ensure_assistant_reply(bot_reply)
@@ -489,8 +652,15 @@ async def get_history(
     query = select(Message).where(Message.conversation_id == conv_id).order_by(Message.created_at)
     result = await db.execute(query)
     messages = result.scalars().all()
-    
-    return [MessageResponse.model_validate(msg) for msg in messages]
+
+    out: list[MessageResponse] = []
+    for msg in messages:
+        m = MessageResponse.model_validate(msg)
+        expanded = expand_s3_uris_to_presigned(m.content)
+        if expanded != m.content:
+            m = m.model_copy(update={"content": expanded})
+        out.append(m)
+    return out
 
 
 @router.delete("/conversations/{conversation_id}", status_code=204)
@@ -646,8 +816,7 @@ async def websocket_chat(ws: WebSocket):
         {"type": "stream_end",   "detected_intent": ..., "detected_emotion": ..., "avatar_action": ...}
         {"type": "error",        "detail": "..."}
     """
-    # --- Auth via query param ---
-    token = ws.query_params.get("token")
+    token = _extract_ws_token(ws)
     if not token:
         await ws.close(code=4001, reason="Missing token")
         return
@@ -656,7 +825,11 @@ async def websocket_chat(ws: WebSocket):
         await ws.close(code=4001, reason="Invalid token")
         return
 
-    await ws.accept()
+    proto_hdr = (ws.headers.get("sec-websocket-protocol") or "").strip()
+    if proto_hdr:
+        await ws.accept(subprotocol="bearer")
+    else:
+        await ws.accept()
     user_uuid = UUID(user_id)
 
     try:
@@ -730,7 +903,7 @@ async def _process_ws_message(
 
     # 4) Invoke Claude agent
     aid = _session_agent_id(session)
-    result = await run_claude_agent(lc_messages, agent_id=aid)
+    result = await _invoke_agent(lc_messages, aid)
 
     bot_reply = _sanitize_agent_handle_typo(result["reply"], aid)
     bot_reply = _ensure_assistant_reply(bot_reply)
@@ -801,6 +974,7 @@ class TranscribeResponse(BaseModel):
 
 @router.post("/transcribe", response_model=TranscribeResponse)
 async def transcribe_audio(
+    request: Request,
     file: UploadFile = File(...),
     current_user_id: str = Depends(get_current_user_id),
 ):
@@ -811,6 +985,24 @@ async def transcribe_audio(
     """
     logger.info(f"[TRANSCRIBE] Request from user {current_user_id}")
     logger.info(f"[TRANSCRIBE] Filename: {file.filename}, Content-Type: {file.content_type}")
+
+    # Microservice mode: forward to media-service.
+    media_url = (settings.MEDIA_SERVICE_URL or os.environ.get("MEDIA_SERVICE_URL") or "").strip()
+    if media_url:
+        auth = (request.headers.get("Authorization") or "").strip()
+        content = await file.read()
+        mime = file.content_type or "application/octet-stream"
+        files = {"file": (file.filename or "audio.webm", content, mime)}
+        headers = {"Authorization": auth} if auth else {}
+        async with httpx.AsyncClient(timeout=httpx.Timeout(60.0, connect=5.0)) as client:
+            res = await client.post(
+                media_url.rstrip("/") + "/chat/transcribe",
+                headers=headers,
+                files=files,
+            )
+        if not res.ok:
+            raise HTTPException(status_code=res.status_code, detail=res.text)
+        return res.json()
 
     allowed_extensions = [".mp3", ".mp4", ".mpeg", ".mpga", ".m4a", ".wav", ".webm"]
     file_ext = Path(file.filename or "").suffix.lower()
@@ -873,12 +1065,6 @@ async def transcribe_audio(
             raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
 
     raise HTTPException(status_code=500, detail="No transcription service available. Set DEEPGRAM_API_KEY or GROQ_API_KEY")
-    
-    logger.error("[TRANSCRIBE] No transcription service available")
-    raise HTTPException(
-        status_code=500,
-        detail="No transcription service available. Set GROQ_API_KEY or OPENAI_API_KEY"
-    )
 
 
 # ---------------------------------------------------------------------------
@@ -895,11 +1081,13 @@ class MediaAnalysisResponse(BaseModel):
     relationship_level: int | None = None
     relationship_level_up: bool = False
     new_relationship_level: int | None = None
+    stored_media_url: str | None = None  # presigned HTTPS if S3 upload succeeded
 
 
 @router.post("/analyze-media", response_model=MediaAnalysisResponse)
 async def analyze_media(
-    file: UploadFile = File(...),
+    request: Request,
+    file: UploadFile | None = File(None),
     message: str = Form(""),
     conversation_id: str | None = Form(None),
     agent_id: str | None = Form(None),
@@ -918,7 +1106,47 @@ async def analyze_media(
     - YouTube URLs in message field
     - Web URLs in message field
     """
-    logger.info(f"analyze_media called: file={file.filename}, message={message[:100] if message else 'empty'}")
+    logger.info(
+        f"analyze_media called: file={getattr(file, 'filename', None)}, message={message[:100] if message else 'empty'}"
+    )
+
+    # Microservice mode: forward to media-service.
+    media_url = (settings.MEDIA_SERVICE_URL or os.environ.get("MEDIA_SERVICE_URL") or "").strip()
+    if media_url:
+        auth = (request.headers.get("Authorization") or "").strip()
+        form_data: dict[str, str] = {
+            "message": message or "",
+        }
+        if conversation_id:
+            form_data["conversation_id"] = conversation_id
+        if agent_id:
+            form_data["agent_id"] = agent_id
+        if entry_mode:
+            form_data["entry_mode"] = entry_mode
+        if persona:
+            form_data["persona"] = persona
+        if character_name:
+            form_data["character_name"] = character_name
+        if gender:
+            form_data["gender"] = gender
+
+        files = None
+        if file is not None:
+            content = await file.read()
+            mime = file.content_type or "application/octet-stream"
+            files = {"file": (file.filename or "upload", content, mime)}
+
+        headers = {"Authorization": auth} if auth else {}
+        async with httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=5.0)) as client:
+            res = await client.post(
+                media_url.rstrip("/") + "/chat/analyze-media",
+                headers=headers,
+                data=form_data,
+                files=files,
+            )
+        if not res.ok:
+            raise HTTPException(status_code=res.status_code, detail=res.text)
+        return res.json()
     
     # Check if message contains YouTube URL
     youtube_pattern = r'(https?://)?(www\.)?(youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]{11})'
@@ -927,6 +1155,28 @@ async def analyze_media(
     # Check if message contains web URL
     url_pattern = r'https?://[^\s]+'
     url_match = re.search(url_pattern, message) if message else None
+
+    # Optional microservice split: delegate URL-based analysis to knowledge-service.
+    knowledge_url = (settings.KNOWLEDGE_SERVICE_URL or os.environ.get("KNOWLEDGE_SERVICE_URL") or "").strip()
+    if knowledge_url and (youtube_match or (url_match and not youtube_match)):
+        auth = (request.headers.get("Authorization") or "").strip()
+        data = {
+            "message": message or "",
+            "conversation_id": conversation_id or "",
+            "agent_id": agent_id or "",
+            "entry_mode": entry_mode or "",
+            "persona": persona or "",
+            "character_name": character_name or "",
+            "gender": gender or "",
+        }
+        endpoint = "/chat/analyze-youtube" if youtube_match else "/chat/analyze-web"
+        data["url"] = youtube_match.group(0) if youtube_match else (url_match.group(0) if url_match else "")
+        headers = {"Authorization": auth} if auth else {}
+        async with httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=5.0)) as client:
+            res = await client.post(knowledge_url.rstrip("/") + endpoint, headers=headers, data=data)
+        if not res.ok:
+            raise HTTPException(status_code=res.status_code, detail=res.text)
+        return res.json()
     
     # If YouTube URL detected
     if youtube_match:
@@ -945,6 +1195,12 @@ async def analyze_media(
             agent_id, entry_mode, persona, character_name, gender,
             current_user_id, db
         )
+
+    if file is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Provide either a media file upload or a YouTube/Web URL in message",
+        )
     
     # Validate file type for images/videos
     allowed_image_extensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
@@ -961,7 +1217,7 @@ async def analyze_media(
             detail=f"Unsupported file type. Allowed: {', '.join(allowed_extensions)}"
         )
     
-    # Read and encode image/video
+    # Read media bytes
     content = await file.read()
     logger.info(f"File size: {len(content)} bytes")
     
@@ -973,9 +1229,7 @@ async def analyze_media(
         max_mb = 50 if is_video else 20
         logger.error(f"File too large: {len(content)} bytes > {max_size} bytes")
         raise HTTPException(status_code=400, detail=f"File too large. Max size: {max_mb}MB")
-    
-    base64_content = base64.b64encode(content).decode('utf-8')
-    
+
     # Determine MIME type
     mime_type = "image/jpeg"
     if file_ext in [".png"]:
@@ -992,8 +1246,23 @@ async def analyze_media(
         mime_type = "video/x-msvideo"
     elif file_ext in [".webm"]:
         mime_type = "video/webm"
-    
+
     logger.info(f"MIME type: {mime_type}")
+
+    stored_media_url: str | None = None
+    s3_uri_line = ""
+    s3_upload = await upload_bytes_to_media_bucket(
+        user_id=current_user_id,
+        kind="upload",
+        body=content,
+        content_type=mime_type,
+        filename_suffix=file_ext,
+    )
+    if s3_upload:
+        uri, presigned = s3_upload
+        s3_uri_line = f"\n{uri}"
+        stored_media_url = presigned
+        logger.info(f"[S3] Uploaded user media → {uri}")
 
     # Build session/persona context
     user_uuid = UUID(current_user_id)
@@ -1007,7 +1276,7 @@ async def analyze_media(
     aid = _session_agent_id(session)
     vision_prompt = message or ("Bạn thấy gì trong video này?" if is_video else "Bạn thấy gì trong ảnh này?")
 
-    # Get vision analysis - Gemini 1.5 Pro (primary) → GPT-4o (fallback)
+    # Get vision analysis - GPT-4o (primary) → Gemini 1.5 Pro (fallback)
     gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
     openai_key = os.environ.get("OPENAI_API_KEY", "").strip()
 
@@ -1036,53 +1305,88 @@ SUBJECT_TAG: <tên nhân vật + nguồn ngắn gọn nếu nhận diện, ví d
 
     raw_vision = ""
 
-    # --- Primary: Gemini 1.5 Pro Vision ---
-    if gemini_key:
+    # --- Primary: GPT-4o ---
+    if openai_key:
         try:
-            logger.info("[VISION] Attempting Gemini 1.5 Pro...")
+            logger.info("[VISION] Attempting GPT-4o primary...")
+            from openai import OpenAI
+            oai = OpenAI(api_key=openai_key)
+            user_content: list[dict[str, Any]] = [{"type": "text", "text": vision_prompt}]
+            if is_video:
+                # Summarize the whole video by sampling multiple frames.
+                frame_urls = _extract_video_keyframes_as_data_urls(content, mime_type, max_frames=6)
+                for frame_url in frame_urls:
+                    user_content.append(
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": frame_url, "detail": "low"},
+                        }
+                    )
+                user_content.append(
+                    {
+                        "type": "text",
+                        "text": (
+                            "Các ảnh trên là khung hình theo timeline video. "
+                            "Hãy suy luận diễn biến chính, hành động, bối cảnh, và nội dung nổi bật."
+                        ),
+                    }
+                )
+            else:
+                base64_content = base64.b64encode(content).decode('utf-8')
+                user_content.append(
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:{mime_type};base64,{base64_content}",
+                            "detail": "high",
+                        },
+                    }
+                )
+            response = oai.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": vision_system},
+                    {"role": "user", "content": user_content},
+                ],
+                max_tokens=900,
+                temperature=0.7,
+            )
+            raw_vision = response.choices[0].message.content or ""
+            logger.info("[VISION] ✅ GPT-4o SUCCESS")
+        except Exception as e:
+            logger.error(f"[VISION] GPT-4o failed: {e}, falling back to Gemini")
+
+    # --- Fallback: Gemini 1.5 Pro Vision ---
+    if not raw_vision and gemini_key:
+        try:
+            logger.info("[VISION] Attempting Gemini 1.5 Pro fallback...")
             import google.generativeai as genai
             genai.configure(api_key=gemini_key)
             model = genai.GenerativeModel(
                 model_name="gemini-1.5-pro",
                 system_instruction=vision_system,
             )
-            import PIL.Image
-            from io import BytesIO
-            img = PIL.Image.open(BytesIO(content))
-            response = model.generate_content(
-                [vision_prompt, img],
-                generation_config={"max_output_tokens": 900, "temperature": 0.7},
-            )
-            raw_vision = response.text or ""
-            logger.info(f"[VISION] ✅ Gemini SUCCESS: {raw_vision[:80]}")
-        except ImportError:
-            logger.warning("[VISION] google-generativeai not installed, falling back to GPT-4o")
-        except Exception as e:
-            logger.error(f"[VISION] Gemini failed: {e}, falling back to GPT-4o")
+            if is_video:
+                # Use native media bytes for video instead of forcing PIL image parsing.
+                response = model.generate_content(
+                    [vision_prompt, {"mime_type": mime_type, "data": content}],
+                    generation_config={"max_output_tokens": 900, "temperature": 0.7},
+                )
+            else:
+                import PIL.Image
+                from io import BytesIO
 
-    # --- Fallback: GPT-4o ---
-    if not raw_vision and openai_key:
-        try:
-            logger.info("[VISION] Attempting GPT-4o fallback...")
-            from openai import OpenAI
-            oai = OpenAI(api_key=openai_key)
-            response = oai.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": vision_system},
-                    {"role": "user", "content": [
-                        {"type": "text", "text": vision_prompt},
-                        {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{base64_content}", "detail": "high"}},
-                    ]},
-                ],
-                max_tokens=900,
-                temperature=0.7,
-            )
-            raw_vision = response.choices[0].message.content or ""
-            logger.info(f"[VISION] ✅ GPT-4o fallback SUCCESS")
+                img = PIL.Image.open(BytesIO(content))
+                response = model.generate_content(
+                    [vision_prompt, img],
+                    generation_config={"max_output_tokens": 900, "temperature": 0.7},
+                )
+            raw_vision = response.text or ""
+            logger.info(f"[VISION] ✅ Gemini fallback SUCCESS: {raw_vision[:80]}")
+        except ImportError:
+            logger.warning("[VISION] google-generativeai not installed")
         except Exception as e:
-            logger.error(f"[VISION] GPT-4o fallback failed: {e}")
-            raise HTTPException(status_code=500, detail=f"Vision analysis failed: {str(e)}")
+            logger.error(f"[VISION] Gemini fallback failed: {e}")
 
     if not raw_vision:
         raise HTTPException(status_code=500, detail="Vision analysis failed: no response from any provider")
@@ -1160,7 +1464,11 @@ SUBJECT_TAG: <tên nhân vật + nguồn ngắn gọn nếu nhận diện, ví d
     if subject_tag:
         media_label += f" — chủ thể: {subject_tag}"
     media_label += "]"
-    user_msg_content = f"{media_label}\n{message}" if message else media_label
+    user_msg_content = (
+        f"{media_label}{s3_uri_line}\n{message}"
+        if message
+        else f"{media_label}{s3_uri_line}"
+    )
     user_msg = Message(conversation_id=conversation.id, role="user", content=user_msg_content)
     db.add(user_msg)
     await db.commit()
@@ -1207,6 +1515,7 @@ SUBJECT_TAG: <tên nhân vật + nguồn ngắn gọn nếu nhận diện, ví d
         relationship_level=rel_ex.get("relationship_level"),
         relationship_level_up=bool(rel_ex.get("relationship_level_up")),
         new_relationship_level=rel_ex.get("new_relationship_level"),
+        stored_media_url=stored_media_url,
     )
 
 
@@ -1283,19 +1592,21 @@ Transcript (đoạn đầu):
 
 Câu hỏi: {user_question}"""
         
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {
-                    "role": "system",
-                    "content": f"""Bạn là {aid}, một cô gái anime thân thiện. Xưng "mình", gọi đối phương "bạn".
+        messages = [
+            {
+                "role": "system",
+                "content": f"""Bạn là {aid}, một cô gái anime thân thiện. Xưng "mình", gọi đối phương "bạn".
 Phân tích video YouTube và trả lời bằng tiếng Việt, giọng tự nhiên như chat với bạn.
 Không dùng bullet points, không giọng trợ lý AI."""
-                },
-                {"role": "user", "content": analysis_prompt}
-            ],
+            },
+            {"role": "user", "content": analysis_prompt}
+        ]
+        response = await asyncio.to_thread(
+            client.chat.completions.create,
+            model="gpt-4o-mini",
+            messages=messages,
             max_tokens=600,
-            temperature=0.7
+            temperature=0.7,
         )
         
         analysis_reply = response.choices[0].message.content or ""
@@ -1353,6 +1664,8 @@ Không dùng bullet points, không giọng trợ lý AI."""
     except ImportError as e:
         logger.error(f"Missing package: {e}")
         raise HTTPException(status_code=500, detail="youtube-transcript-api package required")
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"YouTube analysis failed: {e}")
         raise HTTPException(status_code=500, detail=f"YouTube analysis failed: {str(e)}")
@@ -1377,26 +1690,7 @@ async def _analyze_web_url(
         import httpx
         from bs4 import BeautifulSoup
         
-        # SSRF protection: block private/internal IPs
-        import ipaddress
-        import urllib.parse
-        try:
-            parsed = urllib.parse.urlparse(web_url)
-            hostname = parsed.hostname or ""
-            # Block private IP ranges
-            try:
-                ip = ipaddress.ip_address(hostname)
-                if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
-                    raise HTTPException(status_code=400, detail="URL not allowed")
-            except ValueError:
-                pass  # hostname is a domain, not IP - OK
-            # Block localhost variants
-            if hostname.lower() in ("localhost", "127.0.0.1", "::1", "0.0.0.0"):
-                raise HTTPException(status_code=400, detail="URL not allowed")
-        except HTTPException:
-            raise
-        except Exception:
-            raise HTTPException(status_code=400, detail="Invalid URL")
+        await _validate_public_web_url(web_url)
 
         # Fetch web content
         async with httpx.AsyncClient(follow_redirects=False, timeout=10.0) as client:
@@ -1448,19 +1742,21 @@ Nội dung (đoạn đầu):
 
 Câu hỏi: {user_question}"""
         
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {
-                    "role": "system",
-                    "content": f"""Bạn là {aid}, một cô gái anime thân thiện. Xưng "mình", gọi đối phương "bạn".
+        messages = [
+            {
+                "role": "system",
+                "content": f"""Bạn là {aid}, một cô gái anime thân thiện. Xưng "mình", gọi đối phương "bạn".
 Phân tích nội dung web và trả lời bằng tiếng Việt, giọng tự nhiên như chat với bạn.
 Không dùng bullet points, không giọng trợ lý AI."""
-                },
-                {"role": "user", "content": analysis_prompt}
-            ],
+            },
+            {"role": "user", "content": analysis_prompt}
+        ]
+        response = await asyncio.to_thread(
+            client.chat.completions.create,
+            model="gpt-4o-mini",
+            messages=messages,
             max_tokens=600,
-            temperature=0.7
+            temperature=0.7,
         )
         
         analysis_reply = response.choices[0].message.content or ""
@@ -1518,6 +1814,8 @@ Không dùng bullet points, không giọng trợ lý AI."""
     except ImportError as e:
         logger.error(f"Missing package: {e}")
         raise HTTPException(status_code=500, detail="beautifulsoup4 and httpx packages required")
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Web scraping failed: {e}")
         raise HTTPException(status_code=500, detail=f"Web scraping failed: {str(e)}")
@@ -1541,6 +1839,7 @@ class ImagineResponse(BaseModel):
 
 @router.post("/imagine", response_model=ImagineResponse)
 async def imagine(
+    request: Request,
     payload: ImagineRequest,
     current_user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
@@ -1549,6 +1848,20 @@ async def imagine(
     Text-to-image via Replicate (FLUX Kontext Pro by default).
     Saves user prompt + assistant image-message into the conversation history.
     """
+    media_url = (settings.MEDIA_SERVICE_URL or os.environ.get("MEDIA_SERVICE_URL") or "").strip()
+    if media_url:
+        auth = (request.headers.get("Authorization") or "").strip()
+        headers = {"Authorization": auth} if auth else {}
+        async with httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=5.0)) as client:
+            res = await client.post(
+                media_url.rstrip("/") + "/chat/imagine",
+                headers=headers,
+                json=payload.model_dump(),
+            )
+        if not res.ok:
+            raise HTTPException(status_code=res.status_code, detail=res.text)
+        return res.json()
+
     prompt = (payload.prompt or "").strip()
     if not prompt:
         raise HTTPException(status_code=400, detail="prompt is required")
@@ -1597,6 +1910,13 @@ async def imagine(
     if not image_url or not image_url.startswith("http"):
         raise HTTPException(status_code=502, detail="Replicate returned no image URL")
 
+    outbound_image_url = image_url
+    stored_s3_uri = ""
+    s3_gen = await fetch_and_store_generated_image(user_id=current_user_id, source_url=image_url)
+    if s3_gen:
+        stored_s3_uri, outbound_image_url = s3_gen
+        logger.info(f"[S3] Stored generated image → {stored_s3_uri}")
+
     # Persist into conversation history (user prompt + assistant image bubble).
     user_uuid = UUID(current_user_id)
     conversation = await _get_or_create_conversation(
@@ -1610,7 +1930,7 @@ async def imagine(
     db.add(user_msg)
     await db.commit()
 
-    bot_content = f"[Đã tạo ảnh từ prompt: {prompt}]\n{image_url}"
+    bot_content = f"[Đã tạo ảnh từ prompt: {prompt}]\n{stored_s3_uri or image_url}"
     bot_msg = Message(
         conversation_id=conversation.id,
         role="assistant",
@@ -1626,6 +1946,6 @@ async def imagine(
 
     return ImagineResponse(
         conversation_id=str(conversation.id),
-        image_url=image_url,
+        image_url=outbound_image_url,
         prompt=prompt,
     )

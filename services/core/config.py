@@ -39,6 +39,21 @@ class Settings(BaseSettings):
     # Optional: Chroma HTTP API (retrieval / future RAG). Compose: http://chromadb:8000
     CHROMA_SERVER_URL: str | None = None
 
+    # Optional: external agent-service endpoint (microservice mode)
+    AGENT_SERVICE_URL: str | None = None
+
+    # Optional: media-service endpoint (microservice mode)
+    MEDIA_SERVICE_URL: str | None = None
+
+    # Optional: knowledge-service endpoint (youtube/web analysis)
+    KNOWLEDGE_SERVICE_URL: str | None = None
+
+    # Optional: S3 for user media uploads + generated images (boto3 uses AWS_ACCESS_KEY_ID etc.)
+    S3_MEDIA_BUCKET: str | None = None
+    S3_MEDIA_PREFIX: str = "virfriendo"
+    S3_GET_PRESIGNED_SECONDS: int = 604800  # 7 days
+    AWS_REGION: str | None = None
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     def cors_origin_list(self) -> list[str]:

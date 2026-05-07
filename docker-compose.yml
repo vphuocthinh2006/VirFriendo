@@ -3,7 +3,7 @@ name: virfriendo
 services:
   database:
     image: postgres:16-alpine
-    container_name: anime_db
+    container_name: virfriendo_db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -21,7 +21,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: anime_redis
+    container_name: virfriendo_redis
     ports:
       - "6379:6379"
     volumes:
@@ -35,7 +35,7 @@ services:
 
   chromadb:
     image: chromadb/chroma:latest
-    container_name: anime_chroma
+    container_name: virfriendo_chroma
     ports:
       - "8003:8000"
     volumes:
@@ -52,6 +52,11 @@ services:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
       REDIS_URL: redis://redis:6379/0
       CHROMA_SERVER_URL: http://chromadb:8000
+      AGENT_SERVICE_URL: http://agent:8010
+      MEDIA_SERVICE_URL: http://media:8020
+      KNOWLEDGE_SERVICE_URL: http://knowledge:8041
+      RETRIEVAL_PROXY_ENABLED: "true"
+      RETRIEVAL_SERVICE_URL: http://retrieval:8031
     depends_on:
       database:
         condition: service_healthy
@@ -59,6 +64,10 @@ services:
         condition: service_healthy
       chromadb:
         condition: service_started
+      agent:
+        condition: service_healthy
+      knowledge:
+        condition: service_healthy
     healthcheck:
       test:
         [
@@ -69,6 +78,115 @@ services:
       timeout: 8s
       retries: 5
       start_period: 90s
+
+  agent:
+    build: .
+    container_name: virfriendo_agent
+    command: ["uvicorn", "services.agent_api.main:app", "--host", "0.0.0.0", "--port", "8010"]
+    env_file:
+      - .env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      RETRIEVAL_PROXY_ENABLED: "true"
+      RETRIEVAL_SERVICE_URL: http://retrieval:8031
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8010/health', timeout=5)\"",
+        ]
+      interval: 15s
+      timeout: 8s
+      retries: 5
+      start_period: 45s
+
+  media:
+    build: .
+    container_name: virfriendo_media
+    command: ["uvicorn", "services.media_api.main:app", "--host", "0.0.0.0", "--port", "8020"]
+    env_file:
+      - .env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      CHROMA_SERVER_URL: http://chromadb:8000
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      MEDIA_SERVICE_URL: ""
+      KNOWLEDGE_SERVICE_URL: http://knowledge:8041
+      RETRIEVAL_PROXY_ENABLED: "true"
+      RETRIEVAL_SERVICE_URL: http://retrieval:8031
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      knowledge:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8020/health', timeout=5)\"",
+        ]
+      interval: 15s
+      timeout: 8s
+      retries: 5
+      start_period: 45s
+
+  retrieval:
+    build: .
+    container_name: virfriendo_retrieval
+    command: ["uvicorn", "services.retrieval_api.main:app", "--host", "0.0.0.0", "--port", "8031"]
+    env_file:
+      - .env
+    environment:
+      RETRIEVAL_PROXY_ENABLED: "false"
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8031/health', timeout=5)\"",
+        ]
+      interval: 15s
+      timeout: 8s
+      retries: 5
+      start_period: 45s
+
+  knowledge:
+    build: .
+    container_name: virfriendo_knowledge
+    command: ["uvicorn", "services.knowledge_api.main:app", "--host", "0.0.0.0", "--port", "8041"]
+    env_file:
+      - .env
+    environment:
+      KNOWLEDGE_SERVICE_URL: ""
+      RETRIEVAL_PROXY_ENABLED: "true"
+      RETRIEVAL_SERVICE_URL: http://retrieval:8031
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379/0
+      CHROMA_SERVER_URL: http://chromadb:8000
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      retrieval:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8041/health', timeout=5)\"",
+        ]
+      interval: 15s
+      timeout: 8s
+      retries: 5
+      start_period: 45s
 
   web:
     build:

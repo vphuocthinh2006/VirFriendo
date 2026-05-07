@@ -98,3 +98,10 @@ ml/*.jsonl
 
 # Claude Code workspace
 .claude/
+
+# Temporary hidden docs/slides (do not publish yet)
+docs/06-slide-architecture-aws-metrics.md
+docs/slide-render/
+docs/pally-system-design.drawio
+docs/pally-system-design.excalidraw
+docs/system-design.xml
