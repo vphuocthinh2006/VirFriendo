@@ -226,3 +226,33 @@ jobs:
             --cluster "${{ steps.cfg.outputs.cluster }}" \
             --services "${{ steps.cfg.outputs.service }}"
           exit 1
+
+      - name: Notify deploy success
+        if: success()
+        shell: bash
+        run: |
+          aws sns publish \
+            --topic-arn "arn:aws:sns:ap-southeast-1:292773837061:pally-alerts" \
+            --subject "[Pally] Deploy SUCCESS - ${{ github.sha }}" \
+            --message "✅ Deploy completed successfully.
+
+Commit: ${{ github.sha }}
+Branch: ${{ github.ref_name }}
+Actor: ${{ github.actor }}
+Task: ${{ steps.register.outputs.task_definition }}
+Health: OK (${{ steps.cfg.outputs.health_url }})"
+
+      - name: Notify deploy failure
+        if: failure()
+        shell: bash
+        run: |
+          aws sns publish \
+            --topic-arn "arn:aws:sns:ap-southeast-1:292773837061:pally-alerts" \
+            --subject "[Pally] Deploy FAILED - ${{ github.sha }}" \
+            --message "❌ Deploy failed and rolled back.
+
+Commit: ${{ github.sha }}
+Branch: ${{ github.ref_name }}
+Actor: ${{ github.actor }}
+Rolled back to: ${{ steps.previous.outputs.current_task_definition }}
+Check logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
