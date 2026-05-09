@@ -58,13 +58,13 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(253, 203, 70, 0.4), rgba(253, 203, 70, 0.6));
+  background: #fff9e6, rgba(253, 203, 70, 0.6));
   border-radius: 4px;
   border: 1px solid rgba(255, 249, 230, 0.9);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(253, 203, 70, 0.6), rgba(253, 203, 70, 0.8));
+  background: #fff9e6, rgba(253, 203, 70, 0.8));
 }
 
 body {
@@ -127,7 +127,7 @@ body {
   padding: clamp(1.75rem, 4vw, 2.35rem) clamp(1.35rem, 4vw, 2rem) clamp(2rem, 4vw, 2.5rem);
   border-radius: 3px;
   border: 1px solid rgba(255, 255, 255, 0.38);
-  background: linear-gradient(165deg, rgba(255, 249, 230, 0.98) 0%, rgba(255, 248, 236, 0.99) 100%);
+  background: #fff9e6 0%, rgba(255, 248, 236, 0.99) 100%);
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.275),
     inset 0 1px 0 rgba(0, 0, 0, 0.08),
@@ -245,7 +245,7 @@ body {
 .aid-auth-or__line {
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  background: #fff9e6, transparent);
 }
 
 .aid-auth-or__text {
@@ -456,7 +456,7 @@ body {
   padding: clamp(1rem, 4vw, 1.65rem) clamp(1.1rem, 4vw, 1.85rem);
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.35);
-  background: linear-gradient(168deg, #0A0A0A, #000000);
+  background: #fff9e6;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.275) inset,
     0 0 32px rgba(0, 0, 0, 0.04),
@@ -503,7 +503,7 @@ body {
   height: 100%;
   width: 0;
   border-radius: inherit;
-  background: linear-gradient(90deg, #FFFFFF, #666666, #000000, #666666, #FFFFFF);
+  background: #fff9e6;
   background-size: 180% 100%;
   animation: vf-connect-progress-fill var(--vf-connect-load-ms, 3.6s) cubic-bezier(0.18, 0.82, 0.22, 1) forwards;
 }
@@ -588,7 +588,7 @@ body {
   max-width: 28rem;
   border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
-  background: linear-gradient(180deg, #ffffff, #fff9e6);
+  background: #fff9e6;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.275);
   padding: 1.25rem;
 }
@@ -597,7 +597,7 @@ body {
   width: min(92vw, 960px);
   border-radius: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  background: linear-gradient(180deg, #ffffff, #fff9e6);
+  background: #fff9e6;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.275);
   padding: clamp(1.25rem, 3vw, 2.2rem);
 }
@@ -620,14 +620,14 @@ body {
 .vf-btn-primary {
   border-radius: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.88);
-  background: linear-gradient(180deg, #0A0A0A, #000000);
+  background: #fff9e6;
   color: #2d2d2d;
   padding: 0.65rem 0.8rem;
   font-weight: 600;
 }
 
 .vf-btn-primary:hover {
-  background: linear-gradient(180deg, #fdcb46, #f5c030);
+  background: #fff9e6;
 }
 
 .vf-btn-ghost {
@@ -737,9 +737,7 @@ body {
 .vf-landing-hero-art {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.12), transparent 45%),
-    #000000;
+  background: #fff9e6;
   filter: none;
 }
 
@@ -747,7 +745,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.65), transparent 42%);
+  background: #fff9e6, transparent 42%);
 }
 
 .vf-landing-overlay-card {
@@ -757,7 +755,7 @@ body {
   margin: 2.6rem 0 0 1.4rem;
   border-radius: 1.05rem;
   border: 1px solid rgba(253, 203, 70, 0.3);
-  background: linear-gradient(180deg, #ffffff, #fff9e6);
+  background: #fff9e6;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.275);
   padding: 1.15rem 1rem;
 }
@@ -861,8 +859,7 @@ body {
   min-height: 64px;
   padding: max(0px, env(safe-area-inset-top, 0)) max(20px, env(safe-area-inset-right, 0)) 0
     max(20px, env(safe-area-inset-left, 0));
-  background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.97) 0%, rgba(255, 248, 236, 0.99) 100%);
+  background: #fff9e6;
   border-bottom: 1px solid rgba(255, 255, 255, 0.28);
   box-shadow:
     inset 0 -1px 0 rgba(0, 0, 0, 0.225),
@@ -881,10 +878,7 @@ body {
   right: 0;
   bottom: 0;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.35) 20%,
+  background: #fff9e6 20%,
     rgba(255, 255, 255, 0.55) 50%,
     rgba(255, 255, 255, 0.35) 80%,
     transparent 100%
@@ -1165,7 +1159,7 @@ body {
   text-transform: uppercase;
   text-decoration: none;
   color: #2d2d2d;
-  background: linear-gradient(180deg, #fdcb46 0%, #f5c030 100%);
+  background: #fff9e6;
   border: 2px solid rgba(0, 0, 0, 0.95);
   border-radius: 4px;
   box-shadow:
@@ -1235,7 +1229,7 @@ body {
   padding: 0.35rem;
   border-radius: 6px;
   border: 1px solid rgba(255, 255, 255, 0.28);
-  background: linear-gradient(165deg, rgba(255, 249, 230, 0.98) 0%, rgba(255, 248, 236, 0.99) 100%);
+  background: #fff9e6 0%, rgba(255, 248, 236, 0.99) 100%);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.275);
 }
 
@@ -1328,11 +1322,7 @@ body {
 .aid-hero-bg {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(ellipse 100% 72% at 50% -12%, rgba(253, 203, 70, 0.3), transparent 58%),
-    radial-gradient(ellipse 58% 48% at 12% 88%, rgba(0, 0, 0, 0.42), transparent 54%),
-    radial-gradient(ellipse 58% 48% at 88% 85%, rgba(0, 0, 0, 0.06), transparent 54%),
-    linear-gradient(180deg, #000000 0%, #000000 42%, #0A0A0A 100%);
+  background: #fff9e6;
   transform: scale(1.04);
   /* animation removed — constant scale+translate repaint */
 }
@@ -1353,9 +1343,7 @@ body {
 .aid-hero-aurora {
   position: absolute;
   inset: -20%;
-  background:
-    radial-gradient(ellipse 58% 46% at 22% 32%, rgba(255, 255, 255, 0.1), transparent 56%),
-    radial-gradient(ellipse 52% 42% at 78% 58%, rgba(153, 153, 153, 0.08), transparent 52%);
+  background: #fff9e6;
   opacity: 0.55;
   /* mix-blend-mode removed — GPU thrashing */
   pointer-events: none;
@@ -1365,12 +1353,12 @@ body {
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(1.5px 1.5px at 12% 18%, rgba(0, 0, 0, 0.08), transparent),
-    radial-gradient(1px 1px at 55% 42%, rgba(255, 255, 255, 1.0), transparent),
-    radial-gradient(1px 1px at 78% 22%, rgba(0, 0, 0, 0.38), transparent),
-    radial-gradient(1.5px 1.5px at 30% 68%, rgba(255, 255, 255, 1.0), transparent),
-    radial-gradient(1px 1px at 88% 76%, rgba(255, 248, 220, 0.4), transparent),
-    radial-gradient(1px 1px at 42% 12%, rgba(0, 0, 0, 0.22), transparent);
+    #fff9e6, transparent),
+    #fff9e6, transparent),
+    #fff9e6, transparent),
+    #fff9e6, transparent),
+    #fff9e6, transparent),
+    #fff9e6, transparent);
   background-size: 100% 100%;
   opacity: 0.52;
   /* animation removed — constant repaint */
@@ -1389,9 +1377,7 @@ body {
 .aid-hero-vignette {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.125), rgba(0, 0, 0, 0.225)),
-    radial-gradient(circle at 50% 58%, transparent 35%, rgba(0, 0, 0, 0.24) 100%);
+  background: #fff9e6;
   pointer-events: none;
 }
 
@@ -1435,10 +1421,7 @@ body {
   width: min(200px, 42vw);
   height: 4px;
   border-radius: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.35) 15%,
+  background: #fff9e6 15%,
     rgba(0, 0, 0, 0.65) 50%,
     rgba(255, 255, 255, 0.35) 85%,
     transparent
@@ -1657,10 +1640,7 @@ body {
   inset: -40% -30%;
   z-index: 1;
   pointer-events: none;
-  background: linear-gradient(
-    105deg,
-    transparent 0%,
-    rgba(255, 255, 255, 1.0) 45%,
+  background: #fff9e6 45%,
     transparent 70%
   );
   transform: translateX(-120%) skewX(-12deg);
@@ -1690,7 +1670,7 @@ body {
 }
 
 .aid-cta-secondary {
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(255, 249, 230, 0.98) 100%);
+  background: #fff9e6 0%, rgba(255, 249, 230, 0.98) 100%);
   color: var(--aid-gold-bright);
   border: 2px solid var(--aid-gold-deep);
   box-shadow:
@@ -1706,7 +1686,7 @@ body {
 
 .aid-cta-secondary:hover {
   transform: translateY(-2px);
-  background: linear-gradient(180deg, rgba(255, 249, 230, 0.98) 0%, rgba(255, 249, 230, 0.99) 100%);
+  background: #fff9e6 0%, rgba(255, 249, 230, 0.99) 100%);
   border-color: var(--aid-gold-bright);
   color: #2d2d2d;
   box-shadow:
@@ -1715,7 +1695,7 @@ body {
 }
 
 .aid-cta-google {
-  background: linear-gradient(180deg, #fdcb46 0%, #f5c030 100%);
+  background: #fff9e6;
   color: #2d2d2d;
   border: 2px solid rgba(253, 203, 70, 0.3);
   box-shadow:
@@ -1729,7 +1709,7 @@ body {
 
 .aid-cta-google:hover {
   transform: translateY(-2px);
-  background: linear-gradient(180deg, #ffffff 0%, #fff9e6 100%);
+  background: #fff9e6;
   box-shadow:
     2px 5px 0 rgba(0, 0, 0, 0.09),
     0 14px 40px rgba(255, 255, 255, 0.12);
@@ -1830,9 +1810,7 @@ body {
   height: 1.2rem;
   margin: 0 auto;
   flex-shrink: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.85) 0%,
+  background: #fff9e6 0%,
     rgba(255, 255, 255, 0.15) 100%
   );
   border-radius: 1px;
@@ -1861,12 +1839,10 @@ body {
 /* What to do — parchment / BG3 black–gold, scroll-driven stagger in/out */
 .aid-what {
   --aid-parchment-font: "Pixelify Sans", "Courier New", monospace;
-  --aid-parchment-bg: linear-gradient(165deg, #0A0A0A 0%, #0A0A0A 48%, #0A0A0A 100%);
+  --aid-parchment-bg: #fff9e6;
   position: relative;
   padding: clamp(2.75rem, 7vw, 5rem) clamp(1rem, 4vw, 2.5rem) 4rem;
-  background:
-    radial-gradient(ellipse 80% 45% at 50% 0%, rgba(0, 0, 0, 0.04), transparent 55%),
-    linear-gradient(180deg, #000000 0%, #0A0A0A 100%);
+  background: #fff9e6;
   border-top: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.04);
 }
@@ -1907,7 +1883,7 @@ body {
   width: 4rem;
   height: 2px;
   margin: 0.9rem auto 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  background: #fff9e6, transparent);
   border-radius: 2px;
   box-shadow: 0 0 14px rgba(255, 255, 255, 0.35);
 }
@@ -1929,7 +1905,7 @@ body {
   padding: 1.4rem 1.35rem 1.45rem 1.35rem;
   border-radius: 16px;
   border: 2px solid #CCCCCC;
-  background: linear-gradient(165deg, #ffffff 0%, #fff9e6 55%, #fff9e6 100%);
+  background: #fff9e6;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     0 10px 28px rgba(255, 255, 255, 0.28),
@@ -2000,7 +1976,7 @@ body {
   display: grid;
   place-items: center;
   color: #2d2d2d;
-  background: linear-gradient(145deg, #ffffff 0%, #fff9e6 55%, #fff9e6 100%);
+  background: #fff9e6;
   border-radius: 50%;
   border: 2px solid rgba(0, 0, 0, 0.95);
   box-shadow:
@@ -2125,9 +2101,7 @@ body {
 /* Landing: CTA to /menu (full grid lives on /menu only) */
 .aid-landing-menu-cta {
   padding: clamp(2.5rem, 6vw, 4rem) clamp(1rem, 4vw, 2rem);
-  background:
-    radial-gradient(ellipse 65% 40% at 50% 0%, rgba(0, 0, 0, 0.04), transparent 55%),
-    linear-gradient(180deg, #000000 0%, #0A0A0A 100%);
+  background: #fff9e6;
   border-top: 1px solid rgba(253, 203, 70, 0.3);
 }
 
@@ -2204,9 +2178,7 @@ body {
   --aid-deployed-font: "Pixelify Sans", "Courier New", monospace;
   position: relative;
   padding: clamp(2.5rem, 6vw, 4.25rem) clamp(1rem, 4vw, 2rem) clamp(2.75rem, 6vw, 4rem);
-  background:
-    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(0, 0, 0, 0.04), transparent 55%),
-    linear-gradient(180deg, #0A0A0A 0%, #0A0A0A 100%);
+  background: #fff9e6;
   border-top: 1px solid rgba(253, 203, 70, 0.3);
   box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.04);
 }
@@ -2271,7 +2243,7 @@ body {
   flex-direction: column;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.26);
-  background: linear-gradient(165deg, #0A0A0A 0%, #0A0A0A 48%, #0A0A0A 100%);
+  background: #fff9e6;
   box-shadow:
     inset 0 1px 0 rgba(0, 0, 0, 0.04),
     0 14px 36px rgba(0, 0, 0, 0.25),
@@ -2561,7 +2533,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 
 /* Footer — left: Team TUQ + names; right: VirFriendo | Contact us */
 .aid-footer {
-  background: linear-gradient(180deg, rgba(255, 248, 236, 0.95) 0%, #0A0A0A 100%);
+  background: #fff9e6 0%, #0A0A0A 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.04);
   color: rgba(0, 0, 0, 0.92);
@@ -3209,7 +3181,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   position: relative;
   overflow: hidden;
   padding: 0.9rem 1rem 1.2rem;
-  background: radial-gradient(120% 90% at 50% 0%, #0A0A0A 0%, #0A0A0A 50%, #000000 100%);
+  background: #fff9e6;
 }
 
 .vf-ad-ambient {
@@ -3304,10 +3276,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 .vf-ad-hero-art {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at 72% 38%, rgba(0, 0, 0, 0.6), transparent 33%),
-    radial-gradient(circle at 46% 74%, rgba(153, 153, 153, 0.42), transparent 42%),
-    linear-gradient(180deg, rgba(220, 163, 92, 0.75), rgba(126, 82, 54, 0.68) 56%, rgba(0, 0, 0, 0.72));
+  background: #fff9e6;
   transform: scale(1.04);
   animation: vf-ad-hero-zoom 9s ease-in-out infinite;
 }
@@ -3321,7 +3290,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(9, 12, 17, 0.56), rgba(9, 12, 17, 0.08) 45%, rgba(9, 12, 17, 0.22));
+  background: #fff9e6, rgba(9, 12, 17, 0.08) 45%, rgba(9, 12, 17, 0.22));
 }
 
 .vf-ad-card {
@@ -3332,7 +3301,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   width: min(360px, calc(100% - 2.4rem));
   border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.52);
-  background: linear-gradient(180deg, rgba(24, 29, 37, 0.93), rgba(18, 22, 29, 0.95));
+  background: #fff9e6, rgba(18, 22, 29, 0.95));
   box-shadow: 0 20px 44px rgba(0, 0, 0, 0.175);
   padding: 1.1rem 1rem;
 }
@@ -3368,7 +3337,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
     margin: 1.25rem auto 0;
   }
   .vf-landing-hero::after {
-    background: linear-gradient(180deg, rgba(11, 13, 18, 0.42), rgba(11, 13, 18, 0.28));
+    background: #fff9e6, rgba(11, 13, 18, 0.28));
   }
 }
 
@@ -3405,13 +3374,11 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 .vn-stage-bg {
   /* cloud sky gradient */
-  background:
-    radial-gradient(ellipse 140% 90% at 50% 110%, #FFFFFF 0%, #0A0A0A 40%, #000000 100%);
+  background: #fff9e6;
   animation: vn-stage-bg 10s ease-in-out infinite;
 }
 .vn-stage-vignette {
-  background:
-    radial-gradient(ellipse 120% 80% at 50% 85%, transparent 45%, rgba(0, 0, 0, 0.175) 100%);
+  background: #fff9e6;
   pointer-events: none;
 }
 
@@ -3429,14 +3396,10 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   opacity: 0.22;
 }
 .vn-branches::before {
-  background:
-    linear-gradient(135deg, transparent 0%, rgba(59,130,95,0.2) 25%, transparent 55%) 0 0 / 220px 220px no-repeat,
-    linear-gradient(160deg, transparent 10%, rgba(255,148,148,0.24) 40%, transparent 80%) 100% 0 / 260px 260px no-repeat;
+  background: #fff9e6;
 }
 .vn-branches::after {
-  background:
-    radial-gradient(circle at 10% 90%, rgba(34,90,60,0.45) 0, transparent 55%),
-    radial-gradient(circle at 90% 20%, rgba(155,60,80,0.45) 0, transparent 55%);
+  background: #fff9e6;
 }
 
 @keyframes vn-portrait-glow {
@@ -3456,8 +3419,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .vn-dialogue-glass {
-  background:
-    linear-gradient(180deg, rgba(24,13,15,0.96) 0%, rgba(13,9,12,0.98) 100%);
+  background: #fff9e6;
   box-shadow:
     0 -4px 36px rgba(0, 0, 0, 0.225),
     inset 0 1px 0 rgba(255, 255, 255, 0.16),
@@ -3507,11 +3469,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background:
-    radial-gradient(ellipse 95% 65% at 50% -18%, rgba(255, 255, 255, 0.12), transparent 58%),
-    radial-gradient(ellipse 55% 48% at 0% 100%, rgba(0, 0, 0, 0.45), transparent 52%),
-    radial-gradient(ellipse 55% 48% at 100% 100%, rgba(0, 0, 0, 0.42), transparent 52%),
-    linear-gradient(180deg, var(--bg3-black-rich) 0%, var(--bg3-black) 55%, #0A0A0A 100%);
+  background: #fff9e6;
   color: var(--ad-text);
   font-family: var(--aid-font-serif);
 }
@@ -3610,9 +3568,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 .ad-agent-detail__hero-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(255, 248, 236, 0.92) 0%,
+  background: #fff9e6 0%,
     rgba(0, 0, 0, 0.55) 38%,
     transparent 68%
   );
@@ -3646,7 +3602,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   gap: 0.75rem 1rem;
   margin-top: 0;
   padding: 0.65rem 0.85rem;
-  background: linear-gradient(180deg, rgba(255, 249, 230, 0.98) 0%, rgba(255, 248, 236, 0.99) 100%);
+  background: #fff9e6 0%, rgba(255, 248, 236, 0.99) 100%);
   border: 1px solid rgba(253, 203, 70, 0.5);
   border-top: none;
   border-radius: 0 0 4px 4px;
@@ -3721,7 +3677,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   padding: 0.35rem 0;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.55);
-  background: linear-gradient(165deg, #0A0A0A 0%, #0A0A0A 100%);
+  background: #fff9e6;
   box-shadow:
     0 12px 32px rgba(0, 0, 0, 0.275),
     inset 0 0 0 1px rgba(0, 0, 0, 0.04);
@@ -3755,7 +3711,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   min-height: 2.65rem;
   border-radius: 3px;
   border: 2px solid var(--vf-gold-deep);
-  background: linear-gradient(180deg, #222222 0%, #111111 55%, #000000 100%);
+  background: #fff9e6;
   color: #2d2d2d;
   font-size: 0.72rem;
   font-weight: 800;
@@ -3896,7 +3852,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 .ad-agent-detail__prompt {
   padding: 0.85rem 1rem;
   border-radius: 4px;
-  background: linear-gradient(165deg, rgba(0, 0, 0, 0.55) 0%, rgba(255, 248, 236, 0.85) 100%);
+  background: #fff9e6 0%, rgba(255, 248, 236, 0.85) 100%);
   border: 1px solid rgba(253, 203, 70, 0.5);
   margin-bottom: 1.25rem;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
@@ -3926,7 +3882,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
   top: 72px;
   padding: 0.75rem 0.85rem;
   border-radius: 4px;
-  background: linear-gradient(165deg, rgba(0, 0, 0, 0.75) 0%, rgba(255, 248, 236, 0.95) 100%);
+  background: #fff9e6 0%, rgba(255, 248, 236, 0.95) 100%);
   border: 1px solid rgba(253, 203, 70, 0.5);
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.04),
@@ -4285,7 +4241,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 .ad-hero__banner-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(105deg, rgba(72, 73, 232, 0.08) 0%, transparent 60%);
+  background: #fff9e6 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -4492,7 +4448,7 @@ button.aid-ai-card__like-btn.is-liked .aid-ai-card__stat-icon {
 }
 
 .ad-menu-filters__pill--active {
-  background: linear-gradient(180deg, #fdcb46 0%, #f5c030 100%);
+  background: #fff9e6;
   color: #2d2d2d;
   border-color: rgba(0, 0, 0, 0.85);
   box-shadow:
@@ -4890,7 +4846,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   text-transform: uppercase;
   text-decoration: none;
   color: #2d2d2d;
-  background: linear-gradient(180deg, #fdcb46 0%, #f5c030 100%);
+  background: #fff9e6;
   border: 2px solid rgba(253, 203, 70, 0.3);
   border-radius: 4px;
   flex-shrink: 0;
@@ -4948,7 +4904,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   margin-top: auto;
   padding: 1.25rem 1rem 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.22);
-  background: linear-gradient(180deg, rgba(255, 248, 236, 0.98) 0%, #0A0A0A 100%);
+  background: #fff9e6 0%, #0A0A0A 100%);
 }
 
 .ad-page-footer__inner {
@@ -5045,9 +5001,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   --aid-gold: #FFFFFF;
   --aid-gold-bright: #FFFFFF;
   --aid-gold-deep: #FFFFFF;
-  background:
-    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(255, 255, 255, 0.12), transparent 55%),
-    linear-gradient(180deg, #0A0A0A 0%, #000000 45%, #0A0A0A 100%);
+  background: #fff9e6;
   color: var(--bg3-text);
 }
 
@@ -5103,7 +5057,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   padding: 1.1rem 1.25rem;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.28);
-  background: linear-gradient(165deg, rgba(0, 0, 0, 0.92) 0%, rgba(255, 248, 236, 0.96) 100%);
+  background: #fff9e6 0%, rgba(255, 248, 236, 0.96) 100%);
   box-shadow:
     inset 0 1px 0 rgba(0, 0, 0, 0.06),
     0 12px 36px rgba(0, 0, 0, 0.225);
@@ -5158,7 +5112,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   padding: 1.25rem 1.15rem 1.35rem;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.32);
-  background: linear-gradient(165deg, rgba(0, 0, 0, 0.97) 0%, rgba(255, 248, 236, 0.99) 100%);
+  background: #fff9e6 0%, rgba(255, 248, 236, 0.99) 100%);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.275);
 }
 
@@ -5418,7 +5372,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .chat-entry-btn-primary {
   border: 2px solid rgba(0, 0, 0, 0.95);
-  background: linear-gradient(180deg, #fdcb46 0%, #f5c030 100%);
+  background: #fff9e6;
   color: #2d2d2d;
   box-shadow:
     0 1px 0 rgba(0, 0, 0, 0.35) inset,
@@ -5635,7 +5589,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   padding: 0.65rem 1.5rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 249, 230, 0.95);
-  background: linear-gradient(180deg, #fdcb46 0%, #f5c030 100%);
+  background: #fff9e6;
   color: #2d2d2d;
   font-family: var(--bg3-font-display);
   font-size: 0.72rem;
@@ -5819,8 +5773,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   overflow: hidden;
   overflow-y: hidden;
   padding: 0.65rem 0.85rem 0.75rem;
-  mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
+  mask-image: #fff9e6;
+  -webkit-mask-image: #fff9e6;
 }
 
 .vf-chat-model-vtuber {
@@ -5911,7 +5865,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.45rem 0.55rem;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.88) 100%);
+  background: #fff9e6 0%, rgba(0, 0, 0, 0.88) 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   font-family: var(--aid-font-display);
   overflow-x: auto;
@@ -5958,7 +5912,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-chat-tab--active {
   color: #2d2d2d;
-  background: linear-gradient(180deg, #ffffff, #fff9e6);
+  background: #fff9e6;
 }
 
 .vf-chat-tab--ghost {
@@ -6002,9 +5956,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-bubble--user {
-  background: linear-gradient(
-    168deg,
-    rgba(0, 0, 0, 0.97) 0%,
+  background: #fff9e6 0%,
     rgba(255, 249, 230, 0.99) 55%,
     rgba(0, 0, 0, 0.96) 100%
   );
@@ -6082,7 +6034,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(155deg, rgba(255, 249, 230, 0.98), rgba(255, 249, 230, 0.99));
+  background: #fff9e6, rgba(255, 249, 230, 0.99));
   border: 1px solid rgba(255, 255, 255, 0.28);
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.2),
@@ -6664,9 +6616,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(255, 255, 255, 0.12), transparent 62%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.92) 0%, rgba(255, 248, 236, 0.96) 100%);
+  background: #fff9e6;
   backdrop-filter: blur(6px);
 }
 
@@ -6807,7 +6757,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   padding: 1rem 1rem 1.25rem;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.42);
-  background: linear-gradient(165deg, rgba(15, 15, 15, 0.98) 0%, rgba(255, 249, 230, 0.99) 100%);
+  background: #fff9e6 0%, rgba(255, 249, 230, 0.99) 100%);
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.275),
     0 0 32px rgba(0, 0, 0, 0.04),
@@ -6935,9 +6885,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-game-card__art--chess {
-  background:
-    radial-gradient(ellipse 80% 70% at 50% 40%, rgba(0, 0, 0, 0.55), transparent 55%),
-    linear-gradient(155deg, #0A0A0A 0%, #000000 100%);
+  background: #fff9e6;
 }
 
 .vf-game-card__art--chess::after {
@@ -6947,8 +6895,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-game-card__art--caro {
   background:
-    repeating-linear-gradient(0deg, #0A0A0A 0px, #0A0A0A 8px, #0A0A0A 8px, #0A0A0A 16px),
-    repeating-linear-gradient(90deg, #0A0A0A 0px, #0A0A0A 8px, #0A0A0A 8px, #0A0A0A 16px);
+    repeating-#fff9e6,
+    repeating-#fff9e6;
   background-blend-mode: normal;
 }
 
@@ -6959,8 +6907,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-game-card__art--tetris {
-  background:
-    linear-gradient(145deg, #a78bfa 0%, #6366f1 42%, #FFFFFF 100%);
+  background: #fff9e6;
 }
 
 .vf-game-card__art--tetris::after {
@@ -6969,8 +6916,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-game-card__art--snake {
-  background:
-    linear-gradient(180deg, #10b981 0%, #065f46 55%, #022c22 100%);
+  background: #fff9e6;
 }
 
 .vf-game-card__art--snake::after {
@@ -6979,7 +6925,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-game-card__art--story {
-  background: linear-gradient(160deg, #e1c7ec 0%, #fff9e6 100%);
+  background: #fff9e6;
 }
 
 .vf-game-card__art--story::after {
@@ -6989,9 +6935,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 /* Ringrealms (hub art id ringrealms) — ancient / bronze tile */
 .vf-game-card__art--ringrealms {
-  background:
-    radial-gradient(ellipse 85% 70% at 40% 25%, rgba(255, 255, 255, 0.22), transparent 55%),
-    linear-gradient(165deg, #0A0A0A 0%, #ffffff 55%, #000000 100%);
+  background: #fff9e6;
 }
 
 .vf-game-card__art--ringrealms::after {
@@ -7002,9 +6946,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 /* Back-compat hub art id */
 .vf-game-card__art--zeroad {
-  background:
-    radial-gradient(ellipse 85% 70% at 40% 25%, rgba(255, 255, 255, 0.22), transparent 55%),
-    linear-gradient(165deg, #0A0A0A 0%, #ffffff 55%, #000000 100%);
+  background: #fff9e6;
 }
 
 .vf-game-card__art--zeroad::after {
@@ -7053,7 +6995,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   font-size: clamp(1.55rem, 4.2vw, 2.05rem);
   font-weight: 700;
   letter-spacing: 0.04em;
-  background: linear-gradient(118deg, #fff9e6 0%, #ffffff 48%, #fff9e6 100%);
+  background: #fff9e6;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -7091,7 +7033,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-arcade__btn--primary {
   border: none;
-  background: linear-gradient(135deg, #ffffff 0%, #fff9e6 100%);
+  background: #fff9e6;
   color: #000000;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.175) inset;
 }
@@ -7108,7 +7050,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: absolute;
   inset: -12% -8% auto -8%;
   height: 55%;
-  background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(255, 255, 255, 0.14), transparent 62%);
+  background: #fff9e6;
   z-index: 0;
 }
 
@@ -7124,10 +7066,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: min(9rem, 55vw);
   height: 2px;
   margin-bottom: 0.65rem;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.15) 12%,
+  background: #fff9e6 12%,
     rgba(255, 255, 255, 0.85) 50%,
     rgba(255, 255, 255, 0.15) 88%,
     transparent
@@ -7180,7 +7119,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: relative;
   border-radius: 3px;
   border: 1px solid rgba(255, 255, 255, 0.38);
-  background: linear-gradient(165deg, rgba(0, 0, 0, 0.97) 0%, rgba(255, 249, 230, 0.99) 100%);
+  background: #fff9e6 0%, rgba(255, 249, 230, 0.99) 100%);
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.275),
     inset 0 1px 0 rgba(0, 0, 0, 0.06),
@@ -7194,11 +7133,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: repeating-linear-gradient(
-    -12deg,
-    transparent,
-    transparent 18px,
-    rgba(255, 255, 255, 0.025) 18px,
+  background-image: repeating-#fff9e6 18px,
     rgba(255, 255, 255, 0.025) 19px
   );
   pointer-events: none;
@@ -7290,7 +7225,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-caro-grid-pill--on {
   border-color: rgba(255, 255, 255, 0.65);
-  background: linear-gradient(180deg, rgba(253, 203, 70, 0.3) 0%, rgba(0, 0, 0, 0.35) 100%);
+  background: #fff9e6 0%, rgba(0, 0, 0, 0.35) 100%);
   color: var(--bg3-gold-bright, #FFFFFF);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.15),
@@ -7321,7 +7256,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-caro-stone--on {
   border-color: rgba(94, 205, 210, 0.45);
-  background: linear-gradient(180deg, rgba(40, 90, 95, 0.35) 0%, rgba(10, 25, 28, 0.55) 100%);
+  background: #fff9e6 0%, rgba(10, 25, 28, 0.55) 100%);
   box-shadow: 0 0 20px rgba(64, 180, 190, 0.12);
 }
 
@@ -7352,7 +7287,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #2d2d2d;
-  background: linear-gradient(180deg, #fdcb46 0%, #f5c030 48%, #e8b020 100%);
+  background: #fff9e6;
   box-shadow:
     inset 0 1px 0 rgba(0, 0, 0, 0.35),
     0 6px 22px rgba(0, 0, 0, 0.225);
@@ -7415,9 +7350,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   padding: 0.55rem;
   border-radius: 2px;
   border: 1px solid rgba(255, 255, 255, 0.22);
-  background:
-    linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(255, 248, 236, 0.98)),
-    repeating-linear-gradient(90deg, #0A0A0A 0px, #0A0A0A 7px, #0A0A0A 7px, #0A0A0A 14px);
+  background: #fff9e6;
   box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.275);
 }
 
@@ -7437,7 +7370,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   justify-content: center;
   border-radius: 2px;
   border: 1px solid rgba(0, 0, 0, 0.85);
-  background: linear-gradient(165deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.96) 100%);
+  background: #fff9e6 0%, rgba(0, 0, 0, 0.96) 100%);
   cursor: default;
   transition:
     background 0.15s ease,
@@ -7458,13 +7391,13 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 .vf-caro-cell--yours {
   border-color: rgba(94, 205, 210, 0.4);
-  background: linear-gradient(165deg, rgba(25, 55, 58, 0.55) 0%, rgba(10, 28, 30, 0.85) 100%);
+  background: #fff9e6 0%, rgba(10, 28, 30, 0.85) 100%);
   box-shadow: inset 0 0 10px rgba(64, 180, 190, 0.12);
 }
 
 .vf-caro-cell--foe {
   border-color: rgba(210, 165, 94, 0.4);
-  background: linear-gradient(165deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.88) 100%);
+  background: #fff9e6 0%, rgba(0, 0, 0, 0.88) 100%);
   box-shadow: inset 0 0 10px rgba(210, 165, 94, 0.1);
 }
 
@@ -7521,9 +7454,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   margin: 0 auto 1rem;
   border-radius: 2px;
   border: 1px dashed rgba(255, 255, 255, 0.28);
-  background:
-    linear-gradient(0deg, transparent 46%, rgba(255, 255, 255, 0.12) 47%, rgba(255, 255, 255, 0.12) 53%, transparent 54%),
-    linear-gradient(90deg, transparent 46%, rgba(255, 255, 255, 0.12) 47%, rgba(255, 255, 255, 0.12) 53%, transparent 54%);
+  background: #fff9e6;
   opacity: 0.85;
 }
 
@@ -7733,9 +7664,9 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   animation-iteration-count: infinite;
   animation-timing-function: linear;
 }
-.aid-petal-v0 { background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%); }
-.aid-petal-v1 { background: linear-gradient(135deg, #a6d17d 0%, #32CD32 100%); }
-.aid-petal-v2 { background: linear-gradient(135deg, #fdcb46 0%, #f5c030 100%); }
+.aid-petal-v0 { background: #fff9e6; }
+.aid-petal-v1 { background: #fff9e6; }
+.aid-petal-v2 { background: #fff9e6; }
 @keyframes aid-petal-fall {
   0%   { transform: translate3d(0, 0, 0) rotate(var(--rot, 0deg)); opacity: 0; }
   10%  { opacity: 0.95; }
@@ -7748,8 +7679,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: absolute;
   left: 0; right: 0; bottom: 0;
   height: 78px;
-  background:
-    linear-gradient(180deg, transparent 0%, rgba(166, 209, 125, 0.5) 30%, #a6d17d 60%, #145214 100%);
+  background: #fff9e6;
   border-top: 1px solid rgba(166, 209, 125, 0.6);
 }
 .aid-ground::before {
@@ -7758,18 +7688,18 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: absolute;
   top: 6px; left: 0; right: 0; height: 14px;
   background-image:
-    radial-gradient(circle at 4% 100%, #145214 1.5px, transparent 2px),
-    radial-gradient(circle at 11% 100%, #1a6b1a 1.5px, transparent 2px),
-    radial-gradient(circle at 19% 100%, #145214 1.5px, transparent 2px),
-    radial-gradient(circle at 27% 100%, #1a6b1a 1.5px, transparent 2px),
-    radial-gradient(circle at 35% 100%, #145214 1.5px, transparent 2px),
-    radial-gradient(circle at 43% 100%, #1a6b1a 1.5px, transparent 2px),
-    radial-gradient(circle at 56% 100%, #145214 1.5px, transparent 2px),
-    radial-gradient(circle at 64% 100%, #1a6b1a 1.5px, transparent 2px),
-    radial-gradient(circle at 72% 100%, #145214 1.5px, transparent 2px),
-    radial-gradient(circle at 81% 100%, #1a6b1a 1.5px, transparent 2px),
-    radial-gradient(circle at 89% 100%, #145214 1.5px, transparent 2px),
-    radial-gradient(circle at 96% 100%, #1a6b1a 1.5px, transparent 2px);
+    #fff9e6,
+    #fff9e6,
+    #fff9e6,
+    #fff9e6,
+    #fff9e6,
+    #fff9e6,
+    #fff9e6,
+    #fff9e6,
+    #fff9e6,
+    #fff9e6,
+    #fff9e6,
+    #fff9e6;
   background-size: 100% 100%;
   opacity: 0.85;
 }
@@ -7914,10 +7844,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 /* ===== Cozy Companion Room — Chat page Phase 1 ===== */
 .vf-chat-cozy {
-  background:
-    radial-gradient(ellipse 90% 65% at 50% -10%, rgba(255, 255, 255, 0.18), transparent 60%),
-    radial-gradient(ellipse 70% 55% at 50% 110%, rgba(0, 0, 0, 0.45), transparent 60%),
-    linear-gradient(180deg, #000000 0%, #0A0A0A 60%, #0A0A0A 100%);
+  background: #fff9e6;
 }
 
 .vf-chat-cozy .vf-chat-stage {
@@ -7941,7 +7868,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: min(420px, 50vw);
   height: min(320px, 38vh);
   transform: translateX(-50%);
-  background: radial-gradient(ellipse 80% 70% at 50% 30%, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.35) 50%, transparent 80%);
+  background: #fff9e6;
   filter: blur(20px);
   z-index: 0;
 }
@@ -7983,7 +7910,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 /* Glassmorph the side panels + main pane */
 .vf-chat-cozy .vf-chat-sidebar-frame {
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.62) 0%, rgba(0, 0, 0, 0.45) 100%);
+  background: #fff9e6 0%, rgba(0, 0, 0, 0.45) 100%);
   backdrop-filter: blur(18px) saturate(1.2);
   -webkit-backdrop-filter: blur(18px) saturate(1.2);
   border-radius: 22px;
@@ -8002,7 +7929,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 /* Avatar card: bigger, halo glow, breathing */
 .vf-chat-cozy .vf-chat-sidebar-primary {
-  background: linear-gradient(180deg, rgba(253, 203, 70, 0.6) 0%, rgba(0, 0, 0, 0.05) 100%);
+  background: #fff9e6 0%, rgba(0, 0, 0, 0.05) 100%);
   border-radius: 20px;
   border: 1px solid rgba(253, 203, 70, 0.9);
   box-shadow:
@@ -8015,7 +7942,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 70% 50% at 50% 35%, rgba(255, 255, 255, 0.22) 0%, transparent 70%);
+  background: #fff9e6;
   pointer-events: none;
   z-index: 0;
   animation: vf-cozy-halo 6s ease-in-out infinite;
@@ -8042,7 +7969,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 
 /* Main chat pane: glass frame */
 .vf-chat-cozy .vf-chat-main {
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.55) 0%, rgba(0, 0, 0, 0.42) 100%);
+  background: #fff9e6 0%, rgba(0, 0, 0, 0.42) 100%);
   backdrop-filter: blur(20px) saturate(1.15);
   -webkit-backdrop-filter: blur(20px) saturate(1.15);
   border-radius: 22px;
@@ -8055,19 +7982,19 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-cozy .vf-chat-tabs {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(0, 0, 0, 0.06) 100%);
+  background: #fff9e6 0%, rgba(0, 0, 0, 0.06) 100%);
   border-bottom: 1px solid rgba(253, 203, 70, 0.3);
   backdrop-filter: blur(8px);
 }
 .vf-chat-cozy .vf-chat-tab--active {
-  background: linear-gradient(180deg, #ffffff, #fff9e6);
+  background: #fff9e6;
   color: #2d2d2d;
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.35);
 }
 
 /* Glass chat bubbles */
 .vf-chat-cozy .vf-chat-bubble--user {
-  background: linear-gradient(168deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 249, 230, 0.85) 100%);
+  background: #fff9e6 0%, rgba(255, 249, 230, 0.85) 100%);
   backdrop-filter: blur(14px) saturate(1.2);
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
   border: 1px solid rgba(255, 255, 255, 0.85);
@@ -8078,7 +8005,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   border-radius: 1.2rem;
 }
 .vf-chat-cozy .vf-chat-bubble--assistant {
-  background: linear-gradient(168deg, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.55) 100%);
+  background: #fff9e6 0%, rgba(0, 0, 0, 0.55) 100%);
   backdrop-filter: blur(14px) saturate(1.2);
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
   border: 1px solid rgba(253, 203, 70, 0.8);
@@ -8092,7 +8019,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 /* Message input area: glass dock */
 .vf-chat-cozy .vf-chat-composer-row,
 .vf-chat-cozy .vf-chat-input-wrap {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.62) 0%, rgba(0, 0, 0, 0.08) 100%);
+  background: #fff9e6 0%, rgba(0, 0, 0, 0.08) 100%);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid rgba(255, 255, 255, 0.22);
@@ -8138,7 +8065,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 .vf-chat-settings-drawer {
   width: min(380px, 92vw);
   height: 100%;
-  background: linear-gradient(180deg, #000000 0%, #0A0A0A 100%);
+  background: #fff9e6;
   border-left: 1px solid #FFFFFF;
   box-shadow: -10px 0 40px rgba(0, 0, 0, 0.16);
   padding: 1.25rem 1.25rem 2rem;
@@ -8214,7 +8141,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 .vf-chat-mood-chip:hover { background: #fff9e6; transform: translateY(-1px); }
 .vf-chat-mood-chip.is-active {
-  background: linear-gradient(180deg, #ffffff, #fff9e6);
+  background: #fff9e6;
   border-color: #CCCCCC;
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.35);
 }
@@ -8225,11 +8152,11 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   border: 1.5px solid rgba(0, 0, 0, 0.18);
   flex-shrink: 0;
 }
-.vf-chat-mood-chip--cozy   .vf-chat-mood-swatch { background: linear-gradient(180deg, #000000, #1a1a1a); }
-.vf-chat-mood-chip--cafe   .vf-chat-mood-swatch { background: linear-gradient(180deg, #a6d17d, #8bc060); }
-.vf-chat-mood-chip--garden .vf-chat-mood-swatch { background: linear-gradient(180deg, #ffffff, #fff9e6); }
-.vf-chat-mood-chip--library .vf-chat-mood-swatch { background: linear-gradient(180deg, #c4b5f0, #6b4828); }
-.vf-chat-mood-chip--beach  .vf-chat-mood-swatch { background: linear-gradient(180deg, #91dcf8, #0A0A0A); }
+.vf-chat-mood-chip--cozy   .vf-chat-mood-swatch { background: #fff9e6; }
+.vf-chat-mood-chip--cafe   .vf-chat-mood-swatch { background: #fff9e6; }
+.vf-chat-mood-chip--garden .vf-chat-mood-swatch { background: #fff9e6; }
+.vf-chat-mood-chip--library .vf-chat-mood-swatch { background: #fff9e6; }
+.vf-chat-mood-chip--beach  .vf-chat-mood-swatch { background: #fff9e6; }
 
 .vf-chat-settings-range {
   width: 100%;
@@ -8266,25 +8193,16 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 .vf-chat-shell[data-mood="cafe"] {
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212, 165, 116, 0.25), transparent 60%),
-    linear-gradient(180deg, #0A0A0A 0%, #FFFFFF 50%, #FFFFFF 100%);
+  background: #fff9e6;
 }
 .vf-chat-shell[data-mood="garden"] {
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(253, 203, 70, 0.5), transparent 60%),
-    linear-gradient(180deg, #0A0A0A 0%, #FFFFFF 50%, #FFFFFF 100%);
+  background: #fff9e6;
 }
 .vf-chat-shell[data-mood="library"] {
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(196, 181, 240, 0.3), transparent 60%),
-    linear-gradient(180deg, #0A0A0A 0%, #FFFFFF 50%, #CCCCCC 100%);
+  background: #fff9e6;
 }
 .vf-chat-shell[data-mood="beach"] {
-  background:
-    radial-gradient(ellipse 90% 65% at 50% -10%, rgba(145, 220, 248, 0.35), transparent 60%),
-    radial-gradient(ellipse 60% 50% at 50% 110%, rgba(0, 0, 0, 0.08), transparent 60%),
-    linear-gradient(180deg, #000000 0%, #000000 60%, #0A0A0A 100%);
+  background: #fff9e6;
 }
 
 .vf-chat-slash-palette {
@@ -8292,7 +8210,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   bottom: calc(100% + 8px);
   left: 0.5rem;
   right: 0.5rem;
-  background: linear-gradient(180deg, #111111 0%, #000000 100%);
+  background: #fff9e6;
   border: 2px solid #fdcb46;
   border-radius: 14px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
@@ -8398,7 +8316,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   right: 0;
   top: calc(100% + 6px);
   min-width: 140px;
-  background: linear-gradient(180deg, #111111 0%, #000000 100%);
+  background: #fff9e6;
   border: 2px solid #fdcb46;
   border-radius: 12px;
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.2);
@@ -8462,7 +8380,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   opacity: 0.92;
 }
 .vf-chat-settings-action.is-active {
-  background: linear-gradient(180deg, #ffffff, #fff9e6);
+  background: #fff9e6;
   border-color: #CCCCCC;
   box-shadow: 0 4px 10px rgba(253, 203, 70, 0.4);
 }
@@ -8494,7 +8412,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   gap: 0.55rem;
   padding: 0.55rem 0.7rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, #000000 0%, #0A0A0A 100%);
+  background: #fff9e6;
   border: 1.5px solid #FFFFFF;
   font-family: var(--bg3-font-body);
   font-size: 0.78rem;
@@ -8535,7 +8453,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   transform: scale(1.05);
 }
 .vf-music-btn.is-active {
-  background: linear-gradient(180deg, #ffffff, #fff9e6);
+  background: #fff9e6;
   border-color: #CCCCCC;
   color: #2d2d2d;
   box-shadow: 0 2px 6px rgba(253, 203, 70, 0.4);
@@ -8544,12 +8462,12 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   width: 44px;
   height: 44px;
   font-size: 1.05rem;
-  background: linear-gradient(180deg, #a6d17d, #8bc060);
+  background: #fff9e6;
   border-color: #d49a1a;
   color: #2d2d2d;
 }
 .vf-music-btn--play:hover {
-  background: linear-gradient(180deg, #ffffff, #fff9e6);
+  background: #fff9e6;
 }
 
 .vf-music-volume {
@@ -8592,7 +8510,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   padding: 0.42rem 0.85rem;
   border-radius: 8px;
   border: 1.5px solid #FFFFFF;
-  background: linear-gradient(180deg, #a6d17d, #8bc060);
+  background: #fff9e6;
   color: #2d2d2d;
   font-family: var(--bg3-font-body);
   font-size: 0.78rem;
@@ -8639,7 +8557,7 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   padding: 1.6rem 2rem;
   border-radius: 22px;
   border: 2px dashed rgba(255, 255, 255, 0.55);
-  background: linear-gradient(165deg, rgba(253, 203, 70, 0.8) 0%, rgba(255, 249, 230, 0.85) 100%);
+  background: #fff9e6 0%, rgba(255, 249, 230, 0.85) 100%);
   backdrop-filter: blur(8px);
   text-align: center;
   max-width: 420px;
