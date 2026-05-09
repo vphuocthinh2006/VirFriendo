@@ -8655,3 +8655,27 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
 }
 
 /* ===== No dark/light toggle — single Black+Red theme ===== */
+
+/* Model info badge under bot messages */
+.vf-chat-model-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0;
+  margin-top: 0.25rem;
+}
+
+.vf-chat-model-badge-provider {
+  font-family: var(--bg3-font-body);
+  font-size: 0.62rem;
+  color: #6b3a2a;
+  opacity: 0.6;
+}
+
+.vf-chat-model-badge-tag {
+  font-size: 0.58rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  background: rgba(166, 209, 125, 0.3);
+  color: #3d6b1c;
+}

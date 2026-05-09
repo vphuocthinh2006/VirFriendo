@@ -9,6 +9,16 @@ export interface ChatResponse {
   detected_intent: string | null
   detected_emotion: string | null
   avatar_action: string | null
+  model_info?: {
+    provider: string
+    model: string
+    web_search_used: boolean
+    nlp_models: {
+      emotion_classifier: string
+      vit_gallery: string
+      llm_arbitrator: string
+    }
+  } | null
   bibliotherapy_suggestion: string | null
   user_message_count?: number | null
   relationship_level?: number | null
@@ -34,4 +44,5 @@ export interface MessageItem {
   detected_intent?: string | null
   detected_emotion?: string | null
   avatar_action?: string | null
+  model_info?: ChatResponse['model_info']
 }

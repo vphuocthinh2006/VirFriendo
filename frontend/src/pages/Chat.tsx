@@ -1251,6 +1251,7 @@ export default function Chat() {
           detected_intent: res.detected_intent,
           detected_emotion: res.detected_emotion,
           avatar_action: res.avatar_action,
+          model_info: res.model_info,
         }
         setMessages((prev) => [...prev, assistantMsg])
         await fetchConversations()
@@ -1318,6 +1319,7 @@ export default function Chat() {
           detected_intent: res.detected_intent,
           detected_emotion: res.detected_emotion,
           avatar_action: res.avatar_action,
+          model_info: res.model_info,
         }
         setMessages((prev) => [...prev, assistantMsg])
         await fetchConversations()
@@ -1567,6 +1569,7 @@ export default function Chat() {
         detected_intent: res.detected_intent,
         detected_emotion: res.detected_emotion,
         avatar_action: res.avatar_action,
+          model_info: res.model_info,
       }
       setMessages((prev) => [...prev, assistantMsg])
 
@@ -1625,6 +1628,7 @@ export default function Chat() {
         detected_intent: res.detected_intent,
         detected_emotion: res.detected_emotion,
         avatar_action: res.avatar_action,
+          model_info: res.model_info,
       }
 
       setMessages((prev) => [...prev, userMsg, assistantMsg])
@@ -2034,6 +2038,12 @@ export default function Chat() {
                   return (
                     <div key={msg.id} className="vf-chat-narrative-row vf-chat-msg-row">
                       <div className="vf-chat-narrative-inner">{renderAssistantNarrative(msg, index)}</div>
+                      {msg.model_info && (
+                        <div className="vf-chat-model-badge">
+                          <span className="vf-chat-model-badge-provider">{msg.model_info.provider}/{msg.model_info.model}</span>
+                          {msg.model_info.web_search_used && <span className="vf-chat-model-badge-tag">🔍 web</span>}
+                        </div>
+                      )}
                       {actionsMenu}
                     </div>
                   )
