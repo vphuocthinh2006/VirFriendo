@@ -84,6 +84,34 @@ def _get_llm():
     return _llm
 
 
+_active_model_name: str = "unknown"
+
+
+def get_active_model_info() -> dict:
+    """Return info about which LLM is currently active."""
+    global _active_model_name
+    llm = _get_llm()
+    if llm is None:
+        return {"provider": "none", "model": "none"}
+    
+    # Detect provider from class name
+    cls = type(llm).__name__
+    if "Groq" in cls:
+        provider = "groq"
+        model = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+    elif "Anthropic" in cls:
+        provider = "anthropic"
+        model = os.environ.get("ANTHROPIC_MODEL", "claude-3-5-sonnet-latest")
+    elif "OpenAI" in cls:
+        provider = "openai"
+        model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+    else:
+        provider = cls.lower()
+        model = "unknown"
+    
+    return {"provider": provider, "model": model}
+
+
 async def generate(system_prompt: str, user_message: str) -> Optional[str]:
     """
     Gọi LLM với system + user message. Trả về nội dung reply hoặc None nếu lỗi/không cấu hình.

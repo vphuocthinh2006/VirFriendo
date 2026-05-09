@@ -284,6 +284,7 @@ class ChatResponse(BaseModel):
     avatar_action: str | None = None
     dialogue_act: str | None = None
     ml_debug: dict[str, Any] | None = None
+    model_info: dict[str, Any] | None = None
     bibliotherapy_suggestion: str | None = None
     user_message_count: int | None = None
     relationship_level: int | None = None
@@ -705,6 +706,7 @@ async def chat(
         avatar_action=avatar_action,
         dialogue_act=dlg_act_val,
         ml_debug=user_ml_blob if nlp_out else None,
+        model_info=result.get("model_info"),
         bibliotherapy_suggestion=bibliotherapy,
         user_message_count=rel_ex.get("user_message_count"),
         relationship_level=rel_ex.get("relationship_level"),
