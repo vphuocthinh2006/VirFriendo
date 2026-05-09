@@ -44,6 +44,8 @@ class Message(Base):
     content: Mapped[str] = mapped_column(nullable=False)
     detected_intent: Mapped[Optional[str]] = mapped_column(String(50))
     detected_emotion: Mapped[Optional[str]] = mapped_column(String(50))
+    dialogue_act: Mapped[Optional[str]] = mapped_column(String(128))
+    ml_metadata: Mapped[Optional[str]] = mapped_column(Text)
     avatar_action: Mapped[Optional[str]] = mapped_column(String(50))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

@@ -34,6 +34,19 @@ from services.core.s3_media import (
     fetch_and_store_generated_image,
     upload_bytes_to_media_bucket,
 )
+from sqlalchemy import update as sa_update
+
+from services.agent_service.api.intent_classifier import intent_classifier
+from services.ml.confidence_gate import (
+    emotion_to_avatar_action as _emotion_to_avatar_from_gate,
+    gate_dialogue_act,
+    merge_emotion_for_avatar,
+    needs_emotion_llm_arbitrator,
+)
+from services.ml.llm_double_check import arbitrator_pick_emotion, arbitration_to_avatar_emotion
+from services.ml.nlp_inference import get_nlp_service
+from services.ml.gallery_search import gallery_matcher, gallery_hints_blob
+from services.ml.vit_encoder import encode_image_pil_normalized
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
@@ -269,6 +282,8 @@ class ChatResponse(BaseModel):
     detected_intent: str | None = None
     detected_emotion: str | None = None
     avatar_action: str | None = None
+    dialogue_act: str | None = None
+    ml_debug: dict[str, Any] | None = None
     bibliotherapy_suggestion: str | None = None
     user_message_count: int | None = None
     relationship_level: int | None = None
@@ -326,6 +341,94 @@ def _relationship_payload(rel: Mapping[str, Any] | None) -> dict[str, Any]:
         "relationship_level_up": bool(rel.get("relationship_level_up")),
         "new_relationship_level": rel.get("new_relationship_level"),
     }
+
+
+async def _nlp_predict_for_user_text(text: str):
+    svc = get_nlp_service()
+    if not svc.enabled():
+        return None
+    return await asyncio.to_thread(svc.maybe_predict, text)
+
+
+async def _intent_predict_for_user_text(text: str) -> str:
+    label = await asyncio.to_thread(intent_classifier.predict, text)
+    return label if isinstance(label, str) else str(label)
+
+
+def _nlp_user_payload(nlp_out: Any) -> dict[str, Any] | None:
+    if nlp_out is None:
+        return None
+    return {
+        "emotion_label": nlp_out.emotion_label,
+        "dialogue_act_label": nlp_out.dialogue_act_label,
+        "emotion_probs": {
+            "top1": round(nlp_out.emotion_prob_top1, 4),
+            "margin": round(nlp_out.emotion_margin, 4),
+        },
+        "act_probs": {
+            "top1": round(nlp_out.act_prob_top1, 4),
+            "margin": round(nlp_out.act_margin, 4),
+        },
+        "emotion_idx": nlp_out.emotion_logits_idx,
+        "act_idx": nlp_out.act_logits_idx,
+    }
+
+
+async def _finalize_avatar_with_merge_and_arbitrator(
+    *,
+    user_text_raw: str,
+    nlp_out: Any,
+    agent_emotion: str | None,
+) -> tuple[str, str, dict[str, Any]]:
+    emo_heur = agent_emotion
+    merged_e, avatar_a, meta = merge_emotion_for_avatar(nlp_out, emo_heur)
+    if needs_emotion_llm_arbitrator(nlp_out, meta) and nlp_out is not None:
+        pick, raw_snip = await arbitrator_pick_emotion(
+            user_snippet=user_text_raw[:400],
+            heuristic_emotion=emo_heur or "neutral",
+            nlp_emotion=nlp_out.emotion_label,
+            nlp_p_top=nlp_out.emotion_prob_top1,
+        )
+        merged_e = arbitration_to_avatar_emotion(pick, merged_e)
+        avatar_a = _emotion_to_avatar_from_gate(merged_e)
+        meta["llm_double_check_snippet"] = raw_snip
+    return merged_e, avatar_a, meta
+
+
+async def _run_character_gallery_on_image_bytes(body: bytes) -> tuple[list[dict[str, Any]], str]:
+    """Used from analyze-media (thread offload)."""
+
+    def _inner() -> tuple[list[dict[str, Any]], str]:
+        if not getattr(settings, "ENABLE_VIT_GALLERY", False):
+            return [], ""
+        try:
+            from io import BytesIO
+
+            import numpy as np
+            import PIL.Image
+
+            img = PIL.Image.open(BytesIO(body))
+            emb = encode_image_pil_normalized(img)
+            if emb is None:
+                return [], ""
+            vec = emb.numpy().reshape(-1).astype(np.float32, copy=False)
+            hits = gallery_matcher().top_k(vec, k=8)
+            hint = gallery_hints_blob(hits)
+            slim = []
+            for h in hits[:5]:
+                slim.append(
+                    {
+                        "character": h.get("character"),
+                        "similarity": round(float(h["similarity"]), 4),
+                        "tier": h.get("tier"),
+                    }
+                )
+            return slim, hint
+        except Exception:
+            logger.exception("Gallery ViT inference failed")
+            return [], ""
+
+    return await asyncio.to_thread(_inner)
 
 
 def _conversation_title_from_text(text: str) -> str:
@@ -511,15 +614,41 @@ async def chat(
 
     lc_messages = await _build_lc_messages(db, conversation.id, user_uuid, request.message, session)
     aid = _session_agent_id(session)
-    result = await _invoke_agent(lc_messages, aid)
+    agent_task = asyncio.create_task(_invoke_agent(lc_messages, aid))
+    nlp_task = asyncio.create_task(_nlp_predict_for_user_text(request.message))
+    intent_task = asyncio.create_task(_intent_predict_for_user_text(request.message))
+    result, nlp_out, routed_intent = await asyncio.gather(agent_task, nlp_task, intent_task)
 
     bot_reply = _sanitize_agent_handle_typo(result["reply"], aid)
     bot_reply = _ensure_assistant_reply(bot_reply)
 
-    intent = result.get("intent")
-    emotion = result.get("emotion")
-    avatar_action = result.get("avatar_action")
+    intent = routed_intent
+    emotion_ml, avatar_action, emotion_meta = await _finalize_avatar_with_merge_and_arbitrator(
+        user_text_raw=request.message,
+        nlp_out=nlp_out,
+        agent_emotion=result.get("emotion"),
+    )
+    emotion = emotion_ml
     bibliotherapy = result.get("bibliotherapy_suggestion")
+
+    dlg_act_val = gate_dialogue_act(nlp_out) if nlp_out else None
+    user_ml_blob: dict[str, Any] = {
+        "intent_classifier": routed_intent,
+        "nlp": _nlp_user_payload(nlp_out),
+        "emotion_merge": emotion_meta,
+    }
+    ml_json_u = json.dumps(user_ml_blob, ensure_ascii=False)[:12000]
+
+    await db.execute(
+        sa_update(Message)
+        .where(Message.id == user_msg.id)
+        .values(dialogue_act=dlg_act_val, ml_metadata=ml_json_u),
+    )
+
+    bot_ml_json = json.dumps(
+        {"nlp_emotion": _nlp_user_payload(nlp_out), "emotion_merge_bot": emotion_meta},
+        ensure_ascii=False,
+    )[:8000]
 
     # BƯỚC 4: Lưu phản hồi bot vào DB
     bot_msg = Message(
@@ -528,6 +657,8 @@ async def chat(
         content=bot_reply,
         detected_intent=intent,
         detected_emotion=emotion,
+        dialogue_act=None,
+        ml_metadata=bot_ml_json,
         avatar_action=avatar_action,
     )
     db.add(bot_msg)
@@ -553,6 +684,8 @@ async def chat(
         detected_intent=intent,
         detected_emotion=emotion,
         avatar_action=avatar_action,
+        dialogue_act=dlg_act_val,
+        ml_debug=user_ml_blob if nlp_out else None,
         bibliotherapy_suggestion=bibliotherapy,
         user_message_count=rel_ex.get("user_message_count"),
         relationship_level=rel_ex.get("relationship_level"),
@@ -573,6 +706,8 @@ class MessageResponse(BaseModel):
     content: str
     detected_intent: str | None = None
     detected_emotion: str | None = None
+    dialogue_act: str | None = None
+    ml_metadata: str | None = None
     avatar_action: str | None = None
     model_config = ConfigDict(from_attributes=True)
 
@@ -901,15 +1036,39 @@ async def _process_ws_message(
     # 3) Build LangChain messages (same as POST /chat)
     lc_messages = await _build_lc_messages(db, conversation.id, user_uuid, content, session)
 
-    # 4) Invoke Claude agent
+    # 4) Invoke Claude agent (+ parallel NLP + intent)
     aid = _session_agent_id(session)
-    result = await _invoke_agent(lc_messages, aid)
+    agent_task = asyncio.create_task(_invoke_agent(lc_messages, aid))
+    nlp_task = asyncio.create_task(_nlp_predict_for_user_text(content))
+    intent_task = asyncio.create_task(_intent_predict_for_user_text(content))
+    result, nlp_out, routed_intent = await asyncio.gather(agent_task, nlp_task, intent_task)
 
     bot_reply = _sanitize_agent_handle_typo(result["reply"], aid)
     bot_reply = _ensure_assistant_reply(bot_reply)
-    intent = result.get("intent")
-    emotion = result.get("emotion")
-    avatar_action = result.get("avatar_action")
+    intent = routed_intent
+    emotion, avatar_action, emotion_meta = await _finalize_avatar_with_merge_and_arbitrator(
+        user_text_raw=content,
+        nlp_out=nlp_out,
+        agent_emotion=result.get("emotion"),
+    )
+
+    dlg_act_val = gate_dialogue_act(nlp_out) if nlp_out else None
+    user_ml_blob: dict[str, Any] = {
+        "intent_classifier": routed_intent,
+        "nlp": _nlp_user_payload(nlp_out),
+        "emotion_merge": emotion_meta,
+    }
+    ml_json_u = json.dumps(user_ml_blob, ensure_ascii=False)[:12000]
+    await db.execute(
+        sa_update(Message)
+        .where(Message.id == user_msg.id)
+        .values(dialogue_act=dlg_act_val, ml_metadata=ml_json_u),
+    )
+
+    bot_ml_json = json.dumps(
+        {"nlp_emotion": _nlp_user_payload(nlp_out), "emotion_merge_bot": emotion_meta},
+        ensure_ascii=False,
+    )[:8000]
 
     # 5) Save bot message
     bot_msg = Message(
@@ -918,6 +1077,8 @@ async def _process_ws_message(
         content=bot_reply,
         detected_intent=intent,
         detected_emotion=emotion,
+        dialogue_act=None,
+        ml_metadata=bot_ml_json,
         avatar_action=avatar_action,
     )
     db.add(bot_msg)
@@ -947,6 +1108,7 @@ async def _process_ws_message(
         "detected_intent": intent,
         "detected_emotion": emotion,
         "avatar_action": avatar_action,
+        "dialogue_act": dlg_act_val,
     }
     end_payload.update(_relationship_payload(rel) if rel else {})
     await ws.send_json(end_payload)
@@ -1082,6 +1244,7 @@ class MediaAnalysisResponse(BaseModel):
     relationship_level_up: bool = False
     new_relationship_level: int | None = None
     stored_media_url: str | None = None  # presigned HTTPS if S3 upload succeeded
+    character_gallery_hints: list[dict[str, Any]] | None = None  # ViT + gallery top-k metadata
 
 
 @router.post("/analyze-media", response_model=MediaAnalysisResponse)
@@ -1276,6 +1439,19 @@ async def analyze_media(
     aid = _session_agent_id(session)
     vision_prompt = message or ("Bạn thấy gì trong video này?" if is_video else "Bạn thấy gì trong ảnh này?")
 
+    gallery_hints_list: list[dict[str, Any]] = []
+    gallery_ctx = ""
+    if not is_video and getattr(settings, "ENABLE_VIT_GALLERY", False):
+        gallery_hints_list, _ = await _run_character_gallery_on_image_bytes(content)
+        if gallery_hints_list:
+            top = gallery_hints_list[0]
+            nm = top.get("character") or ""
+            tier = top.get("tier") or ""
+            gallery_ctx = (
+                f"Hệ thống đối chiếu gallery cục bộ gợi ý chủ đề có thể liên quan: 「{nm}」 "
+                f"(mức tin cậy kỹ thuật: {tier}). Đây chỉ là prior — hãy tự nhìn ảnh; không nhắc số cosine.\n\n"
+            )
+
     # Get vision analysis - GPT-4o (primary) → Gemini 1.5 Pro (fallback)
     gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
     openai_key = os.environ.get("OPENAI_API_KEY", "").strip()
@@ -1283,7 +1459,7 @@ async def analyze_media(
     if not gemini_key and not openai_key:
         raise HTTPException(status_code=500, detail="Vision analysis requires GEMINI_API_KEY or OPENAI_API_KEY")
 
-    vision_system = f"""Bạn là {aid}, một cô gái anime thân thiện. Xưng "mình", gọi đối phương "bạn".
+    vision_system = gallery_ctx + f"""Bạn là {aid}, một cô gái anime thân thiện. Xưng "mình", gọi đối phương "bạn".
 
 NHIỆM VỤ: Phân tích {'video' if is_video else 'ảnh'} và trả lời bằng tiếng Việt.
 
@@ -1516,6 +1692,7 @@ SUBJECT_TAG: <tên nhân vật + nguồn ngắn gọn nếu nhận diện, ví d
         relationship_level_up=bool(rel_ex.get("relationship_level_up")),
         new_relationship_level=rel_ex.get("new_relationship_level"),
         stored_media_url=stored_media_url,
+        character_gallery_hints=gallery_hints_list if gallery_hints_list else None,
     )
 
 
@@ -1659,6 +1836,7 @@ Không dùng bullet points, không giọng trợ lý AI."""
             relationship_level=rel_ex.get("relationship_level"),
             relationship_level_up=bool(rel_ex.get("relationship_level_up")),
             new_relationship_level=rel_ex.get("new_relationship_level"),
+            character_gallery_hints=None,
         )
         
     except ImportError as e:
@@ -1809,6 +1987,7 @@ Không dùng bullet points, không giọng trợ lý AI."""
             relationship_level=rel_ex.get("relationship_level"),
             relationship_level_up=bool(rel_ex.get("relationship_level_up")),
             new_relationship_level=rel_ex.get("new_relationship_level"),
+            character_gallery_hints=None,
         )
         
     except ImportError as e:

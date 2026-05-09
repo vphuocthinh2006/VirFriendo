@@ -92,8 +92,13 @@ ehthumbs.db
 
 # --- Local-only (benchmarks, ad-hoc scripts) ---
 .pytest_cache/
-/scripts/
+/scripts/*
+!/scripts/ingest_gallery_chroma.py
 /run.ps1
+
+# Bundled-export ML checkpoints (large; host via S3 or release asset, not git)
+ML_model_and_embedding_gallery-*/
+NLP_main-*/
 ml/*.jsonl
 
 # Claude Code workspace

@@ -38,6 +38,37 @@ class Settings(BaseSettings):
 
     # Optional: Chroma HTTP API (retrieval / future RAG). Compose: http://chromadb:8000
     CHROMA_SERVER_URL: str | None = None
+    CHROMA_GALLERY_COLLECTION: str = "character_gallery_vit"
+
+    # --- Local ML (NLP multitask BERT + ViT gallery) — optional, lazy-loaded ---
+    ENABLE_NLP_METADATA: bool = False
+    NLP_MODEL_PATH: str | None = None
+    NLP_LABEL_PATH: str | None = None
+    NLP_BERT_NAME: str = "bert-base-uncased"
+    NLP_ACT_LABEL_ID_OFFSET: int = 1
+    NLP_EMOTION_MIN_PROB: float = 0.55
+    NLP_EMOTION_MIN_MARGIN: float = 0.08
+    NLP_EMOTION_LOW_PROB: float = 0.35
+    NLP_CONFIDENCE_GRAY_LOW: float = 0.4
+    NLP_CONFIDENCE_GRAY_HIGH: float = 0.7
+    NLP_ACT_MIN_PROB: float = 0.55
+    NLP_ACT_MIN_MARGIN: float = 0.06
+
+    ENABLE_LLM_DOUBLE_CHECK: bool = False
+    DOUBLE_CHECK_MODEL: str = "llama-3.1-8b-instant"
+    DOUBLE_CHECK_MAX_TOKENS: int = 64
+
+    ML_DEVICE: str = "cpu"
+
+    ENABLE_VIT_GALLERY: bool = False
+    VIT_MODEL_PATH: str | None = None
+    VIT_TIMM_MODEL: str = "vit_base_patch16_224"
+    VIT_NUM_CLASSES: int = 45
+    GALLERY_EMBEDDINGS_NPY_PATH: str | None = None
+    GALLERY_CLASS_NAMES_PKL_PATH: str | None = None
+    GALLERY_VECTOR_BACKEND: str = "numpy"
+    VIT_MIN_SIMILARITY: float = 0.35
+    VIT_MIN_MARGIN_SIM: float = 0.03
 
     # Optional: external agent-service endpoint (microservice mode)
     AGENT_SERVICE_URL: str | None = None

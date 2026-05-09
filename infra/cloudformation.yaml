@@ -1,0 +1,477 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  VirFriendo (Pally) — Cloud Architecture
+  Region: ap-southeast-1
+  This template documents the existing infrastructure.
+  Deploy with: aws cloudformation deploy --template-file cloudformation.yaml --stack-name virfriendo-infra
+
+# ============================================================
+# PARAMETERS
+# ============================================================
+Parameters:
+  Environment:
+    Type: String
+    Default: production
+    AllowedValues: [production, staging]
+
+  DBPassword:
+    Type: String
+    NoEcho: true
+    Description: RDS master password
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-0fcbf828663e5d038
+
+  SubnetA:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-0c47daadb04acdea9
+
+  SubnetB:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-0f39d29b7fd62dd8d
+
+  ECRApiImage:
+    Type: String
+    Default: 292773837061.dkr.ecr.ap-southeast-1.amazonaws.com/virfriendo-api:latest
+    Description: ECR image URI for API container
+
+# ============================================================
+# RESOURCES
+# ============================================================
+Resources:
+
+  # ----------------------------------------------------------
+  # S3 — Media Storage
+  # ----------------------------------------------------------
+  MediaBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: virfriendo-media-ap-southeast-1
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Suspended
+      Tags:
+        - Key: Project
+          Value: virfriendo
+
+  # ----------------------------------------------------------
+  # IAM — ECS Task Role (app permissions)
+  # ----------------------------------------------------------
+  ECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: virfriendo-ecs-task-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: pally-s3-media
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: [s3:PutObject, s3:GetObject, s3:DeleteObject]
+                Resource: !Sub arn:aws:s3:::virfriendo-media-ap-southeast-1/media/*
+              - Effect: Allow
+                Action: s3:ListBucket
+                Resource: !Sub arn:aws:s3:::virfriendo-media-ap-southeast-1
+        - PolicyName: pally-secrets
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Sub arn:aws:secretsmanager:ap-southeast-1:${AWS::AccountId}:secret:virfriendo/prod/database*
+
+  # ----------------------------------------------------------
+  # IAM — ECS Execution Role (pull ECR, write logs)
+  # ----------------------------------------------------------
+  ECSExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: virfriendo-ecs-execution-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: pally-secrets-read
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Sub arn:aws:secretsmanager:ap-southeast-1:${AWS::AccountId}:secret:virfriendo/prod/database*
+
+  # ----------------------------------------------------------
+  # Security Groups
+  # ----------------------------------------------------------
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ALB - allow HTTP/HTTPS from internet
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  ECSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ECS tasks - allow from ALB only
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8000
+          ToPort: 8000
+          SourceSecurityGroupId: !Ref ALBSecurityGroup
+
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: RDS - allow from ECS only
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref ECSSecurityGroup
+
+  # ----------------------------------------------------------
+  # RDS — PostgreSQL
+  # ----------------------------------------------------------
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupName: virfriendo-db-subnets
+      DBSubnetGroupDescription: VirFriendo DB subnets
+      SubnetIds:
+        - !Ref SubnetA
+        - !Ref SubnetB
+
+  Database:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
+    Properties:
+      DBInstanceIdentifier: virfriendo-db
+      DBInstanceClass: db.t4g.micro
+      Engine: postgres
+      EngineVersion: '16.9'
+      MasterUsername: dumbaahh
+      MasterUserPassword: !Ref DBPassword
+      AllocatedStorage: 30
+      StorageType: gp3
+      Iops: 3000
+      StorageThroughput: 125
+      StorageEncrypted: true
+      MultiAZ: false
+      PubliclyAccessible: false
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VPCSecurityGroups:
+        - !Ref RDSSecurityGroup
+      BackupRetentionPeriod: 7
+      DeletionProtection: true
+      Tags:
+        - Key: Project
+          Value: virfriendo
+
+  # ----------------------------------------------------------
+  # ALB — Application Load Balancer
+  # ----------------------------------------------------------
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: virfriendo-alb
+      Type: application
+      Scheme: internet-facing
+      Subnets:
+        - !Ref SubnetA
+        - !Ref SubnetB
+      SecurityGroups:
+        - !Ref ALBSecurityGroup
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: virfriendo-api-tg
+      Port: 8000
+      Protocol: HTTP
+      VpcId: !Ref VpcId
+      TargetType: ip
+      HealthCheckPath: /health
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 3
+
+  ListenerHTTP:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+
+  # ----------------------------------------------------------
+  # ECS — Cluster + Task Definition + Service
+  # ----------------------------------------------------------
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: virfriendo-cluster
+
+  CloudWatchLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /ecs/virfriendo-api
+      RetentionInDays: 30
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: virfriendo-api
+      NetworkMode: awsvpc
+      RequiresCompatibilities: [FARGATE]
+      Cpu: '1024'
+      Memory: '4096'
+      TaskRoleArn: !GetAtt ECSTaskRole.Arn
+      ExecutionRoleArn: !GetAtt ECSExecutionRole.Arn
+      ContainerDefinitions:
+        - Name: api
+          Image: !Ref ECRApiImage
+          Essential: true
+          PortMappings:
+            - ContainerPort: 8000
+              Protocol: tcp
+          Environment:
+            - Name: CORS_ORIGINS
+              Value: https://virfriendo.pages.dev,https://virfriendo.win,https://api.virfriendo.win
+            - Name: OPENAI_MODEL
+              Value: gpt-4o
+            - Name: GROQ_MODEL
+              Value: llama-3.3-70b-versatile
+            - Name: LLM_MAX_TOKENS
+              Value: '1024'
+            - Name: LLM_MAX_HISTORY
+              Value: '12'
+            - Name: S3_MEDIA_BUCKET
+              Value: virfriendo-media-ap-southeast-1
+            - Name: S3_MEDIA_PREFIX
+              Value: media
+            - Name: S3_GET_PRESIGNED_SECONDS
+              Value: '604800'
+            - Name: AWS_REGION
+              Value: ap-southeast-1
+          Secrets:
+            - Name: DATABASE_URL
+              ValueFrom: !Sub arn:aws:secretsmanager:ap-southeast-1:${AWS::AccountId}:secret:virfriendo/prod/database-VfWz1x:DATABASE_URL::
+            - Name: SECRET_KEY
+              ValueFrom: !Sub arn:aws:secretsmanager:ap-southeast-1:${AWS::AccountId}:secret:virfriendo/prod/database-VfWz1x:SECRET_KEY::
+            - Name: ANTHROPIC_API_KEY
+              ValueFrom: !Sub arn:aws:secretsmanager:ap-southeast-1:${AWS::AccountId}:secret:virfriendo/prod/database-VfWz1x:ANTHROPIC_API_KEY::
+            - Name: GROQ_API_KEY
+              ValueFrom: !Sub arn:aws:secretsmanager:ap-southeast-1:${AWS::AccountId}:secret:virfriendo/prod/database-VfWz1x:GROQ_API_KEY::
+            - Name: GEMINI_API_KEY
+              ValueFrom: !Sub arn:aws:secretsmanager:ap-southeast-1:${AWS::AccountId}:secret:virfriendo/prod/database-VfWz1x:GEMINI_API_KEY::
+            - Name: OPENAI_API_KEY
+              ValueFrom: !Sub arn:aws:secretsmanager:ap-southeast-1:${AWS::AccountId}:secret:virfriendo/prod/database-VfWz1x:OPENAI_API_KEY::
+            - Name: DEEPGRAM_API_KEY
+              ValueFrom: !Sub arn:aws:secretsmanager:ap-southeast-1:${AWS::AccountId}:secret:virfriendo/prod/database-VfWz1x:DEEPGRAM_API_KEY::
+            - Name: REPLICATE_API_TOKEN
+              ValueFrom: !Sub arn:aws:secretsmanager:ap-southeast-1:${AWS::AccountId}:secret:virfriendo/prod/database-VfWz1x:REPLICATE_API_TOKEN::
+            - Name: TAVILY_API_KEY
+              ValueFrom: !Sub arn:aws:secretsmanager:ap-southeast-1:${AWS::AccountId}:secret:virfriendo/prod/database-VfWz1x:TAVILY_API_KEY::
+            - Name: LLM_PROVIDER
+              ValueFrom: !Sub arn:aws:secretsmanager:ap-southeast-1:${AWS::AccountId}:secret:virfriendo/prod/database-VfWz1x:LLM_PROVIDER::
+            - Name: APP_ENV
+              ValueFrom: !Sub arn:aws:secretsmanager:ap-southeast-1:${AWS::AccountId}:secret:virfriendo/prod/database-VfWz1x:APP_ENV::
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/virfriendo-api
+              awslogs-region: ap-southeast-1
+              awslogs-stream-prefix: ecs
+
+  ECSService:
+    Type: AWS::ECS::Service
+    DependsOn: ListenerHTTP
+    Properties:
+      ServiceName: virfriendo-api-svc
+      Cluster: !Ref ECSCluster
+      TaskDefinition: !Ref TaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref SubnetA
+            - !Ref SubnetB
+          SecurityGroups:
+            - !Ref ECSSecurityGroup
+      LoadBalancers:
+        - ContainerName: api
+          ContainerPort: 8000
+          TargetGroupArn: !Ref TargetGroup
+      HealthCheckGracePeriodSeconds: 120
+      DeploymentConfiguration:
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+
+  # ----------------------------------------------------------
+  # Auto Scaling
+  # ----------------------------------------------------------
+  AutoScalingTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      ServiceNamespace: ecs
+      ResourceId: !Sub service/${ECSCluster}/${ECSService.Name}
+      ScalableDimension: ecs:service:DesiredCount
+      MinCapacity: 1
+      MaxCapacity: 3
+      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+
+  AutoScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: pally-cpu-scaling
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref AutoScalingTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 70.0
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+        ScaleInCooldown: 300
+        ScaleOutCooldown: 60
+
+  # ----------------------------------------------------------
+  # CloudWatch — Alarms + SNS
+  # ----------------------------------------------------------
+  AlertsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: pally-alerts
+      Subscription:
+        - Protocol: email
+          Endpoint: vphuocthinh1@gmail.com
+
+  Alarm5xxErrors:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: pally-5xx-errors
+      AlarmDescription: API 5xx errors > 10 in 5 minutes
+      MetricName: HTTP5xxCount
+      Namespace: Pally/API
+      Statistic: Sum
+      Period: 300
+      Threshold: 10
+      ComparisonOperator: GreaterThanThreshold
+      EvaluationPeriods: 1
+      TreatMissingData: notBreaching
+      AlarmActions:
+        - !Ref AlertsTopic
+
+  AlarmECSCPU:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: pally-ecs-cpu-high
+      AlarmDescription: ECS CPU > 80%
+      MetricName: CPUUtilization
+      Namespace: AWS/ECS
+      Dimensions:
+        - Name: ClusterName
+          Value: virfriendo-cluster
+        - Name: ServiceName
+          Value: virfriendo-api-svc
+      Statistic: Average
+      Period: 300
+      Threshold: 80
+      ComparisonOperator: GreaterThanThreshold
+      EvaluationPeriods: 2
+      TreatMissingData: notBreaching
+      AlarmActions:
+        - !Ref AlertsTopic
+
+  AlarmECSMemory:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: pally-ecs-memory-high
+      AlarmDescription: ECS Memory > 85%
+      MetricName: MemoryUtilization
+      Namespace: AWS/ECS
+      Dimensions:
+        - Name: ClusterName
+          Value: virfriendo-cluster
+        - Name: ServiceName
+          Value: virfriendo-api-svc
+      Statistic: Average
+      Period: 300
+      Threshold: 85
+      ComparisonOperator: GreaterThanThreshold
+      EvaluationPeriods: 2
+      TreatMissingData: notBreaching
+      AlarmActions:
+        - !Ref AlertsTopic
+
+  AlarmRDSConnections:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: pally-rds-connections-high
+      AlarmDescription: RDS connections > 50
+      MetricName: DatabaseConnections
+      Namespace: AWS/RDS
+      Dimensions:
+        - Name: DBInstanceIdentifier
+          Value: virfriendo-db
+      Statistic: Average
+      Period: 300
+      Threshold: 50
+      ComparisonOperator: GreaterThanThreshold
+      EvaluationPeriods: 1
+      TreatMissingData: notBreaching
+      AlarmActions:
+        - !Ref AlertsTopic
+
+# ============================================================
+# OUTPUTS
+# ============================================================
+Outputs:
+  ALBDNSName:
+    Description: ALB DNS name
+    Value: !GetAtt LoadBalancer.DNSName
+
+  ECSClusterName:
+    Description: ECS Cluster name
+    Value: !Ref ECSCluster
+
+  MediaBucketName:
+    Description: S3 media bucket
+    Value: !Ref MediaBucket
+
+  DatabaseEndpoint:
+    Description: RDS endpoint
+    Value: !GetAtt Database.Endpoint.Address

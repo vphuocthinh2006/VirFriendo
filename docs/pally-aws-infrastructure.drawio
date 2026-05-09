@@ -1,0 +1,248 @@
+<mxfile host="app.diagrams.net" modified="2026-05-07T08:00:00.000Z" agent="Claude" version="24.7.17">
+  <diagram id="pally-aws-infra" name="Pally - AWS Cloud Architecture">
+    <mxGraphModel dx="2400" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2600" pageHeight="1700" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ========== TITLE ========== -->
+        <mxCell id="title" value="Pally / VirFriendo &#8212; AWS Cloud Architecture (ap-southeast-1)&#10;Cloudflare DNS/CDN  +  ECS Fargate  +  Aurora Serverless v2  +  S3  +  CloudWatch" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#1F3A93;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="2520" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== USERS ========== -->
+        <mxCell id="users" value="End Users" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3E;strokeColor=#232F3E;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.users;pointerEvents=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="160" width="60" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== CLOUDFLARE BOX (outside AWS) ========== -->
+        <mxCell id="cf_group" value="Cloudflare  (DNS + CDN + Pages, outside AWS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBEED7;strokeColor=#F38020;fontStyle=1;fontSize=13;verticalAlign=top;align=left;spacingLeft=15;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="120" width="500" height="280" as="geometry"/>
+        </mxCell>
+        <mxCell id="cf_dns" value="Cloudflare DNS&#10;virfriendo.win" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#F38020;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="270" y="170" width="200" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="cf_pages" value="Cloudflare Pages&#10;React static build (frontend)&#10;virfriendo.win" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#F38020;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="270" y="250" width="200" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="cf_proxy" value="Cloudflare Proxy&#10;api.virfriendo.win&#10;→ ALB origin" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#F38020;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="510" y="170" width="200" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="cf_dns_records" value="DNS records:&#10;CNAME virfriendo.win → Pages&#10;CNAME api.virfriendo.win → ALB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#F38020;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="510" y="270" width="200" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== AWS REGION CONTAINER ========== -->
+        <mxCell id="aws_region" value="AWS Cloud  &#8212;  Region: ap-southeast-1 (Singapore)" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=14;fontStyle=1;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_region;strokeColor=#00A4A6;fillColor=none;verticalAlign=top;align=left;spacingLeft=40;fontColor=#147EBA;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="800" y="100" width="1740" height="1100" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== VPC ========== -->
+        <mxCell id="vpc" value="VPC  virfriendo-vpc (10.0.0.0/16)" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=1;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc;strokeColor=#248814;fillColor=none;verticalAlign=top;align=left;spacingLeft=35;fontColor=#AAB7B8;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="1450" height="980" as="geometry" relative="0">
+            <mxPoint as="offset"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ========== WAF ========== -->
+        <mxCell id="waf" value="WAF&#10;virfriendo-alb-waf&#10;CommonRuleSet + SQLi&#10;Rate-limit 2000/IP/5min" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#DD344C;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.web_application_firewall;" vertex="1" parent="aws_region">
+          <mxGeometry x="120" y="120" width="78" height="78" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== ALB ========== -->
+        <mxCell id="alb" value="ALB&#10;virfriendo-alb&#10;internet-facing&#10;:80 / :443→8000" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.application_load_balancer;" vertex="1" parent="aws_region">
+          <mxGeometry x="290" y="120" width="78" height="78" as="geometry"/>
+        </mxCell>
+
+        <!-- Target Group -->
+        <mxCell id="tg" value="Target Group&#10;virfriendo-api-tg&#10;:8000 / health=/health" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F0EC;strokeColor=#8C4FFF;fontSize=11;" vertex="1" parent="aws_region">
+          <mxGeometry x="430" y="125" width="180" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== ECS CLUSTER GROUP ========== -->
+        <mxCell id="ecs_group" value="ECS Cluster  virfriendo-cluster" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=1;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_auto_scaling_group;strokeColor=#D86613;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#D86613;dashed=0;" vertex="1" parent="aws_region">
+          <mxGeometry x="660" y="105" width="650" height="280" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="fargate" value="Fargate" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.fargate;" vertex="1" parent="ecs_group">
+          <mxGeometry x="40" y="55" width="68" height="68" as="geometry"/>
+        </mxCell>
+        <mxCell id="ecs_svc" value="Service&#10;virfriendo-api-svc&#10;Auto Scaling: 1 → 3&#10;Target CPU: 70%" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#ED7100;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="ecs_group">
+          <mxGeometry x="135" y="50" width="200" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="task_def" value="Task Definition&#10;virfriendo-api : 11&#10;CPU 1 vCPU · RAM 4 GB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#ED7100;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="ecs_group">
+          <mxGeometry x="355" y="50" width="200" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="container1" value="Task #1&#10;Container: api&#10;virfriendo-api:latest&#10;:8000" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ED7100;fontSize=10;" vertex="1" parent="ecs_group">
+          <mxGeometry x="40" y="160" width="160" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="container2" value="Task #2&#10;Container: api&#10;(scaled up)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ED7100;fontSize=10;dashed=1;" vertex="1" parent="ecs_group">
+          <mxGeometry x="220" y="160" width="160" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="container3" value="Task #3&#10;Container: api&#10;(max 3)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ED7100;fontSize=10;dashed=1;" vertex="1" parent="ecs_group">
+          <mxGeometry x="400" y="160" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== DATABASE ROW ========== -->
+        <mxCell id="aurora" value="Aurora Serverless v2&#10;virfriendo-aurora&#10;PostgreSQL 16.6&#10;0.5 – 4 ACU&#10;Multi-AZ · 7d backup&#10;Encrypted" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#C925D1;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.aurora;" vertex="1" parent="aws_region">
+          <mxGeometry x="180" y="510" width="78" height="78" as="geometry"/>
+        </mxCell>
+        <mxCell id="aurora_endpoint" value="Endpoint:&#10;virfriendo-aurora.cluster-cvggyooq6zi9&#10;.ap-southeast-1.rds.amazonaws.com" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#C925D1;fontSize=9;fontFamily=Courier New;" vertex="1" parent="aws_region">
+          <mxGeometry x="100" y="640" width="240" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="rds_old" value="RDS (legacy)&#10;virfriendo-db&#10;db.t4g.micro&#10;STOPPED — pending delete" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#C925D1;strokeColor=#ffffff;dashed=1;opacity=50;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.rds;" vertex="1" parent="aws_region">
+          <mxGeometry x="380" y="510" width="78" height="78" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s3" value="S3&#10;virfriendo-media-ap-southeast-1&#10;prefix: media/&#10;public access blocked&#10;presigned URLs (7 days)" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.simple_storage_service;" vertex="1" parent="aws_region">
+          <mxGeometry x="580" y="510" width="78" height="78" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== ECR (Container Registry) ========== -->
+        <mxCell id="ecr_box" value="ECR Container Registry" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#ED7100;fontStyle=1;fontSize=12;verticalAlign=top;align=left;spacingLeft=8;dashed=1;" vertex="1" parent="aws_region">
+          <mxGeometry x="780" y="450" width="280" height="180" as="geometry"/>
+        </mxCell>
+        <mxCell id="ecr_api" value="virfriendo-api&#10;backend image" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elastic_container_registry;" vertex="1" parent="aws_region">
+          <mxGeometry x="810" y="490" width="60" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ecr_web" value="virfriendo-web&#10;frontend image" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elastic_container_registry;" vertex="1" parent="aws_region">
+          <mxGeometry x="950" y="490" width="60" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ecr_lifecycle" value="Lifecycle: keep 2 active revisions (e.g. v10, v11)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fffae6;strokeColor=#ED7100;fontSize=10;" vertex="1" parent="aws_region">
+          <mxGeometry x="800" y="585" width="240" height="35" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== SECRETS / IAM ========== -->
+        <mxCell id="sec_box" value="Secrets &amp; IAM" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBE6EA;strokeColor=#DD344C;fontStyle=1;fontSize=12;verticalAlign=top;align=left;spacingLeft=8;dashed=1;" vertex="1" parent="aws_region">
+          <mxGeometry x="1090" y="450" width="290" height="320" as="geometry"/>
+        </mxCell>
+        <mxCell id="secrets" value="Secrets Manager&#10;virfriendo/prod/database&#10;(all API keys + DB URL)" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#DD344C;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.secrets_manager;" vertex="1" parent="aws_region">
+          <mxGeometry x="1115" y="490" width="68" height="68" as="geometry"/>
+        </mxCell>
+        <mxCell id="iam_task" value="IAM Role&#10;virfriendo-ecs-task-role&#10;(S3 + Secrets Mgr access)" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#DD344C;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.identity_and_access_management;" vertex="1" parent="aws_region">
+          <mxGeometry x="1240" y="490" width="68" height="68" as="geometry"/>
+        </mxCell>
+        <mxCell id="iam_exec" value="IAM Role&#10;virfriendo-ecs-execution-role&#10;(ECR pull + CW logs)" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#DD344C;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.identity_and_access_management;" vertex="1" parent="aws_region">
+          <mxGeometry x="1170" y="630" width="68" height="68" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== MONITORING ========== -->
+        <mxCell id="mon_box" value="Monitoring &amp; Alerting" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE8F1;strokeColor=#E7157B;fontStyle=1;fontSize=12;verticalAlign=top;align=left;spacingLeft=8;dashed=1;" vertex="1" parent="aws_region">
+          <mxGeometry x="100" y="780" width="800" height="240" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="cw_logs" value="CloudWatch Logs&#10;/ecs/virfriendo-api&#10;(retention 30 days)" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudwatch_2;" vertex="1" parent="aws_region">
+          <mxGeometry x="130" y="820" width="68" height="68" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="cw_alarms" value="CloudWatch Alarms (7)&#10;&#10;• ECS CPU &gt; 70 %  → scale-out&#10;• ECS CPU &lt; 63 %  → scale-in&#10;• 5xx errors &gt; 10  → alert&#10;• ALB 5xx &gt; 20  → alert&#10;• ECS CPU &gt; 80 %  → alert&#10;• ECS Memory &gt; 85 %  → alert&#10;• RDS connections &gt; 50  → alert" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#E7157B;fontSize=10;align=left;spacingLeft=8;spacingTop=4;" vertex="1" parent="aws_region">
+          <mxGeometry x="240" y="815" width="270" height="170" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sns" value="SNS Topic&#10;pally-alerts" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.simple_notification_service;" vertex="1" parent="aws_region">
+          <mxGeometry x="565" y="820" width="68" height="68" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="email" value="Email&#10;vphuocthinh1@gmail.com" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#E7157B;fontSize=10;" vertex="1" parent="aws_region">
+          <mxGeometry x="675" y="830" width="200" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== CI/CD GROUP ========== -->
+        <mxCell id="cicd_box" value="CI/CD  (GitHub Actions)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#1B5E20;fontStyle=1;fontSize=12;verticalAlign=top;align=left;spacingLeft=8;dashed=1;" vertex="1" parent="aws_region">
+          <mxGeometry x="940" y="780" width="440" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="github" value="GitHub repo&#10;monorepo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1B5E20;fontSize=10;" vertex="1" parent="aws_region">
+          <mxGeometry x="960" y="825" width="120" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="gha" value="GitHub Actions&#10;Lint + Pytest&#10;Build Docker&#10;Push ECR" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1B5E20;fontSize=10;" vertex="1" parent="aws_region">
+          <mxGeometry x="1100" y="815" width="140" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="deploy" value="ECS Deploy&#10;(rolling, new task def revision)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1B5E20;fontSize=10;" vertex="1" parent="aws_region">
+          <mxGeometry x="1255" y="825" width="115" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="cicd_arrow1" style="endArrow=classic;html=1;rounded=0;strokeColor=#1B5E20;" edge="1" parent="aws_region" source="github" target="gha">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cicd_arrow2" style="endArrow=classic;html=1;rounded=0;strokeColor=#1B5E20;" edge="1" parent="aws_region" source="gha" target="deploy">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cicd_arrow3" value="push image" style="endArrow=classic;html=1;rounded=0;strokeColor=#1B5E20;dashed=1;fontSize=10;" edge="1" parent="aws_region" source="gha" target="ecr_api">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cicd_arrow4" value="update svc" style="endArrow=classic;html=1;rounded=0;strokeColor=#1B5E20;dashed=1;fontSize=10;" edge="1" parent="aws_region" source="deploy" target="ecs_svc">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== EDGES (top-level) ========== -->
+        <mxCell id="e_user_cf" value="DNS lookup" style="endArrow=classic;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="users" target="cf_dns">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_dns_pages" style="endArrow=classic;html=1;rounded=0;strokeColor=#F38020;" edge="1" parent="1" source="cf_dns" target="cf_pages">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_dns_proxy" style="endArrow=classic;html=1;rounded=0;strokeColor=#F38020;" edge="1" parent="1" source="cf_dns" target="cf_proxy">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_proxy_waf" value="HTTPS&#10;api.virfriendo.win" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeColor=#444;strokeWidth=2;" edge="1" parent="1" source="cf_proxy" target="waf">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- AWS internal edges -->
+        <mxCell id="e_waf_alb" value="filtered" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeColor=#444;" edge="1" parent="aws_region" source="waf" target="alb">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_alb_tg" value=":80/:443→8000" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeColor=#8C4FFF;" edge="1" parent="aws_region" source="alb" target="tg">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_tg_ecs" value="forward" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeColor=#8C4FFF;strokeWidth=2;" edge="1" parent="aws_region" source="tg" target="ecs_svc">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e_ecs_aurora" value="SQL (TLS)" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeColor=#C925D1;" edge="1" parent="aws_region" source="container1" target="aurora">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_ecs_s3" value="presigned PUT/GET" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeColor=#7AA116;" edge="1" parent="aws_region" source="container1" target="s3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_ecs_secrets" value="GetSecretValue" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeColor=#DD344C;" edge="1" parent="aws_region" source="container1" target="secrets">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_ecs_logs" value="logs" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeColor=#E7157B;" edge="1" parent="aws_region" source="container1" target="cw_logs">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_logs_alarms" style="endArrow=classic;html=1;rounded=0;strokeColor=#E7157B;" edge="1" parent="aws_region" source="cw_logs" target="cw_alarms">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_alarms_sns" value="trigger" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeColor=#E7157B;" edge="1" parent="aws_region" source="cw_alarms" target="sns">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_sns_email" style="endArrow=classic;html=1;rounded=0;strokeColor=#E7157B;" edge="1" parent="aws_region" source="sns" target="email">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e_ecs_pull" value="docker pull" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeColor=#ED7100;dashed=1;" edge="1" parent="aws_region" source="ecr_api" target="task_def">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- IAM relationships (dashed, use) -->
+        <mxCell id="e_iam_task" value="assumed by tasks" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeColor=#DD344C;dashed=1;" edge="1" parent="aws_region" source="iam_task" target="ecs_svc">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_iam_exec" value="task execution" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeColor=#DD344C;dashed=1;" edge="1" parent="aws_region" source="iam_exec" target="ecr_api">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== LEGEND / TRAFFIC LEGEND ========== -->
+        <mxCell id="legend" value="Traffic / data flow legend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffbe6;strokeColor=#a38812;fontStyle=1;fontSize=12;verticalAlign=top;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="2580" y="160" width="0" height="0" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="legend2" value="Notes&#10;&#10;• Frontend (virfriendo.win) is on Cloudflare Pages — never hits AWS.&#10;• Only api.virfriendo.win goes through Cloudflare proxy → WAF → ALB → ECS.&#10;• Aurora endpoint sits inside VPC private subnets (only reachable from ECS).&#10;• S3 bucket has Public Access Block — clients access via 7-day presigned URLs.&#10;• Secrets Manager &#39;virfriendo/prod/database&#39; holds DB URL + ALL API keys (Anthropic, Groq, OpenAI, Gemini, Deepgram, Replicate, Tavily, Google OAuth, JWT secret).&#10;• ECR lifecycle keeps only the 2 most-recent active revisions (current: 10, 11).&#10;• 5 services in the application code live in the SAME container image — currently the whole monolith image (virfriendo-api:latest) runs as 1 ECS service, scaled by ECS Auto Scaling (1–3 tasks)." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffbe6;strokeColor=#a38812;fontSize=12;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="240" y="430" width="500" height="240" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
