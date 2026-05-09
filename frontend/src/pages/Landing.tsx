@@ -61,14 +61,14 @@ function FanhuaTree() {
           <stop offset="100%" stopColor="#5a3a1f" />
         </linearGradient>
         <radialGradient id="aidCanopy" cx="0.5" cy="0.45" r="0.6">
-          <stop offset="0%" stopColor="#228B22" />
+          <stop offset="0%" stopColor="#a6d17d" />
           <stop offset="55%" stopColor="#1B5E20" />
-          <stop offset="100%" stopColor="#145214" />
+          <stop offset="100%" stopColor="#6ba348" />
         </radialGradient>
         <radialGradient id="aidCanopyAlt" cx="0.5" cy="0.5" r="0.6">
-          <stop offset="0%" stopColor="#EF4444" />
-          <stop offset="60%" stopColor="#DC2626" />
-          <stop offset="100%" stopColor="#B91C1C" />
+          <stop offset="0%" stopColor="#ff7b70" />
+          <stop offset="60%" stopColor="#fa6255" />
+          <stop offset="100%" stopColor="#e04a3f" />
         </radialGradient>
       </defs>
 
@@ -117,17 +117,17 @@ function FanhuaTree() {
       <circle cx="265" cy="170" r="42" fill="url(#aidCanopyAlt)" />
 
       {/* yellow flower nuclei scattered across canopy */}
-      <circle cx="70" cy="190" r="6" fill="#DC2626" />
-      <circle cx="100" cy="170" r="7" fill="#DC2626" />
-      <circle cx="180" cy="100" r="8" fill="#DC2626" />
-      <circle cx="240" cy="40" r="9" fill="#DC2626" />
-      <circle cx="300" cy="100" r="8" fill="#DC2626" />
-      <circle cx="220" cy="125" r="6" fill="#DC2626" />
-      <circle cx="270" cy="125" r="6" fill="#DC2626" />
-      <circle cx="170" cy="160" r="6" fill="#DC2626" />
-      <circle cx="310" cy="160" r="6" fill="#DC2626" />
-      <circle cx="430" cy="170" r="7" fill="#DC2626" />
-      <circle cx="395" cy="155" r="6" fill="#DC2626" />
+      <circle cx="70" cy="190" r="6" fill="#fa6255" />
+      <circle cx="100" cy="170" r="7" fill="#fa6255" />
+      <circle cx="180" cy="100" r="8" fill="#fa6255" />
+      <circle cx="240" cy="40" r="9" fill="#fa6255" />
+      <circle cx="300" cy="100" r="8" fill="#fa6255" />
+      <circle cx="220" cy="125" r="6" fill="#fa6255" />
+      <circle cx="270" cy="125" r="6" fill="#fa6255" />
+      <circle cx="170" cy="160" r="6" fill="#fa6255" />
+      <circle cx="310" cy="160" r="6" fill="#fa6255" />
+      <circle cx="430" cy="170" r="7" fill="#fa6255" />
+      <circle cx="395" cy="155" r="6" fill="#fa6255" />
     </svg>
   )
 }
@@ -136,31 +136,31 @@ function FlowerBed() {
   return (
     <svg viewBox="0 0 320 90" className="aid-flowerbed-svg" aria-hidden>
       {/* grass tufts */}
-      <path d="M8 82 Q14 60 20 82 M28 84 Q34 62 40 84 M50 82 Q56 60 62 82" stroke="#145214" strokeWidth="3" fill="none" strokeLinecap="round" />
-      <path d="M260 84 Q266 62 272 84 M280 82 Q286 60 292 82 M302 84 Q308 62 314 84" stroke="#145214" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path d="M8 82 Q14 60 20 82 M28 84 Q34 62 40 84 M50 82 Q56 60 62 82" stroke="#6ba348" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path d="M260 84 Q266 62 272 84 M280 82 Q286 60 292 82 M302 84 Q308 62 314 84" stroke="#6ba348" strokeWidth="3" fill="none" strokeLinecap="round" />
       {/* red flower 1 */}
       <g transform="translate(76, 66)">
-        <circle r="9" fill="#DC2626" cx="-10" cy="-3" />
-        <circle r="9" fill="#DC2626" cx="10" cy="-3" />
-        <circle r="9" fill="#DC2626" cx="-6" cy="8" />
-        <circle r="9" fill="#DC2626" cx="6" cy="8" />
-        <circle r="6" fill="#DC2626" />
+        <circle r="9" fill="#fa6255" cx="-10" cy="-3" />
+        <circle r="9" fill="#fa6255" cx="10" cy="-3" />
+        <circle r="9" fill="#fa6255" cx="-6" cy="8" />
+        <circle r="9" fill="#fa6255" cx="6" cy="8" />
+        <circle r="6" fill="#fa6255" />
       </g>
       {/* yellow flower middle */}
       <g transform="translate(160, 60)">
-        <circle r="11" fill="#DC2626" cx="-12" cy="-3" />
-        <circle r="11" fill="#DC2626" cx="12" cy="-3" />
-        <circle r="11" fill="#DC2626" cx="-7" cy="10" />
-        <circle r="11" fill="#DC2626" cx="7" cy="10" />
-        <circle r="7" fill="#DC2626" />
+        <circle r="11" fill="#fa6255" cx="-12" cy="-3" />
+        <circle r="11" fill="#fa6255" cx="12" cy="-3" />
+        <circle r="11" fill="#fa6255" cx="-7" cy="10" />
+        <circle r="11" fill="#fa6255" cx="7" cy="10" />
+        <circle r="7" fill="#fa6255" />
       </g>
       {/* red flower 2 */}
       <g transform="translate(244, 66)">
-        <circle r="9" fill="#DC2626" cx="-10" cy="-3" />
-        <circle r="9" fill="#DC2626" cx="10" cy="-3" />
-        <circle r="9" fill="#DC2626" cx="-6" cy="8" />
-        <circle r="9" fill="#DC2626" cx="6" cy="8" />
-        <circle r="6" fill="#DC2626" />
+        <circle r="9" fill="#fa6255" cx="-10" cy="-3" />
+        <circle r="9" fill="#fa6255" cx="10" cy="-3" />
+        <circle r="9" fill="#fa6255" cx="-6" cy="8" />
+        <circle r="9" fill="#fa6255" cx="6" cy="8" />
+        <circle r="6" fill="#fa6255" />
       </g>
       {/* small accent flowers between */}
       <g transform="translate(118, 76)">
@@ -168,14 +168,14 @@ function FlowerBed() {
         <circle r="6" fill="#FF6B6B" cx="7" cy="-2" />
         <circle r="6" fill="#FF6B6B" cx="-4" cy="6" />
         <circle r="6" fill="#FF6B6B" cx="4" cy="6" />
-        <circle r="4" fill="#DC2626" />
+        <circle r="4" fill="#fa6255" />
       </g>
       <g transform="translate(204, 76)">
         <circle r="6" fill="#FF6B6B" cx="-7" cy="-2" />
         <circle r="6" fill="#FF6B6B" cx="7" cy="-2" />
         <circle r="6" fill="#FF6B6B" cx="-4" cy="6" />
         <circle r="6" fill="#FF6B6B" cx="4" cy="6" />
-        <circle r="4" fill="#DC2626" />
+        <circle r="4" fill="#fa6255" />
       </g>
     </svg>
   )
@@ -188,14 +188,14 @@ function Butterfly() {
       {/* left wings */}
       <g className="aid-butterfly-wing-l" style={{ transformOrigin: '20px 15px' }}>
         <ellipse cx="11" cy="11" rx="8" ry="6" fill="#1B5E20" />
-        <ellipse cx="13" cy="20" rx="6" ry="4.5" fill="#228B22" />
-        <circle cx="9" cy="10" r="1.5" fill="#DC2626" />
+        <ellipse cx="13" cy="20" rx="6" ry="4.5" fill="#a6d17d" />
+        <circle cx="9" cy="10" r="1.5" fill="#fa6255" />
       </g>
       {/* right wings */}
       <g className="aid-butterfly-wing-r" style={{ transformOrigin: '20px 15px' }}>
         <ellipse cx="29" cy="11" rx="8" ry="6" fill="#1B5E20" />
-        <ellipse cx="27" cy="20" rx="6" ry="4.5" fill="#228B22" />
-        <circle cx="31" cy="10" r="1.5" fill="#DC2626" />
+        <ellipse cx="27" cy="20" rx="6" ry="4.5" fill="#a6d17d" />
+        <circle cx="31" cy="10" r="1.5" fill="#fa6255" />
       </g>
       {/* antennae */}
       <path d="M20 9 Q19 5 16 4" stroke="#2a1f12" strokeWidth="0.5" fill="none" />
@@ -224,13 +224,13 @@ function LofiCat() {
       <circle cx="86" cy="38" r="14" fill="#d4c8b8" />
       <path d="M76 28 L74 18 L84 26 Z" fill="#b8a89a" />
       <path d="M96 28 L98 18 L88 26 Z" fill="#b8a89a" />
-      <path d="M77 26 L78 22 L82 26 Z" fill="#DC2626" />
-      <path d="M95 26 L94 22 L90 26 Z" fill="#DC2626" />
+      <path d="M77 26 L78 22 L82 26 Z" fill="#fa6255" />
+      <path d="M95 26 L94 22 L90 26 Z" fill="#fa6255" />
       <ellipse cx="80" cy="40" rx="1.6" ry="1.8" fill="#1a1a1a" />
       <ellipse cx="92" cy="40" rx="1.6" ry="1.8" fill="#1a1a1a" />
       <circle cx="80.5" cy="39.5" r="0.5" fill="#ffffff" />
       <circle cx="92.5" cy="39.5" r="0.5" fill="#ffffff" />
-      <path d="M85 43 L87 43 L86 45 Z" fill="#DC2626" />
+      <path d="M85 43 L87 43 L86 45 Z" fill="#fa6255" />
       <path d="M86 45 Q84 47.5 82 47" stroke="#1a1a1a" strokeWidth="0.7" fill="none" strokeLinecap="round" />
       <path d="M86 45 Q88 47.5 90 47" stroke="#1a1a1a" strokeWidth="0.7" fill="none" strokeLinecap="round" />
       <line x1="72" y1="43" x2="80" y2="43.5" stroke="#b8a89a" strokeWidth="0.4" />
