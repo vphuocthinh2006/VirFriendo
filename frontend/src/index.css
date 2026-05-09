@@ -1670,12 +1670,11 @@ body {
 }
 
 .aid-cta-secondary {
-  background: #fff9e6 0%, rgba(255, 249, 230, 0.98) 100%);
-  color: var(--aid-gold-bright);
-  border: 2px solid var(--aid-gold-deep);
+  background: #fff9e6;
+  color: #fa6255;
+  border: 2px solid #fa6255;
   box-shadow:
-    2px 3px 0 rgba(0, 0, 0, 0.225),
-    inset 0 0 0 1px rgba(192, 57, 43, 0.06);
+    2px 3px 0 rgba(192, 57, 43, 0.15);
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.35s ease,
@@ -1686,12 +1685,12 @@ body {
 
 .aid-cta-secondary:hover {
   transform: translateY(-2px);
-  background: #fff9e6 0%, rgba(255, 249, 230, 0.99) 100%);
-  border-color: var(--aid-gold-bright);
-  color: #c0392b;
+  background: #fa6255;
+  border-color: #fa6255;
+  color: #fff9e6;
   box-shadow:
-    2px 5px 0 rgba(0, 0, 0, 0.16),
-    0 12px 36px rgba(253, 203, 70, 0.22);
+    2px 5px 0 rgba(192, 57, 43, 0.2),
+    0 12px 36px rgba(250, 98, 85, 0.22);
 }
 
 .aid-cta-google {
