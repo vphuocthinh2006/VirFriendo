@@ -209,10 +209,12 @@ async def run_claude_agent(
 
         # Agentic loop: Claude may call tools
         max_iterations = 3
+        max_tokens = int(os.environ.get("ANTHROPIC_MAX_TOKENS", "2048"))
+        reply = ""
         for iteration in range(max_iterations):
             response = await client.messages.create(
                 model=os.environ.get("ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022"),
-                max_tokens=1024,
+                max_tokens=max_tokens,
                 system=system,
                 messages=anthropic_messages,
                 tools=TOOLS,
@@ -250,18 +252,37 @@ async def run_claude_agent(
                     "role": "user",
                     "content": tool_results,
                 })
+
+            elif response.stop_reason == "max_tokens":
+                # Truncated mid-generation. Harvest any partial text; if empty,
+                # retry once with a larger budget before giving up.
+                reply = _extract_text_from_anthropic_content(response.content)
+                logger.warning(
+                    "Claude hit max_tokens (limit={}) iter={} text_len={} blocks={}",
+                    max_tokens,
+                    iteration,
+                    len(reply),
+                    [getattr(b, "type", type(b).__name__) for b in (response.content or [])],
+                )
+                if reply:
+                    break
+                if max_tokens < 4096:
+                    max_tokens = 4096
+                    continue
+                break
+
             else:
                 # Unexpected stop reason — still harvest any text blocks
                 reply = _extract_text_from_anthropic_content(response.content)
-                if not reply:
-                    logger.warning(
-                        "Claude unusual stop_reason={} blocks={}",
-                        response.stop_reason,
-                        [getattr(b, "type", type(b).__name__) for b in (response.content or [])],
-                    )
+                logger.warning(
+                    "Claude unusual stop_reason={} blocks={} text_len={}",
+                    response.stop_reason,
+                    [getattr(b, "type", type(b).__name__) for b in (response.content or [])],
+                    len(reply or ""),
+                )
                 break
         else:
-            reply = "Mình đang xử lý, bạn thử lại nhé~"
+            reply = reply or "Mình đang xử lý, bạn thử lại nhé~"
 
         reply = (reply or "").strip()
         if not reply:
