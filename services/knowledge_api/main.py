@@ -1,3 +1,13 @@
+"""
+VirFriendo Knowledge Service (port 8041).
+
+Thin HTTP wrapper that re-exposes ``services.core.api.chat._analyze_youtube``
+and ``_analyze_web_url`` under ``/chat/analyze-youtube`` and
+``/chat/analyze-web``. The actual scraping / LLM-summary logic lives in
+``services/core/api/chat.py``; this service is a deployment-time split, not
+a logic boundary. Diagram should label this box "Knowledge proxy → core" or
+move the analyze logic into ``core`` and drop this service.
+"""
 from __future__ import annotations
 
 from fastapi import Depends, FastAPI, Form

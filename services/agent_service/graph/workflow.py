@@ -1,4 +1,12 @@
 # services/agent_service/graph/workflow.py
+#
+# DEPRECATED — legacy LangGraph workflow (classifier → emotion → route_intent →
+# chit_chat / guardrail / entertainment_expert / comfort / advice / crisis).
+#
+# Production traffic now goes through services/agent_service/claude_agent.py
+# (single Claude tool_use loop). This module is no longer imported by
+# agent_api/main.py — kept temporarily for reference and as a fallback we may
+# re-enable. Safe to delete once we confirm we will not need to roll back.
 from langgraph.graph import StateGraph, START, END
 from langchain_core.messages import HumanMessage
 from typing import Literal

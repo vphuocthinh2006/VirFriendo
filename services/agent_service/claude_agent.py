@@ -1,10 +1,15 @@
 """
-Claude tool_use agent — replaces LangGraph workflow.
+Claude tool_use agent — current production agent for /run on agent_api.
 
-Single LLM call with tools:
+Single LLM call with agentic tool loop. Replaces the legacy LangGraph
+classifier→emotion→route_intent→chit_chat workflow at
+``services/agent_service/graph/workflow.py`` (kept around for reference but
+NOT wired into any FastAPI route — see agent_api/main.py).
+
+Tools currently registered (TOOLS list below):
   - web_search(query)     : Tavily, only when fresh info needed
-  - recall_memory(topic)  : user memories from DB (future)
-  - generate_image(prompt): Replicate FLUX
+  - recall_memory(topic)  : user memories from DB — NOT YET IMPLEMENTED
+  - generate_image(prompt): Replicate FLUX — NOT YET IMPLEMENTED
 
 Claude decides when to use tools. No Python classifier, no routing nodes.
 """
