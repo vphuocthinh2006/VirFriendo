@@ -25,7 +25,7 @@ def _get_llm():
             return None
         try:
             from langchain_anthropic import ChatAnthropic
-            model = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
+            model = os.environ.get("ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022")
             llm = ChatAnthropic(
                 model=model,
                 temperature=temperature,
