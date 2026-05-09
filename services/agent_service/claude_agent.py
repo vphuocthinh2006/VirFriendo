@@ -17,6 +17,47 @@ from typing import Any, Sequence
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage
 from loguru import logger
 
+
+def _stringify_lc_content(content: Any) -> str:
+    """Normalize LangChain message content to a single string for the Anthropic API."""
+    if content is None:
+        return ""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts: list[str] = []
+        for block in content:
+            if isinstance(block, dict):
+                if block.get("type") == "text":
+                    parts.append(str(block.get("text") or ""))
+                elif "text" in block:
+                    parts.append(str(block.get("text") or ""))
+            elif isinstance(block, str):
+                parts.append(block)
+        return "\n".join(p.strip() for p in parts if p.strip()).strip()
+    return str(content).strip()
+
+
+def _extract_text_from_anthropic_content(content: Any) -> str:
+    """Pull user-visible text from Anthropic message.content blocks (SDK objects or dicts)."""
+    parts: list[str] = []
+    if not content:
+        return ""
+    for block in content:
+        if isinstance(block, dict):
+            if block.get("type") == "text":
+                parts.append(str(block.get("text") or ""))
+        else:
+            btype = getattr(block, "type", None)
+            if btype == "text":
+                parts.append(str(getattr(block, "text", "") or ""))
+            elif hasattr(block, "text"):
+                txt = getattr(block, "text", None)
+                if txt:
+                    parts.append(str(txt))
+    return "".join(parts).strip()
+
+
 # ---------------------------------------------------------------------------
 # Tool definitions (Anthropic tool_use format)
 # ---------------------------------------------------------------------------
@@ -148,11 +189,15 @@ async def run_claude_agent(
         for msg in messages:
             if isinstance(msg, SystemMessage):
                 # Merge into system prompt
-                system = msg.content + "\n\n" + system
+                system = _stringify_lc_content(msg.content) + "\n\n" + system
             elif isinstance(msg, HumanMessage):
-                anthropic_messages.append({"role": "user", "content": msg.content})
+                uc = _stringify_lc_content(msg.content)
+                if uc:
+                    anthropic_messages.append({"role": "user", "content": uc})
             elif isinstance(msg, AIMessage):
-                anthropic_messages.append({"role": "assistant", "content": msg.content})
+                ac = _stringify_lc_content(msg.content)
+                if ac:
+                    anthropic_messages.append({"role": "assistant", "content": ac})
 
         if not anthropic_messages:
             return {
@@ -176,11 +221,7 @@ async def run_claude_agent(
 
             # Check stop reason
             if response.stop_reason == "end_turn":
-                # Extract text reply
-                reply = ""
-                for block in response.content:
-                    if hasattr(block, "text"):
-                        reply += block.text
+                reply = _extract_text_from_anthropic_content(response.content)
                 break
 
             elif response.stop_reason == "tool_use":
@@ -210,11 +251,14 @@ async def run_claude_agent(
                     "content": tool_results,
                 })
             else:
-                # Unexpected stop reason
-                reply = ""
-                for block in response.content:
-                    if hasattr(block, "text"):
-                        reply += block.text
+                # Unexpected stop reason — still harvest any text blocks
+                reply = _extract_text_from_anthropic_content(response.content)
+                if not reply:
+                    logger.warning(
+                        "Claude unusual stop_reason={} blocks={}",
+                        response.stop_reason,
+                        [getattr(b, "type", type(b).__name__) for b in (response.content or [])],
+                    )
                 break
         else:
             reply = "Mình đang xử lý, bạn thử lại nhé~"
