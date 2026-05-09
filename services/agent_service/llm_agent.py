@@ -11,7 +11,6 @@ No Anthropic tool_use dependency. Works with any LangChain-compatible LLM.
 from __future__ import annotations
 
 import os
-import re
 from typing import Any, Sequence
 
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage
@@ -50,26 +49,46 @@ Phạm vi:
 
 
 # ---------------------------------------------------------------------------
-# Web search decision + execution
+# Web search decision — LLM-based (ask Groq if search is needed)
 # ---------------------------------------------------------------------------
 
-# Keywords that hint the user wants fresh/time-sensitive info
-_FRESH_INFO_PATTERNS = re.compile(
-    r"(mới nhất|tập mới|chap mới|chapter mới|ep mới|episode mới|"
-    r"bao giờ ra|khi nào ra|release date|ngày phát hành|"
-    r"mấy tập rồi|bao nhiêu tập|"
-    r"tin tức|news|trending|box office|doanh thu|"
-    r"season \d|mùa \d|phần \d|"
-    r"2024|2025|2026|năm nay|tháng này|tuần này|hôm nay)",
-    re.IGNORECASE,
-)
+_SEARCH_DECISION_PROMPT = """Bạn là một classifier. Nhiệm vụ duy nhất: quyết định tin nhắn user có CẦN tìm kiếm web không.
+
+Trả lời ĐÚNG 1 từ: YES hoặc NO
+
+Trả lời YES khi user hỏi về:
+- Thông tin mới, cập nhật, tin tức, sự kiện gần đây
+- Số liệu cụ thể (ngày phát hành, số tập, doanh thu, xếp hạng)
+- So sánh cần data thực (A vs B nếu cần stats)
+- Bất kỳ thứ gì bạn không chắc chắn 100% là đúng
+- Người, nhân vật, tác phẩm bạn không biết rõ
+
+Trả lời NO khi:
+- Chào hỏi, tâm sự, vent
+- Hỏi ý kiến cá nhân, cảm nhận
+- Kiến thức phổ thông bạn chắc chắn biết
+- Lore/gameplay/tips của game/anime nổi tiếng mà bạn đã biết
+- Tin nhắn quá ngắn hoặc không rõ nghĩa (1-2 từ chào)
+
+Tin nhắn user: """
 
 
-def _needs_web_search(user_text: str) -> bool:
-    """Heuristic: does the user message likely need fresh info?"""
+async def _should_search(user_text: str) -> bool:
+    """Ask LLM whether this message needs web search. Fast, cheap call."""
     if not user_text or len(user_text) < 3:
         return False
-    return bool(_FRESH_INFO_PATTERNS.search(user_text))
+
+    from services.agent_service.llm.client import generate
+    try:
+        result = await generate(_SEARCH_DECISION_PROMPT + user_text, "YES or NO?")
+        if result:
+            answer = result.strip().upper()
+            decision = answer.startswith("YES")
+            logger.info("Search decision for '{}': {} (raw: {})", user_text[:50], decision, answer[:10])
+            return decision
+    except Exception as e:
+        logger.warning("Search decision failed, defaulting NO: {}", e)
+    return False
 
 
 async def _do_web_search(query: str) -> str:
@@ -130,9 +149,9 @@ async def run_agent(
     system = _build_system(agent_id, memories)
     user_text = _extract_last_user_text(messages)
 
-    # Step 1: Check if web search is needed
+    # Step 1: Ask LLM if web search is needed
     search_context = ""
-    if _needs_web_search(user_text):
+    if await _should_search(user_text):
         logger.info("Agent: web_search triggered for: {}", user_text[:80])
         search_context = await _do_web_search(user_text)
 
