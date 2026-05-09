@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 
-from services.agent_service.claude_agent import run_claude_agent
+from services.agent_service.llm_agent import run_agent
 
 
 class AgentMessage(BaseModel):
@@ -37,4 +37,4 @@ async def health():
 @app.post("/run")
 async def run_agent(payload: AgentRunRequest):
     lc_messages = [_to_lc_message(m) for m in payload.messages]
-    return await run_claude_agent(lc_messages, agent_id=payload.agent_id or "tuq27")
+    return await run_agent(lc_messages, agent_id=payload.agent_id or "tuq27")

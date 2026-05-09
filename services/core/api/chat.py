@@ -128,9 +128,9 @@ async def _invoke_agent(lc_messages: list[Any], agent_id: str) -> dict[str, Any]
         except Exception as e:
             logger.warning("agent-service unavailable, fallback local: {}", e)
 
-    from services.agent_service.claude_agent import run_claude_agent
+    from services.agent_service.llm_agent import run_agent
 
-    return await run_claude_agent(lc_messages, agent_id=agent_id)
+    return await run_agent(lc_messages, agent_id=agent_id)
 
 
 _FALLBACK_EMPTY_REPLY = (
