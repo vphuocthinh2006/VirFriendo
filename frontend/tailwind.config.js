@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: ['selector', '[data-theme="dark"]'],
   theme: {
     extend: {
       fontFamily: {
@@ -44,6 +45,18 @@ export default {
           assistant: '#fff8ec',
           border: '#b0d4cf',
           input: '#fff8ec',
+        },
+        dark: {
+          bg: '#121212',
+          surface: '#1E1E2E',
+          elevated: '#2A2A3E',
+          border: '#3A3A5E',
+          text: '#E0E0E0',
+          muted: '#9E9E9E',
+          accent: '#6C5CE7',
+          'accent-bright': '#8B7CF7',
+          'user-bubble': '#3D5AF1',
+          'assistant-bubble': '#2A2A3E',
         },
         vn: {
           stage: '#fff8ec',

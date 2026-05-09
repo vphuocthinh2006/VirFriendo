@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { useTheme } from '../hooks/useTheme'
 import { LANDING_UPDATES } from '../landingRoutes'
 
 function IconHome() {
@@ -66,12 +67,30 @@ function IconBell() {
   )
 }
 
+function IconSun() {
+  return (
+    <svg className="aid-theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <circle cx="12" cy="12" r="5" />
+      <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+    </svg>
+  )
+}
+
+function IconMoon() {
+  return (
+    <svg className="aid-theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  )
+}
+
 function navLinkClass({ isActive }: { isActive: boolean }) {
   return `aid-nav-link${isActive ? ' aid-nav-link-active' : ''}`
 }
 
 export default function AppTopbar() {
   const { logout } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const userWrapRef = useRef<HTMLDivElement>(null)
@@ -125,6 +144,15 @@ export default function AppTopbar() {
         </div>
 
         <div className="aid-app-topbar-right">
+          <button
+            type="button"
+            className="aid-theme-toggle"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          >
+            {theme === 'dark' ? <IconSun /> : <IconMoon />}
+          </button>
           <NavLink
             to="/chat"
             className={({ isActive }) => `aid-app-play${isActive ? ' aid-app-play--here' : ''}`}
