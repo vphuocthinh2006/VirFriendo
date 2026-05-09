@@ -4,48 +4,48 @@
 
 html {
   scroll-behavior: smooth;
-  scrollbar-color: rgba(220, 38, 38, 0.5) rgba(10, 10, 10, 0.8);
+  scrollbar-color: rgba(255, 255, 255, 0.25) rgba(0, 0, 0, 0.9);
 }
 
-/* Pally theme: Black + Red — single dark theme, no light/dark toggle needed */
+/* Pally theme: Black + White */
 :root {
-  --bg3-black: #0A0A0A;
-  --bg3-black-rich: #141414;
-  --bg3-gold: #DC2626;
-  --bg3-gold-bright: #EF4444;
-  --bg3-gold-deep: #B91C1C;
-  --bg3-text: #F5F5F5;
-  --petzen-teal: #DC2626;
-  --petzen-teal-bright: #EF4444;
-  --petzen-teal-deep: #B91C1C;
-  --petzen-orange: #DC2626;
-  --petzen-orange-bright: #EF4444;
-  --petzen-yellow: #EF4444;
-  --petzen-cream: #0A0A0A;
-  --petzen-cream-2: #141414;
-  --petzen-cream-3: #1F1F1F;
-  --petzen-text: #F5F5F5;
-  --petzen-text-muted: #A3A3A3;
-  --onme-blue: #DC2626;
-  --onme-blue-bright: #EF4444;
-  --onme-blue-deep: #B91C1C;
-  --onme-lime: #DC2626;
-  --onme-lime-bright: #EF4444;
-  --onme-periwinkle: #292929;
-  --onme-bg: #0A0A0A;
-  --onme-bg-2: #141414;
-  --fanhua-red: #DC2626;
-  --fanhua-red-bright: #EF4444;
-  --fanhua-yellow: #EF4444;
-  --fanhua-cream: #0A0A0A;
-  --fanhua-cream-deep: #141414;
+  --bg3-black: #000000;
+  --bg3-black-rich: #0A0A0A;
+  --bg3-gold: #FFFFFF;
+  --bg3-gold-bright: #FFFFFF;
+  --bg3-gold-deep: #CCCCCC;
+  --bg3-text: #FFFFFF;
+  --petzen-teal: #FFFFFF;
+  --petzen-teal-bright: #FFFFFF;
+  --petzen-teal-deep: #CCCCCC;
+  --petzen-orange: #FFFFFF;
+  --petzen-orange-bright: #FFFFFF;
+  --petzen-yellow: #FFFFFF;
+  --petzen-cream: #000000;
+  --petzen-cream-2: #0A0A0A;
+  --petzen-cream-3: #141414;
+  --petzen-text: #FFFFFF;
+  --petzen-text-muted: #999999;
+  --onme-blue: #FFFFFF;
+  --onme-blue-bright: #FFFFFF;
+  --onme-blue-deep: #CCCCCC;
+  --onme-lime: #FFFFFF;
+  --onme-lime-bright: #FFFFFF;
+  --onme-periwinkle: #1A1A1A;
+  --onme-bg: #000000;
+  --onme-bg-2: #0A0A0A;
+  --fanhua-red: #FFFFFF;
+  --fanhua-red-bright: #FFFFFF;
+  --fanhua-yellow: #FFFFFF;
+  --fanhua-cream: #000000;
+  --fanhua-cream-deep: #0A0A0A;
   --bg3-font-display: "Cinzel", "Georgia", serif;
   --bg3-font-body: "Pixelify Sans", "Courier New", monospace;
 }
 
 ::selection {
-  background: rgba(220, 38, 38, 0.4);
-  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.25);
+  color: #000000;
 }
 
 ::-webkit-scrollbar {
@@ -54,24 +54,24 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0A0A0A;
+  background: #000000;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(220, 38, 38, 0.6), rgba(185, 28, 28, 0.8));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.5));
   border-radius: 4px;
-  border: 1px solid rgba(20, 20, 20, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.8);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(239, 68, 68, 0.8), rgba(220, 38, 38, 0.95));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.7));
 }
 
 body {
   @apply antialiased;
-  color: #F5F5F5;
+  color: #FFFFFF;
   font-family: var(--bg3-font-body);
-  background: #0A0A0A;
+  background: #000000;
 }
 
 #root {
@@ -7727,15 +7727,15 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: absolute;
   display: block;
   border-radius: 50% 0 50% 50%;
-  background: #ecb02b;
+  background: #DC2626;
   will-change: transform, opacity;
   animation-name: aid-petal-fall;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
 }
-.aid-petal-v0 { background: linear-gradient(135deg, #ecb02b 0%, #f5c451 100%); }
-.aid-petal-v1 { background: linear-gradient(135deg, #edc55b 0%, #fff8ec 100%); }
-.aid-petal-v2 { background: linear-gradient(135deg, #88cec7 0%, #66bcb4 100%); }
+.aid-petal-v0 { background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%); }
+.aid-petal-v1 { background: linear-gradient(135deg, #228B22 0%, #32CD32 100%); }
+.aid-petal-v2 { background: linear-gradient(135deg, #B91C1C 0%, #DC2626 100%); }
 @keyframes aid-petal-fall {
   0%   { transform: translate3d(0, 0, 0) rotate(var(--rot, 0deg)); opacity: 0; }
   10%  { opacity: 0.95; }
@@ -7749,8 +7749,8 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   left: 0; right: 0; bottom: 0;
   height: 78px;
   background:
-    linear-gradient(180deg, transparent 0%, rgba(102, 188, 180, 0.5) 30%, #66bcb4 60%, #3a8b82 100%);
-  border-top: 1px solid rgba(58, 139, 130, 0.5);
+    linear-gradient(180deg, transparent 0%, rgba(34, 139, 34, 0.5) 30%, #228B22 60%, #145214 100%);
+  border-top: 1px solid rgba(34, 139, 34, 0.6);
 }
 .aid-ground::before {
   /* grass tuft texture */
@@ -7758,18 +7758,18 @@ button.ad-card__like-btn.is-liked .ad-card__stat-icon {
   position: absolute;
   top: 6px; left: 0; right: 0; height: 14px;
   background-image:
-    radial-gradient(circle at 4% 100%, #3a8b82 1.5px, transparent 2px),
-    radial-gradient(circle at 11% 100%, #3a8b82 1.5px, transparent 2px),
-    radial-gradient(circle at 19% 100%, #3a8b82 1.5px, transparent 2px),
-    radial-gradient(circle at 27% 100%, #3a8b82 1.5px, transparent 2px),
-    radial-gradient(circle at 35% 100%, #3a8b82 1.5px, transparent 2px),
-    radial-gradient(circle at 43% 100%, #3a8b82 1.5px, transparent 2px),
-    radial-gradient(circle at 56% 100%, #3a8b82 1.5px, transparent 2px),
-    radial-gradient(circle at 64% 100%, #3a8b82 1.5px, transparent 2px),
-    radial-gradient(circle at 72% 100%, #3a8b82 1.5px, transparent 2px),
-    radial-gradient(circle at 81% 100%, #3a8b82 1.5px, transparent 2px),
-    radial-gradient(circle at 89% 100%, #3a8b82 1.5px, transparent 2px),
-    radial-gradient(circle at 96% 100%, #3a8b82 1.5px, transparent 2px);
+    radial-gradient(circle at 4% 100%, #145214 1.5px, transparent 2px),
+    radial-gradient(circle at 11% 100%, #1a6b1a 1.5px, transparent 2px),
+    radial-gradient(circle at 19% 100%, #145214 1.5px, transparent 2px),
+    radial-gradient(circle at 27% 100%, #1a6b1a 1.5px, transparent 2px),
+    radial-gradient(circle at 35% 100%, #145214 1.5px, transparent 2px),
+    radial-gradient(circle at 43% 100%, #1a6b1a 1.5px, transparent 2px),
+    radial-gradient(circle at 56% 100%, #145214 1.5px, transparent 2px),
+    radial-gradient(circle at 64% 100%, #1a6b1a 1.5px, transparent 2px),
+    radial-gradient(circle at 72% 100%, #145214 1.5px, transparent 2px),
+    radial-gradient(circle at 81% 100%, #1a6b1a 1.5px, transparent 2px),
+    radial-gradient(circle at 89% 100%, #145214 1.5px, transparent 2px),
+    radial-gradient(circle at 96% 100%, #1a6b1a 1.5px, transparent 2px);
   background-size: 100% 100%;
   opacity: 0.85;
 }
