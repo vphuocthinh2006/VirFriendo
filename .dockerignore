@@ -18,6 +18,7 @@ frontend/
 docs/
 tests/
 scripts/
+!scripts/download_models.py
 integrations/
 data/
 exports/
