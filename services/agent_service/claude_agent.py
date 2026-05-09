@@ -274,6 +274,7 @@ async def run_claude_agent(
         max_iterations = 3
         max_tokens = int(os.environ.get("ANTHROPIC_MAX_TOKENS", "2048"))
         model_name = os.environ.get("ANTHROPIC_MODEL", "claude-3-5-sonnet-latest")
+        logger.info("Claude agent: using model={} max_tokens={}", model_name, max_tokens)
         reply = ""
         for iteration in range(max_iterations):
             response = await client.messages.create(
