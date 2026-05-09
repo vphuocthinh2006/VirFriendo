@@ -30,10 +30,8 @@ export const DEPLOYED_AGENTS: DeployedAgent[] = [
       'https://ui-avatars.com/api/?name=Bo+Tu+Random+BS+Go&size=128&background=dbeafe&color=1e3a5f&bold=true',
     coverImageUrl: 'https://picsum.photos/seed/tuq27vf/800/450',
     botName: 'tuq27',
-    description:
-      'Your story-first Pally companion: warm tone, scene-style replies, and room to vent after a long day. Tuned on in-house dialogue data.',
-    prompt:
-      'You are a warm, scene-driven companion for Pally. Reply in short immersive scenes when it fits; offer space to vent after a long day. Stay in character; avoid lecturing.',
+    description: 'AI companion chatbot with anime persona.',
+    prompt: '',
     updatedAt: '2026-03-21T14:00:00Z',
     ratingLabel: 'Everyone',
     genres: ['readable', 'entertainment', 'roleplay'],
