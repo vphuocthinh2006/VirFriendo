@@ -231,28 +231,31 @@ jobs:
         if: success()
         shell: bash
         run: |
+          MSG=$(printf '%s\n\nCommit: %s\nBranch: %s\nActor: %s\nTask: %s\nHealth: OK (%s)' \
+            '✅ Deploy completed successfully.' \
+            '${{ github.sha }}' \
+            '${{ github.ref_name }}' \
+            '${{ github.actor }}' \
+            '${{ steps.register.outputs.task_definition }}' \
+            '${{ steps.cfg.outputs.health_url }}')
           aws sns publish \
             --topic-arn "arn:aws:sns:ap-southeast-1:292773837061:pally-alerts" \
             --subject "[Pally] Deploy SUCCESS - ${{ github.sha }}" \
-            --message "✅ Deploy completed successfully.
-
-Commit: ${{ github.sha }}
-Branch: ${{ github.ref_name }}
-Actor: ${{ github.actor }}
-Task: ${{ steps.register.outputs.task_definition }}
-Health: OK (${{ steps.cfg.outputs.health_url }})"
+            --message "$MSG"
 
       - name: Notify deploy failure
         if: failure()
         shell: bash
         run: |
+          LOG_URL='https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          MSG=$(printf '%s\n\nCommit: %s\nBranch: %s\nActor: %s\nRolled back to: %s\nCheck logs: %s' \
+            '❌ Deploy failed and rolled back.' \
+            '${{ github.sha }}' \
+            '${{ github.ref_name }}' \
+            '${{ github.actor }}' \
+            '${{ steps.previous.outputs.current_task_definition }}' \
+            "$LOG_URL")
           aws sns publish \
             --topic-arn "arn:aws:sns:ap-southeast-1:292773837061:pally-alerts" \
             --subject "[Pally] Deploy FAILED - ${{ github.sha }}" \
-            --message "❌ Deploy failed and rolled back.
-
-Commit: ${{ github.sha }}
-Branch: ${{ github.ref_name }}
-Actor: ${{ github.actor }}
-Rolled back to: ${{ steps.previous.outputs.current_task_definition }}
-Check logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            --message "$MSG"
