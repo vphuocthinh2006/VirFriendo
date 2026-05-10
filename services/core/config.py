@@ -67,7 +67,7 @@ class Settings(BaseSettings):
     GALLERY_EMBEDDINGS_NPY_PATH: str | None = None
     GALLERY_CLASS_NAMES_PKL_PATH: str | None = None
     GALLERY_VECTOR_BACKEND: str = "numpy"
-    VIT_MIN_SIMILARITY: float = 0.35
+    VIT_MIN_SIMILARITY: float = 0.657
     VIT_MIN_MARGIN_SIM: float = 0.03
 
     # Optional: external agent-service endpoint (microservice mode)
