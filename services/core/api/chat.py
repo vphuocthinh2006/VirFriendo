@@ -1522,7 +1522,7 @@ SEARCH QUERY — CỰC KỲ QUAN TRỌNG:
 - Nếu thấy đặc điểm độc đáo (mặt nạ, vũ khí, biểu tượng): dùng nó trong query.
 - Ví dụ: thấy mặt nạ fox → "fox mask anime character", thấy bịt mắt + tóc trắng → "Gojo Satoru Jujutsu Kaisen"
 
-Trả lời bằng tiếng Việt, tự nhiên, 3-6 câu. KHÔNG bullet points.
+Trả lời bằng tiếng Việt, tự nhiên, 3-6 câu. KHÔNG bullet points. KHÔNG BAO GIỜ dùng ký tự Trung Quốc/Nhật/Hàn — chỉ tiếng Việt thuần.
 
 CUỐI câu trả lời, BẮT BUỘC thêm 2 dòng:
 SEARCH_QUERY: <query tiếng Anh CỤ THỂ để tìm đúng nhân vật — PHẢI có tên nhân vật nếu đoán được>
