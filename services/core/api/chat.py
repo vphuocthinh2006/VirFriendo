@@ -1627,31 +1627,32 @@ SUBJECT_TAG: <tên nhân vật + nguồn, ví dụ "Aiden Pearce (Watch Dogs)">"
             return ""
 
     async def _call_gemini() -> str:
-        if not gemini_key:
+        """Fallback: GPT-4o-mini (cheaper, still has vision)."""
+        if not openai_key:
             return ""
         try:
-            logger.info("[VISION] Calling Gemini 1.5 Pro...")
-            import google.generativeai as genai
-            genai.configure(api_key=gemini_key)
-            model = genai.GenerativeModel(model_name="gemini-2.0-flash", system_instruction=vision_system)
+            logger.info("[VISION] Calling GPT-4o-mini (fallback)...")
+            from openai import OpenAI
+            oai = OpenAI(api_key=openai_key)
+            user_content: list[dict[str, Any]] = [{"type": "text", "text": vision_prompt}]
             if is_video:
-                response = model.generate_content(
-                    [vision_prompt, {"mime_type": mime_type, "data": content}],
-                    generation_config={"max_output_tokens": 900, "temperature": 0.5},
-                )
+                frame_urls = _extract_video_keyframes_as_data_urls(content, mime_type, max_frames=4)
+                for frame_url in frame_urls:
+                    user_content.append({"type": "image_url", "image_url": {"url": frame_url, "detail": "low"}})
             else:
-                import PIL.Image
-                from io import BytesIO
-                img = PIL.Image.open(BytesIO(content))
-                response = model.generate_content(
-                    [vision_prompt, img],
-                    generation_config={"max_output_tokens": 900, "temperature": 0.5},
-                )
-            result = response.text or ""
-            logger.info("[VISION] ✅ Gemini done")
+                base64_content = base64.b64encode(content).decode('utf-8')
+                user_content.append({"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{base64_content}", "detail": "high"}})
+            response = oai.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "system", "content": vision_system}, {"role": "user", "content": user_content}],
+                max_tokens=900,
+                temperature=0.5,
+            )
+            result = response.choices[0].message.content or ""
+            logger.info("[VISION] ✅ GPT-4o-mini done")
             return result
         except Exception as e:
-            logger.error("[VISION] Gemini failed: {}", e)
+            logger.error("[VISION] GPT-4o-mini failed: {}", e)
             return ""
 
     # Run both in parallel
