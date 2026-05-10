@@ -110,3 +110,13 @@ docs/slide-render/
 docs/pally-system-design.drawio
 docs/pally-system-design.excalidraw
 docs/system-design.xml
+
+# Diagram files (local work, not code)
+*.drawio
+*.excalidraw
+*.xml
+!docs/pally-system-design.drawio
+
+# Model source folders (downloaded separately)
+NLP_main-*/
+ML_model_and_embedding_gallery-*/
