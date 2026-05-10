@@ -48,7 +48,7 @@ def get_vit_encoder() -> _ViTClassifierWrapper | None:
 
             name = getattr(settings, "VIT_TIMM_MODEL", "vit_base_patch16_224").strip()
             ncls = int(getattr(settings, "VIT_NUM_CLASSES", 45))
-            core = timm.create_model(name, pretrained=False, num_classes=ncls, img_size=448)
+            core = timm.create_model(name, pretrained=False, num_classes=ncls, img_size=448, class_token=False, global_pool='avg')
             wrap = _ViTClassifierWrapper(core)
             try:
                 ckpt = torch.load(path, map_location=_device(), weights_only=False)

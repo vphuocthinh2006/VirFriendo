@@ -1570,7 +1570,7 @@ SUBJECT_TAG: <tên nhân vật + nguồn, ví dụ "Aiden Pearce (Watch Dogs)">"
             logger.info("[VISION] Calling Gemini 1.5 Pro...")
             import google.generativeai as genai
             genai.configure(api_key=gemini_key)
-            model = genai.GenerativeModel(model_name="gemini-1.5-pro", system_instruction=vision_system)
+            model = genai.GenerativeModel(model_name="gemini-2.0-flash", system_instruction=vision_system)
             if is_video:
                 response = model.generate_content(
                     [vision_prompt, {"mime_type": mime_type, "data": content}],
