@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net">
+  <diagram id="virfriendo-a4" name="VirFriendo Architecture">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="5" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="826" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="VirFriendo — Production Architecture (AWS ap-southeast-1)" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="15" y="8" width="1140" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Domain: virfriendo.win  ·  API: api.virfriendo.win  ·  Region: Singapore" style="text;html=1;align=center;verticalAlign=middle;fontSize=8;fontColor=#5A6772;" vertex="1" parent="1">
+          <mxGeometry x="15" y="28" width="1140" height="14" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== EDGE LAYER ==================== -->
+        <!-- Users -->
+        <mxCell id="users-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="15" y="55" width="110" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="users-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3E;strokeColor=#232F3E;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.users;" vertex="1" parent="1">
+          <mxGeometry x="50" y="63" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="users-label" value="End Users&#10;(browser / mobile)" style="text;html=1;align=center;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="105" width="100" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- Cloudflare group -->
+        <mxCell id="cf-group" value="Cloudflare  (DNS · CDN · Pages · WAF Proxy)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#F38020;fontSize=9;fontStyle=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontColor=#A0501A;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="145" y="55" width="320" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="cf-pages" value="Cloudflare Pages — React SPA&#10;static @ virfriendo.win" style="text;html=1;align=center;verticalAlign=middle;fontSize=8;fillColor=#FFFFFF;strokeColor=#F38020;rounded=1;" vertex="1" parent="cf-group">
+          <mxGeometry x="8" y="22" width="148" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="cf-proxy" value="Proxy + DNS&#10;api.virfriendo.win&#10;(orange-cloud, TLS)" style="text;html=1;align=center;verticalAlign=middle;fontSize=8;fillColor=#FFFFFF;strokeColor=#F38020;rounded=1;" vertex="1" parent="cf-group">
+          <mxGeometry x="164" y="22" width="148" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- WAF -->
+        <mxCell id="waf-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF0F0;strokeColor=#DD3522;" vertex="1" parent="1">
+          <mxGeometry x="485" y="55" width="100" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="waf-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#DD3522;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.waf;" vertex="1" parent="1">
+          <mxGeometry x="510" y="60" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="waf-label" value="AWS WAF&#10;CommonRuleSet + SQLi&#10;2000 req/IP/5min" style="text;html=1;align=center;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="487" y="108" width="96" height="26" as="geometry" />
+        </mxCell>
+
+        <!-- IGW -->
+        <mxCell id="igw-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F8E8;strokeColor=#7AA116;" vertex="1" parent="1">
+          <mxGeometry x="600" y="55" width="100" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="igw-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.internet_gateway;" vertex="1" parent="1">
+          <mxGeometry x="625" y="60" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="igw-label" value="Internet Gateway&#10;igw-virfriendo" style="text;html=1;align=center;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="603" y="108" width="94" height="26" as="geometry" />
+        </mxCell>
+
+        <!-- ECR Registry -->
+        <mxCell id="ecr-box" value="ECR Container Registry  (regional)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF1E6;strokeColor=#ED7100;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=9;fontStyle=1;fontColor=#A04A00;" vertex="1" parent="1">
+          <mxGeometry x="715" y="55" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ecr-api" value="virfriendo-api" style="text;html=1;align=center;verticalAlign=middle;fontSize=8;fillColor=#FFFFFF;strokeColor=#ED7100;rounded=1;" vertex="1" parent="ecr-box">
+          <mxGeometry x="8" y="22" width="100" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="ecr-web" value="virfriendo-web" style="text;html=1;align=center;verticalAlign=middle;fontSize=8;fillColor=#FFFFFF;strokeColor=#ED7100;rounded=1;" vertex="1" parent="ecr-box">
+          <mxGeometry x="114" y="22" width="100" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="ecr-policy" value="Lifecycle: keep 2 active revisions  (current: v10, v11)" style="text;html=1;align=center;fontSize=7.5;fontColor=#5A6772;" vertex="1" parent="ecr-box">
+          <mxGeometry x="8" y="48" width="206" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- S3 (top-right) -->
+        <mxCell id="s3-box" value="S3 Object Storage" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F8E8;strokeColor=#7AA116;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=9;fontStyle=1;fontColor=#3F6E12;" vertex="1" parent="1">
+          <mxGeometry x="950" y="55" width="205" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s3-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="s3-box">
+          <mxGeometry x="8" y="22" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="s3-label" value="virfriendo-media-ap-southeast-1&#10;prefix: media/&#10;Public: BLOCKED  ·  7-day presigned URLs" style="text;html=1;align=left;verticalAlign=middle;fontSize=7.5;" vertex="1" parent="s3-box">
+          <mxGeometry x="55" y="22" width="145" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== VPC ==================== -->
+        <mxCell id="vpc" value="VPC  virfriendo-vpc  (10.0.0.0/16)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F8FD;strokeColor=#147EBA;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=10;spacingTop=4;fontSize=10;fontStyle=1;fontColor=#147EBA;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="15" y="160" width="800" height="475" as="geometry" />
+        </mxCell>
+
+        <!-- AZ 1a -->
+        <mxCell id="az1a" value="Availability Zone  ap-southeast-1a" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5294CF;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=3;fontSize=9;fontStyle=2;fontColor=#5294CF;dashed=1;" vertex="1" parent="vpc">
+          <mxGeometry x="10" y="28" width="385" height="437" as="geometry" />
+        </mxCell>
+        <!-- AZ 1a public -->
+        <mxCell id="pub1a" value="Public Subnet  10.0.2.0/24" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F6F0;strokeColor=#00A4A6;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=8;fontStyle=2;fontColor=#007B7C;" vertex="1" parent="az1a">
+          <mxGeometry x="8" y="22" width="370" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="alb1a-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elastic_load_balancing;" vertex="1" parent="pub1a">
+          <mxGeometry x="10" y="22" width="36" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="alb1a-label" value="ALB virfriendo-alb (node 1a)&#10;:80 → :8000  ·  :443 (HTTPS) → :8000" style="text;html=1;align=left;verticalAlign=middle;fontSize=7.5;" vertex="1" parent="pub1a">
+          <mxGeometry x="50" y="20" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="nat1a-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.endpoint;" vertex="1" parent="pub1a">
+          <mxGeometry x="215" y="22" width="36" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="nat1a-label" value="NAT Gateway&#10;(egress to internet)" style="text;html=1;align=left;verticalAlign=middle;fontSize=7.5;" vertex="1" parent="pub1a">
+          <mxGeometry x="255" y="20" width="115" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- AZ 1a private -->
+        <mxCell id="pri1a" value="Private Subnet  10.0.11.0/24" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F1F8;strokeColor=#147EBA;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=8;fontStyle=2;fontColor=#0A4F7A;" vertex="1" parent="az1a">
+          <mxGeometry x="8" y="108" width="370" height="320" as="geometry" />
+        </mxCell>
+        <!-- ECS cluster 1a -->
+        <mxCell id="ecs1a" value="ECS Fargate Cluster — virfriendo-cluster (AZ-1a)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF1E6;strokeColor=#ED7100;align=left;verticalAlign=top;spacingLeft=4;spacingTop=2;fontSize=8;fontStyle=1;fontColor=#A04A00;" vertex="1" parent="pri1a">
+          <mxGeometry x="8" y="22" width="354" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="task1a-1" value="api Task #1&#10;active&#10;2 vCPU · 6 GB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ED7100;align=center;verticalAlign=middle;fontSize=7;" vertex="1" parent="ecs1a">
+          <mxGeometry x="10" y="22" width="100" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="task1a-2" value="api Task #2&#10;scale&#10;2 vCPU · 6 GB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ED7100;align=center;verticalAlign=middle;fontSize=7;" vertex="1" parent="ecs1a">
+          <mxGeometry x="125" y="22" width="100" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="task1a-3" value="api Task #3&#10;max=3&#10;2 vCPU · 6 GB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ED7100;align=center;verticalAlign=middle;fontSize=7;" vertex="1" parent="ecs1a">
+          <mxGeometry x="240" y="22" width="100" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="ecs1a-svc" value="Service: virfriendo-api-svc  ·  Task Def: virfriendo-api:33&#10;Image: virfriendo-api:v11  (from ECR)" style="text;html=1;align=center;verticalAlign=middle;fontSize=7;fontColor=#5A6772;" vertex="1" parent="ecs1a">
+          <mxGeometry x="8" y="76" width="338" height="42" as="geometry" />
+        </mxCell>
+        <!-- Aurora 1a -->
+        <mxCell id="aurora1a-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#3334B9;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.rds;" vertex="1" parent="pri1a">
+          <mxGeometry x="14" y="160" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="aurora1a-label" value="Aurora Serverless v2 — WRITER&#10;virfriendo-aurora  (PostgreSQL 16.6)&#10;0.5 – 4 ACU  ·  asyncpg" style="text;html=1;align=left;verticalAlign=middle;fontSize=7.5;" vertex="1" parent="pri1a">
+          <mxGeometry x="60" y="160" width="300" height="40" as="geometry" />
+        </mxCell>
+        <!-- VPC Endpoints 1a -->
+        <mxCell id="vpce1a" value="VPC Endpoints  (private connectivity, no internet)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F0FF;strokeColor=#8C4FFF;align=left;verticalAlign=top;spacingLeft=4;spacingTop=2;fontSize=7.5;fontStyle=2;fontColor=#5A2EBE;dashed=1;" vertex="1" parent="pri1a">
+          <mxGeometry x="8" y="208" width="354" height="106" as="geometry" />
+        </mxCell>
+        <mxCell id="vpce1a-list" value="• S3 Gateway Endpoint (free)&#10;• ECR  (api &amp; dkr) — Interface&#10;• Secrets Manager — Interface&#10;• CloudWatch Logs — Interface&#10;• SNS — Interface" style="text;html=1;align=left;verticalAlign=top;fontSize=7.5;spacingLeft=8;" vertex="1" parent="vpce1a">
+          <mxGeometry x="4" y="20" width="346" height="82" as="geometry" />
+        </mxCell>
+
+        <!-- AZ 1b (mirror) -->
+        <mxCell id="az1b" value="Availability Zone  ap-southeast-1b" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5294CF;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=3;fontSize=9;fontStyle=2;fontColor=#5294CF;dashed=1;" vertex="1" parent="vpc">
+          <mxGeometry x="405" y="28" width="385" height="437" as="geometry" />
+        </mxCell>
+        <mxCell id="pub1b" value="Public Subnet  10.0.3.0/24" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F6F0;strokeColor=#00A4A6;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=8;fontStyle=2;fontColor=#007B7C;" vertex="1" parent="az1b">
+          <mxGeometry x="8" y="22" width="370" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="alb1b-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elastic_load_balancing;" vertex="1" parent="pub1b">
+          <mxGeometry x="10" y="22" width="36" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="alb1b-label" value="ALB virfriendo-alb (node 1b)&#10;same ALB, multi-AZ&#10;TG: virfriendo-api-tg" style="text;html=1;align=left;verticalAlign=middle;fontSize=7.5;" vertex="1" parent="pub1b">
+          <mxGeometry x="50" y="18" width="150" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="nat1b-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.endpoint;" vertex="1" parent="pub1b">
+          <mxGeometry x="215" y="22" width="36" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="nat1b-label" value="NAT Gateway&#10;(egress to internet)" style="text;html=1;align=left;verticalAlign=middle;fontSize=7.5;" vertex="1" parent="pub1b">
+          <mxGeometry x="255" y="20" width="115" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pri1b" value="Private Subnet  10.0.12.0/24" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F1F8;strokeColor=#147EBA;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=8;fontStyle=2;fontColor=#0A4F7A;" vertex="1" parent="az1b">
+          <mxGeometry x="8" y="108" width="370" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="ecs1b" value="ECS Fargate Cluster — virfriendo-cluster (AZ-1b)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF1E6;strokeColor=#ED7100;align=left;verticalAlign=top;spacingLeft=4;spacingTop=2;fontSize=8;fontStyle=1;fontColor=#A04A00;" vertex="1" parent="pri1b">
+          <mxGeometry x="8" y="22" width="354" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="task1b-1" value="api Task #1&#10;fallback&#10;2 vCPU · 6 GB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ED7100;align=center;verticalAlign=middle;fontSize=7;" vertex="1" parent="ecs1b">
+          <mxGeometry x="10" y="22" width="100" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="task1b-2" value="api Task #2&#10;scale&#10;2 vCPU · 6 GB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ED7100;align=center;verticalAlign=middle;fontSize=7;" vertex="1" parent="ecs1b">
+          <mxGeometry x="125" y="22" width="100" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="task1b-3" value="api Task #3&#10;max=3&#10;2 vCPU · 6 GB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ED7100;align=center;verticalAlign=middle;fontSize=7;" vertex="1" parent="ecs1b">
+          <mxGeometry x="240" y="22" width="100" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="ecs1b-svc" value="Same task definition · auto-scales 1-3 per AZ&#10;CPU &gt; 70% → scale-out  ·  CPU &lt; 63% → scale-in" style="text;html=1;align=center;verticalAlign=middle;fontSize=7;fontColor=#5A6772;" vertex="1" parent="ecs1b">
+          <mxGeometry x="8" y="76" width="338" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="aurora1b-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#3334B9;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.rds;" vertex="1" parent="pri1b">
+          <mxGeometry x="14" y="160" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="aurora1b-label" value="Aurora Serverless v2 — READER / standby&#10;streaming replication from writer (1a)&#10;automatic failover" style="text;html=1;align=left;verticalAlign=middle;fontSize=7.5;" vertex="1" parent="pri1b">
+          <mxGeometry x="60" y="160" width="300" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="vpce1b" value="VPC Endpoints  (private connectivity, no internet)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F0FF;strokeColor=#8C4FFF;align=left;verticalAlign=top;spacingLeft=4;spacingTop=2;fontSize=7.5;fontStyle=2;fontColor=#5A2EBE;dashed=1;" vertex="1" parent="pri1b">
+          <mxGeometry x="8" y="208" width="354" height="106" as="geometry" />
+        </mxCell>
+        <mxCell id="vpce1b-list" value="• S3 Gateway Endpoint (free)&#10;• ECR  (api &amp; dkr) — Interface&#10;• Secrets Manager — Interface&#10;• CloudWatch Logs — Interface&#10;• SNS — Interface" style="text;html=1;align=left;verticalAlign=top;fontSize=7.5;spacingLeft=8;" vertex="1" parent="vpce1b">
+          <mxGeometry x="4" y="20" width="346" height="82" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== Right column: Secrets/IAM + Monitoring ==================== -->
+        <!-- Secrets + IAM -->
+        <mxCell id="sec-group" value="Secrets Manager  &amp;  IAM" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF0F0;strokeColor=#DD3522;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=10;fontStyle=1;fontColor=#A82514;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="830" y="160" width="325" height="225" as="geometry" />
+        </mxCell>
+        <mxCell id="sec-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#DD3522;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.secrets_manager;" vertex="1" parent="sec-group">
+          <mxGeometry x="10" y="26" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sec-label" value="Secrets Manager — virfriendo/prod/database&#10;Database URL + ALL API keys&#10;(Anthropic, OpenAI, etc.)" style="text;html=1;align=left;verticalAlign=middle;fontSize=8;" vertex="1" parent="sec-group">
+          <mxGeometry x="56" y="22" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="iam-task-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#DD3522;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.identity_and_access_management;" vertex="1" parent="sec-group">
+          <mxGeometry x="10" y="92" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="iam-task-label" value="IAM Role — virfriendo-ecs-task-role&#10;S3 + Secrets Mgr access&#10;(used by container code)" style="text;html=1;align=left;verticalAlign=middle;fontSize=8;" vertex="1" parent="sec-group">
+          <mxGeometry x="56" y="88" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="iam-exec-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#DD3522;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.identity_and_access_management;" vertex="1" parent="sec-group">
+          <mxGeometry x="10" y="160" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="iam-exec-label" value="IAM Role — virfriendo-ecs-execution-role&#10;ECR pull + CloudWatch Logs&#10;(used by ECS agent)" style="text;html=1;align=left;verticalAlign=middle;fontSize=8;" vertex="1" parent="sec-group">
+          <mxGeometry x="56" y="156" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Monitoring -->
+        <mxCell id="mon-group" value="Monitoring &amp;  Alerting" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F4FF;strokeColor=#8C4FFF;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=10;fontStyle=1;fontColor=#5A2EBE;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="830" y="395" width="325" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="cw-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudwatch_2;" vertex="1" parent="mon-group">
+          <mxGeometry x="10" y="26" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cw-label" value="CloudWatch Logs — /ecs/virfriendo-api&#10;30-day retention" style="text;html=1;align=left;verticalAlign=middle;fontSize=8;" vertex="1" parent="mon-group">
+          <mxGeometry x="56" y="26" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cw-alarms" value="CloudWatch Alarms (7) :&#10;1. ECS CPU &gt; 70%  → scale-out&#10;2. ECS CPU &lt; 63%  → scale-in&#10;3. ALB 5xx error rate&#10;4. Target group unhealthy hosts&#10;5. Aurora ACU &gt; threshold&#10;6. NAT Gateway error rate&#10;7. SNS publish failures" style="text;html=1;align=left;verticalAlign=top;fontSize=7.5;fillColor=#FFFFFF;strokeColor=#8C4FFF;rounded=1;spacingLeft=6;spacingTop=4;" vertex="1" parent="mon-group">
+          <mxGeometry x="10" y="74" width="305" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="sns-icon" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.simple_notification_service;" vertex="1" parent="mon-group">
+          <mxGeometry x="10" y="184" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sns-label" value="SNS Topic: pally-alerts  →  email&#10;vphuocthinh1@gmail.com" style="text;html=1;align=left;verticalAlign=middle;fontSize=8;" vertex="1" parent="mon-group">
+          <mxGeometry x="56" y="184" width="260" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== Bottom legend / data flow ==================== -->
+        <mxCell id="legend" value="Data flow:  Users → Cloudflare (DNS+Pages serves SPA) → CF Proxy api.virfriendo.win → AWS WAF → IGW → ALB (multi-AZ)  →  ECS Fargate tasks (private subnet)  ↔  Aurora (SQL/TLS, asyncpg)  ·  S3 (presigned PUT/GET via Gateway Endpoint)  ·  Secrets Manager (GetSecretValue)  ·  ECR (docker pull)  ·  CloudWatch (logs push)  ·  SNS → email on alarm" style="text;html=1;align=left;verticalAlign=middle;fontSize=8;fillColor=#FAFBFC;strokeColor=#CCCCCC;rounded=1;spacingLeft=10;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="15" y="650" width="1140" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="legend2" value="Resilience:  Multi-AZ (ap-southeast-1a / 1b)  ·  Aurora streaming replication + auto-failover  ·  ALB cross-AZ routing  ·  ECS auto-scaling 1–3 tasks per AZ&#10;Security:  WAF (CommonRuleSet + SQLi, 2000 req/IP/5min)  ·  Cloudflare proxy/TLS  ·  Private subnets for ECS &amp; DB  ·  VPC Endpoints (no public internet for AWS APIs)  ·  S3 public access blocked (presigned URLs only)  ·  Secrets in Secrets Manager (no env vars)  ·  Least-privilege IAM (task vs. execution role)" style="text;html=1;align=left;verticalAlign=middle;fontSize=7.5;fillColor=#FFFEF7;strokeColor=#E0C97A;rounded=1;spacingLeft=10;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="15" y="710" width="1140" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="footer" value="Build: virfriendo-api:v11  ·  Task Def: virfriendo-api:33  ·  Postgres 16.6  ·  Aurora Serverless v2 (0.5–4 ACU)  ·  ECS Fargate 2 vCPU / 6 GB" style="text;html=1;align=center;verticalAlign=middle;fontSize=7.5;fontColor=#5A6772;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="15" y="775" width="1140" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== Edges (arrows) ==================== -->
+        <mxCell id="e1" style="endArrow=classic;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#666666;" edge="1" parent="1" source="users-box" target="cf-group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="endArrow=classic;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#666666;" edge="1" parent="1" source="cf-group" target="waf-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" style="endArrow=classic;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#666666;" edge="1" parent="1" source="waf-box" target="igw-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="HTTPS to ALB" style="endArrow=classic;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#147EBA;fontSize=7;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="igw-box" target="vpc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="docker pull" style="endArrow=classic;html=1;exitX=0;exitY=1;entryX=0.5;entryY=0;strokeColor=#ED7100;fontSize=7;labelBackgroundColor=#FFFFFF;dashed=1;" edge="1" parent="1" source="ecr-box" target="vpc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="GetSecret · IAM" style="endArrow=classic;startArrow=classic;html=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;strokeColor=#DD3522;fontSize=7;labelBackgroundColor=#FFFFFF;dashed=1;" edge="1" parent="1" source="sec-group" target="vpc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="logs / metrics" style="endArrow=classic;html=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;strokeColor=#8C4FFF;fontSize=7;labelBackgroundColor=#FFFFFF;dashed=1;" edge="1" parent="1" source="vpc" target="mon-group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="presigned PUT/GET" style="endArrow=classic;startArrow=classic;html=1;exitX=0.5;exitY=1;entryX=1;entryY=0;strokeColor=#7AA116;fontSize=7;labelBackgroundColor=#FFFFFF;dashed=1;" edge="1" parent="1" source="s3-box" target="vpc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
