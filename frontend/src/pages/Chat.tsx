@@ -2038,12 +2038,30 @@ export default function Chat() {
                   return (
                     <div key={msg.id} className="vf-chat-narrative-row vf-chat-msg-row">
                       <div className="vf-chat-narrative-inner">{renderAssistantNarrative(msg, index)}</div>
-                      {msg.model_info && (
-                        <div className="vf-chat-model-badge">
-                          <span className="vf-chat-model-badge-provider">{msg.model_info.provider}/{msg.model_info.model}</span>
-                          {msg.model_info.web_search_used && <span className="vf-chat-model-badge-tag">🔍 web</span>}
-                        </div>
-                      )}
+                      <div className="vf-chat-msg-footer">
+                        {msg.model_info && (
+                          <div className="vf-chat-model-badge">
+                            <span className="vf-chat-model-badge-provider">{msg.model_info.provider}/{msg.model_info.model}</span>
+                            {msg.model_info.web_search_used && <span className="vf-chat-model-badge-tag">🔍 web</span>}
+                          </div>
+                        )}
+                        {conversationId && (
+                          <div className="vf-chat-feedback-btns">
+                            <button
+                              type="button"
+                              className="vf-chat-feedback-btn"
+                              title="Good reply"
+                              onClick={() => api.submitFeedback(msg.id, conversationId!, 'up').catch(() => {})}
+                            >👍</button>
+                            <button
+                              type="button"
+                              className="vf-chat-feedback-btn"
+                              title="Bad reply"
+                              onClick={() => api.submitFeedback(msg.id, conversationId!, 'down').catch(() => {})}
+                            >👎</button>
+                          </div>
+                        )}
+                      </div>
                       {actionsMenu}
                     </div>
                   )

@@ -472,6 +472,26 @@ export async function getMemories(): Promise<MemoryItem[]> {
   return handleResponse<MemoryItem[]>(res)
 }
 
+// --- Feedback (RLHF) ---
+export async function submitFeedback(
+  messageId: string,
+  conversationId: string,
+  rating: 'up' | 'down',
+  feedbackText?: string,
+): Promise<{ status: string; rating: string }> {
+  const res = await fetch(`${API_BASE}/chat/feedback`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({
+      message_id: messageId,
+      conversation_id: conversationId,
+      rating,
+      feedback_text: feedbackText || null,
+    }),
+  })
+  return handleResponse(res)
+}
+
 export type DiaryEntryRow = {
   id: string
   content: string
