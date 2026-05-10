@@ -1467,11 +1467,34 @@ async def analyze_media(
         if gallery_hints_list:
             top = gallery_hints_list[0]
             nm = top.get("character") or ""
+            sim = top.get("similarity", 0)
             tier = top.get("tier") or ""
-            gallery_ctx = (
-                f"Hệ thống đối chiếu gallery cục bộ gợi ý chủ đề có thể liên quan: 「{nm}」 "
-                f"(mức tin cậy kỹ thuật: {tier}). Đây chỉ là prior — hãy tự nhìn ảnh; không nhắc số cosine.\n\n"
-            )
+            # Cross-validation: if top2 is close to top1, flag ambiguity
+            margin_note = ""
+            if len(gallery_hints_list) >= 2:
+                second = gallery_hints_list[1]
+                margin = sim - (second.get("similarity", 0))
+                if margin < 0.05:
+                    margin_note = (
+                        f" ⚠️ Lưu ý: nhân vật thứ 2 gần bằng ({second.get('character')}, "
+                        f"sim={second.get('similarity', 0):.2f}) — có thể nhầm lẫn. "
+                        "Hãy dùng Gemini/GPT-4o vision để double-check."
+                    )
+            if tier in ("high", "confident"):
+                gallery_ctx = (
+                    f"Gallery ViT nhận diện: 「{nm}」 (similarity={sim:.2f}, tier={tier}).{margin_note}\n"
+                    "Tin cậy cao — dùng tên này trừ khi vision API nói khác rõ ràng.\n\n"
+                )
+            elif tier == "medium":
+                gallery_ctx = (
+                    f"Gallery ViT gợi ý: 「{nm}」 (similarity={sim:.2f}, tier={tier}).{margin_note}\n"
+                    "Tin cậy trung bình — cần vision API xác nhận. Nếu vision nói khác, ưu tiên vision.\n\n"
+                )
+            else:
+                gallery_ctx = (
+                    f"Gallery ViT gợi ý yếu: 「{nm}」 (similarity={sim:.2f}, tier={tier}).{margin_note}\n"
+                    "Tin cậy thấp — KHÔNG dùng tên này trừ khi vision API cũng đồng ý. Ưu tiên vision.\n\n"
+                )
 
     # Get vision analysis - GPT-4o (primary) → Gemini 1.5 Pro (fallback)
     gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
