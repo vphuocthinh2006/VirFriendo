@@ -1505,23 +1505,28 @@ async def analyze_media(
 
     vision_system = gallery_ctx + f"""Bạn là {aid}, một cô gái anime thân thiện. Xưng "mình", gọi đối phương "bạn".
 
-NHIỆM VỤ: Phân tích {'video' if is_video else 'ảnh'} và trả lời bằng tiếng Việt.
+NHIỆM VỤ: Phân tích {'video' if is_video else 'ảnh'} và NHẬN DIỆN chính xác nhất có thể.
 
-QUAN TRỌNG về nhận diện:
-- Nếu thấy NHÂN VẬT từ phim/show/game/manga/anime quen thuộc, hãy ĐOÁN MẠNH DẠN tên + nguồn — đừng từ chối hay nói "không thể xác định". Đoán dựa trên đặc điểm: kiểu tóc, trang phục, biểu tượng (vd. mặt cười đỏ → Red John từ The Mentalist; tai mèo + tóc đỏ → có thể là Anya/anime nào đó...).
-- Đối với người thật/diễn viên: nếu nhận ra (Simon Baker, Tom Cruise...) cứ tự nhiên đoán theo trí nhớ phổ biến.
-- Nếu vẫn không chắc: liệt kê các đặc điểm hình ảnh nổi bật (màu tóc, trang phục, biểu tượng, phong cách nghệ thuật) để có thể tra trên Google.
+BẮT BUỘC — NHẬN DIỆN NHÂN VẬT:
+- LUÔN LUÔN đoán tên nhân vật/người. KHÔNG BAO GIỜ nói "không thể xác định" hay "người đàn ông bí ẩn".
+- Nếu là nhân vật anime/manga/game/phim: nói TÊN + TÁC PHẨM. Ví dụ: "Đây là Levi Ackerman từ Attack on Titan".
+- Nếu là người thật: nói TÊN + NGHỀ. Ví dụ: "Đây là Keanu Reeves, diễn viên".
+- Nếu không chắc 100%: vẫn PHẢI đoán top 2-3 khả năng. Ví dụ: "Mình nghĩ đây là Aiden Pearce (Watch Dogs) hoặc có thể là một cosplay của nhân vật cyberpunk".
+- Dựa vào MỌI chi tiết: kiểu tóc, màu tóc, trang phục, phụ kiện, sẹo, hình xăm, vũ khí, bối cảnh, phong cách vẽ.
+- KHÔNG BAO GIỜ trả lời chung chung kiểu "người đàn ông mặc áo khoác da" mà không đoán danh tính.
 
-Trả lời CHI TIẾT bao gồm:
-1. Nhận diện người/nhân vật + nguồn nếu có
-2. Vật thể, hành động, bối cảnh
-3. Phong cách nghệ thuật + màu sắc chủ đạo
+SEARCH QUERY — CỰC KỲ QUAN TRỌNG:
+- Query PHẢI cụ thể để Google tìm được đúng nhân vật.
+- ĐÚNG: "Aiden Pearce Watch Dogs character", "Levi Ackerman Attack on Titan"
+- SAI: "mysterious man leather jacket", "anime character dark background"
+- Nếu thấy đặc điểm độc đáo (mặt nạ, vũ khí, biểu tượng): dùng nó trong query.
+- Ví dụ: thấy mặt nạ fox → "fox mask anime character", thấy bịt mắt + tóc trắng → "Gojo Satoru Jujutsu Kaisen"
 
-Trả lời TỰ NHIÊN như chat, KHÔNG bullet points, KHÔNG giọng trợ lý AI.
+Trả lời bằng tiếng Việt, tự nhiên, 3-6 câu. KHÔNG bullet points.
 
-CUỐI câu trả lời, BẮT BUỘC thêm 2 dòng RIÊNG BIỆT theo format CHÍNH XÁC:
-SEARCH_QUERY: <2-6 từ tiếng Anh để tra Google. Ưu tiên: "<tên nhân vật> <nguồn>" (vd "Patrick Jane The Mentalist", "Naruto Uzumaki anime"). Nếu không đoán được nhân vật, vẫn PHẢI cho query mô tả: "<đặc điểm chính> <phong cách>" (vd "blonde curly hair man red smiley face fanart", "anime girl pink hair school uniform"). KHÔNG BAO GIỜ để NONE.>
-SUBJECT_TAG: <tên nhân vật + nguồn ngắn gọn nếu nhận diện, ví dụ "Patrick Jane (The Mentalist)". Nếu không, để "ảnh chung">"""
+CUỐI câu trả lời, BẮT BUỘC thêm 2 dòng:
+SEARCH_QUERY: <query tiếng Anh CỤ THỂ để tìm đúng nhân vật — PHẢI có tên nhân vật nếu đoán được>
+SUBJECT_TAG: <tên nhân vật + nguồn, ví dụ "Aiden Pearce (Watch Dogs)">"""
 
     raw_vision = ""
 
@@ -1647,27 +1652,36 @@ SUBJECT_TAG: <tên nhân vật + nguồn ngắn gọn nếu nhận diện, ví d
     if search_query and not is_video:
         try:
             from services.agent_service.llm.web_search import tavily_search
-            hits = await tavily_search(search_query, max_results=4)
+            # Search with multiple queries for better coverage
+            hits = await tavily_search(search_query, max_results=5)
+            
+            # If first search is too generic, try a more specific one
+            if subject_tag and subject_tag.lower() != "ảnh chung":
+                extra_hits = await tavily_search(f"{subject_tag} character wiki", max_results=3)
+                hits.extend(extra_hits)
+            
             logger.info(f"Tavily hits for {search_query!r}: {len(hits)}")
             if hits:
                 sources_text = "\n".join(
-                    f"- {h.get('title','')}: {h.get('snippet','')[:240]} ({h.get('url','')})"
+                    f"- {h.get('title','')}: {h.get('snippet','')[:300]} ({h.get('url','')})"
                     for h in hits if h.get('snippet') or h.get('title')
                 )
                 if sources_text.strip():
                     from services.agent_service.llm.client import generate
                     enrich_system = (
-                        f"Bạn là {aid}, cô gái anime thân thiện. Xưng 'mình', gọi đối phương 'bạn'. "
-                        "Hãy MỞ RỘNG câu trả lời gốc bằng thông tin từ web (chỉ dùng nếu liên quan): "
-                        "thêm 1-3 câu nói về danh tính nhân vật/chủ thể, nguồn gốc, sự thật thú vị. "
-                        "Giữ giọng chat tự nhiên tiếng Việt, KHÔNG bullet, KHÔNG dán link. "
-                        "Tránh lặp lại nguyên văn câu trả lời gốc."
+                        f"Bạn là {aid}. Xưng 'mình', gọi đối phương 'bạn'. "
+                        "NHIỆM VỤ: Dựa vào thông tin web, XÁC NHẬN hoặc SỬA danh tính nhân vật trong ảnh. "
+                        "Nếu web confirm đúng nhân vật → nói chắc chắn + thêm facts thú vị. "
+                        "Nếu web suggest nhân vật khác → sửa lại danh tính cho đúng. "
+                        "Viết tự nhiên tiếng Việt, 4-8 câu. KHÔNG bullet. KHÔNG link. "
+                        "Phải NÓI RÕ TÊN nhân vật + tác phẩm nguồn."
                     )
                     enrich_user = (
-                        f"CÂU TRẢ LỜI GỐC (phân tích ảnh):\n{vision_reply}\n\n"
-                        f"THÔNG TIN TỪ WEB ('{search_query}'):\n{sources_text}\n\n"
-                        "Hãy viết lại câu trả lời tự nhiên hơn, nhẹ nhàng đan xen thông tin web vào. "
-                        "Phần đầu vẫn giữ là phân tích ảnh, sau đó dẫn dắt vào thông tin tìm được."
+                        f"PHÂN TÍCH ẢNH BAN ĐẦU:\n{vision_reply}\n\n"
+                        f"NHÂN VẬT ĐÃ ĐOÁN: {subject_tag or 'chưa xác định'}\n\n"
+                        f"KẾT QUẢ TÌM KIẾM WEB ('{search_query}'):\n{sources_text}\n\n"
+                        "Viết câu trả lời cuối cùng — XÁC NHẬN danh tính dựa trên web. "
+                        "Nếu web nói khác → sửa. Nếu web confirm → nói chắc chắn hơn + thêm info."
                     )
                     enriched = await generate(enrich_system, enrich_user)
                     if enriched and len(enriched.strip()) > 40:
