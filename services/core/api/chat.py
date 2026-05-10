@@ -1525,88 +1525,98 @@ SUBJECT_TAG: <tên nhân vật + nguồn ngắn gọn nếu nhận diện, ví d
 
     raw_vision = ""
 
-    # --- Primary: GPT-4o ---
-    if openai_key:
+    # --- MULTI-MODEL CONSENSUS: call both GPT-4o AND Gemini, pick best ---
+    gpt4o_result = ""
+    gemini_result = ""
+
+    async def _call_gpt4o() -> str:
+        if not openai_key:
+            return ""
         try:
-            logger.info("[VISION] Attempting GPT-4o primary...")
+            logger.info("[VISION] Calling GPT-4o...")
             from openai import OpenAI
             oai = OpenAI(api_key=openai_key)
             user_content: list[dict[str, Any]] = [{"type": "text", "text": vision_prompt}]
             if is_video:
-                # Summarize the whole video by sampling multiple frames.
                 frame_urls = _extract_video_keyframes_as_data_urls(content, mime_type, max_frames=6)
                 for frame_url in frame_urls:
-                    user_content.append(
-                        {
-                            "type": "image_url",
-                            "image_url": {"url": frame_url, "detail": "low"},
-                        }
-                    )
-                user_content.append(
-                    {
-                        "type": "text",
-                        "text": (
-                            "Các ảnh trên là khung hình theo timeline video. "
-                            "Hãy suy luận diễn biến chính, hành động, bối cảnh, và nội dung nổi bật."
-                        ),
-                    }
-                )
+                    user_content.append({"type": "image_url", "image_url": {"url": frame_url, "detail": "low"}})
+                user_content.append({"type": "text", "text": "Các ảnh trên là khung hình theo timeline video. Hãy suy luận diễn biến chính."})
             else:
                 base64_content = base64.b64encode(content).decode('utf-8')
-                user_content.append(
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:{mime_type};base64,{base64_content}",
-                            "detail": "high",
-                        },
-                    }
-                )
+                user_content.append({"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{base64_content}", "detail": "high"}})
             response = oai.chat.completions.create(
                 model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": vision_system},
-                    {"role": "user", "content": user_content},
-                ],
+                messages=[{"role": "system", "content": vision_system}, {"role": "user", "content": user_content}],
                 max_tokens=900,
-                temperature=0.7,
+                temperature=0.5,
             )
-            raw_vision = response.choices[0].message.content or ""
-            logger.info("[VISION] ✅ GPT-4o SUCCESS")
+            result = response.choices[0].message.content or ""
+            logger.info("[VISION] ✅ GPT-4o done")
+            return result
         except Exception as e:
-            logger.error(f"[VISION] GPT-4o failed: {e}, falling back to Gemini")
+            logger.error("[VISION] GPT-4o failed: {}", e)
+            return ""
 
-    # --- Fallback: Gemini 1.5 Pro Vision ---
-    if not raw_vision and gemini_key:
+    async def _call_gemini() -> str:
+        if not gemini_key:
+            return ""
         try:
-            logger.info("[VISION] Attempting Gemini 1.5 Pro fallback...")
+            logger.info("[VISION] Calling Gemini 1.5 Pro...")
             import google.generativeai as genai
             genai.configure(api_key=gemini_key)
-            model = genai.GenerativeModel(
-                model_name="gemini-1.5-pro",
-                system_instruction=vision_system,
-            )
+            model = genai.GenerativeModel(model_name="gemini-1.5-pro", system_instruction=vision_system)
             if is_video:
-                # Use native media bytes for video instead of forcing PIL image parsing.
                 response = model.generate_content(
                     [vision_prompt, {"mime_type": mime_type, "data": content}],
-                    generation_config={"max_output_tokens": 900, "temperature": 0.7},
+                    generation_config={"max_output_tokens": 900, "temperature": 0.5},
                 )
             else:
                 import PIL.Image
                 from io import BytesIO
-
                 img = PIL.Image.open(BytesIO(content))
                 response = model.generate_content(
                     [vision_prompt, img],
-                    generation_config={"max_output_tokens": 900, "temperature": 0.7},
+                    generation_config={"max_output_tokens": 900, "temperature": 0.5},
                 )
-            raw_vision = response.text or ""
-            logger.info(f"[VISION] ✅ Gemini fallback SUCCESS: {raw_vision[:80]}")
-        except ImportError:
-            logger.warning("[VISION] google-generativeai not installed")
+            result = response.text or ""
+            logger.info("[VISION] ✅ Gemini done")
+            return result
         except Exception as e:
-            logger.error(f"[VISION] Gemini fallback failed: {e}")
+            logger.error("[VISION] Gemini failed: {}", e)
+            return ""
+
+    # Run both in parallel
+    gpt4o_task = asyncio.create_task(_call_gpt4o())
+    gemini_task = asyncio.create_task(_call_gemini())
+    gpt4o_result, gemini_result = await asyncio.gather(gpt4o_task, gemini_task)
+
+    # --- CONSENSUS LOGIC ---
+    if gpt4o_result and gemini_result:
+        # Both succeeded — use LLM to pick the best/merge
+        from services.agent_service.llm.client import generate
+        consensus_prompt = (
+            f"Bạn là judge. Hai hệ thống vision AI đã phân tích cùng 1 ảnh.\n\n"
+            f"=== GPT-4o ===\n{gpt4o_result[:800]}\n\n"
+            f"=== Gemini ===\n{gemini_result[:800]}\n\n"
+            f"=== ViT Gallery ===\n{gallery_ctx or 'Không có kết quả'}\n\n"
+            "NHIỆM VỤ: Viết 1 câu trả lời DUY NHẤT bằng tiếng Việt, tổng hợp thông tin TỐT NHẤT từ cả 2 nguồn.\n"
+            "- Nếu cả 2 đồng ý về nhân vật → dùng tên đó (chắc chắn)\n"
+            "- Nếu 1 bên nhận ra nhân vật, bên kia không → dùng tên từ bên nhận ra\n"
+            "- Nếu 2 bên nói khác nhau → chọn bên có chi tiết cụ thể hơn (tên anime/game/phim)\n"
+            "- Giữ giọng chat tự nhiên, xưng 'mình' gọi 'bạn'\n"
+            "- CUỐI câu trả lời vẫn thêm SEARCH_QUERY: và SUBJECT_TAG: như format gốc"
+        )
+        merged = await generate(consensus_prompt, "Viết câu trả lời tổng hợp:")
+        if merged and len(merged.strip()) > 40:
+            raw_vision = merged.strip()
+            logger.info("[VISION] ✅ Consensus merged from both models")
+        else:
+            raw_vision = gpt4o_result  # fallback to GPT-4o
+    elif gpt4o_result:
+        raw_vision = gpt4o_result
+    elif gemini_result:
+        raw_vision = gemini_result
 
     if not raw_vision:
         raise HTTPException(status_code=500, detail="Vision analysis failed: no response from any provider")
