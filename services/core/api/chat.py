@@ -843,6 +843,69 @@ async def delete_conversation(
     await db.commit()
 
 
+# --- User Feedback (RLHF) ---
+
+class FeedbackRequest(BaseModel):
+    message_id: str
+    conversation_id: str
+    rating: str  # "up" or "down"
+    feedback_text: str | None = None
+
+
+@router.post("/feedback", status_code=201)
+async def submit_feedback(
+    request: FeedbackRequest,
+    current_user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    """User rates a bot message (👍/👎) + optional text feedback. Used for RLHF training data."""
+    if request.rating not in ("up", "down"):
+        raise HTTPException(status_code=400, detail="rating must be 'up' or 'down'")
+
+    user_uuid = UUID(current_user_id)
+
+    # Get the bot message
+    try:
+        msg_id = UUID(request.message_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid message_id")
+
+    msg_query = await db.execute(
+        select(Message).where(Message.id == msg_id, Message.role == "assistant")
+    )
+    bot_msg = msg_query.scalar_one_or_none()
+    if not bot_msg:
+        raise HTTPException(status_code=404, detail="Message not found")
+
+    # Get the user message before it (for context)
+    prev_query = await db.execute(
+        select(Message)
+        .where(Message.conversation_id == bot_msg.conversation_id, Message.role == "user")
+        .order_by(Message.created_at.desc())
+        .limit(1)
+    )
+    user_msg = prev_query.scalar_one_or_none()
+
+    # Log to S3 for RLHF
+    try:
+        from services.ml.feedback_store import log_feedback
+        log_feedback(
+            user_id=current_user_id,
+            message_id=request.message_id,
+            conversation_id=request.conversation_id,
+            bot_reply=bot_msg.content or "",
+            user_message=(user_msg.content if user_msg else ""),
+            rating=request.rating,
+            feedback_text=request.feedback_text,
+            detected_emotion=bot_msg.detected_emotion,
+            detected_intent=bot_msg.detected_intent,
+        )
+    except Exception as e:
+        logger.warning("Feedback logging failed: {}", e)
+
+    return {"status": "ok", "rating": request.rating}
+
+
 class RelationshipOut(BaseModel):
     user_message_count: int
     relationship_level: int
