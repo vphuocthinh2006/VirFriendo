@@ -14,24 +14,22 @@ export type Live2DEmotion =
   | 'sleepy'
   | 'blush'
 
-/** Hosted Hiyori sample model from guansss/pixi-live2d-display test assets (CDN). */
+/** Hosted Shizuku sample model — better expressions than Haru. */
 const DEFAULT_MODEL_URL =
-  'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display@master/test/assets/haru/haru_greeter_t03.model3.json'
+  'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display@master/test/assets/shizuku/shizuku.model.json'
 
 /**
- * Map our high-level emotion → expression file name as defined inside
- * the model3.json. Names below are for the Haru sample (same set used
- * by Live2D's official samples). If the expression doesn't exist on
- * the model, we fall back to no expression change.
+ * Map our high-level emotion → motion group for Shizuku model.
+ * Shizuku uses motion groups instead of named expressions.
  */
 const EMOTION_EXPRESSIONS: Record<Live2DEmotion, string | null> = {
   idle: null,
-  happy: 'F01',
-  sad: 'F02',
-  angry: 'F03',
-  surprised: 'F04',
-  sleepy: 'F05',
-  blush: 'F06',
+  happy: 'tap_body',
+  sad: 'shake',
+  angry: 'flick_head',
+  surprised: 'pinch_out',
+  sleepy: 'pinch_in',
+  blush: 'tap_body',
 }
 
 interface Props {
@@ -177,19 +175,17 @@ export default function Live2DAvatar({
     }
   }, [modelUrl])
 
-  // Apply emotion changes
+  // Apply emotion changes via motion groups (Shizuku model)
   useEffect(() => {
     const model = modelRef.current
     if (!loaded || !model) return
-    const exp = EMOTION_EXPRESSIONS[emotion]
+    const motionGroup = EMOTION_EXPRESSIONS[emotion]
     try {
-      if (exp) {
-        ;(model as unknown as { expression: (name?: string | number) => void }).expression(exp)
-      } else {
-        // idle — clear any active expression
-        ;(model as unknown as { expression: (name?: string | number) => void }).expression()
+      if (motionGroup) {
+        ;(model as unknown as { motion: (group: string, index?: number) => void }).motion(motionGroup)
       }
-    } catch { /* model may not have this expression — ignore */ }
+      // idle = no explicit motion, model returns to default
+    } catch { /* model may not have this motion — ignore */ }
   }, [emotion, loaded])
 
   if (errored && fallback) return <>{fallback}</>
