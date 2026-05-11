@@ -1745,12 +1745,14 @@ SUBJECT_TAG: <tên nhân vật + nguồn, ví dụ "Aiden Pearce (Watch Dogs)">"
     ) -> dict[str, Any]:
         """Compute fusion score to decide ViT vs Vision API winner.
 
+        Logic:
+        - If ViT and GPT-4o AGREE → high confidence, use that name
+        - If they DISAGREE → ALWAYS trust GPT-4o (it sees the actual image)
+        - ViT is only used as confirmation signal, never overrides vision API
+
         Returns dict with 'winner' ('vit' or 'vision'), 'fusion_score', 'reason'.
         """
-        # Normalize ViT similarity to 0-1 confidence (already is, but clamp)
         vit_conf = min(max(vit_sim, 0.0), 1.0)
-
-        # Vision API combined confidence (average of both, weighted toward GPT-4o)
         vision_conf = gpt4o_conf * 0.7 + mini_conf * 0.3
 
         # Check if ViT and vision agree (same character name)
@@ -1760,32 +1762,23 @@ SUBJECT_TAG: <tên nhân vật + nguồn, ví dụ "Aiden Pearce (Watch Dogs)">"
         vit_in_gpt4o = vit_lower in gpt4o_lower or any(w in gpt4o_lower for w in vit_lower.split() if len(w) > 3)
         vit_in_mini = vit_lower in mini_lower or any(w in mini_lower for w in vit_lower.split() if len(w) > 3)
 
-        # Agreement bonus
+        # AGREEMENT: ViT confirms what GPT-4o says → extra confidence
         if vit_in_gpt4o or vit_in_mini:
-            # Both agree → ViT wins easily
-            return {"winner": "vit", "fusion_score": vit_conf + 0.2, "reason": "agreement"}
+            return {"winner": "agreement", "fusion_score": vision_conf + 0.2, "reason": "vit_confirms_vision"}
 
-        # Disagreement → compute fusion
-        # ViT score: similarity * tier_weight
-        tier_weights = {"high": 1.3, "confident": 1.3, "medium": 1.0, "low": 0.5}
-        vit_weighted = vit_conf * tier_weights.get(vit_tier, 0.7)
+        # DISAGREEMENT: GPT-4o and ViT say different things
+        # → ALWAYS trust GPT-4o. It sees the actual pixels.
+        # ViT gallery only has 45 classes and often confuses characters from same anime.
+        # GPT-4o is a general vision model that can identify ANY character.
+        if gpt4o_conf >= 0.5:
+            return {"winner": "vision", "fusion_score": vision_conf, "reason": "vision_overrides_vit_disagreement"}
 
-        # Check if same franchise (e.g. both mention same anime)
-        # Simple heuristic: if vision tags share words with ViT gallery class names
-        same_franchise = False
-        if vit_tier in ("high", "confident", "medium"):
-            # Characters from same anime often get confused (Fern vs Frieren)
-            # ViT is more reliable for distinguishing within same franchise
-            same_franchise = True  # Assume same franchise when ViT has medium+ match
+        # GPT-4o low confidence + ViT high tier → use ViT as hint but still prefer vision
+        if vit_tier in ("high", "confident") and vit_conf >= 0.85:
+            return {"winner": "vit", "fusion_score": vit_conf, "reason": "vit_high_confidence_vision_unsure"}
 
-        if same_franchise and vit_weighted >= 0.65:
-            return {"winner": "vit", "fusion_score": vit_weighted, "reason": "same_franchise_vit_reliable"}
-
-        # Pure score comparison
-        if vit_weighted > vision_conf:
-            return {"winner": "vit", "fusion_score": vit_weighted, "reason": "vit_score_higher"}
-        else:
-            return {"winner": "vision", "fusion_score": vision_conf, "reason": "vision_score_higher"}
+        # Default: trust vision
+        return {"winner": "vision", "fusion_score": vision_conf, "reason": "default_trust_vision"}
 
     if gpt4o_result and gemini_result:
         # Parse confidence from both vision responses
@@ -1813,9 +1806,13 @@ SUBJECT_TAG: <tên nhân vật + nguồn, ví dụ "Aiden Pearce (Watch Dogs)">"
             )
             if fusion["winner"] == "vit":
                 fusion_info = (
-                    f"\n\n⚠️ QUYẾT ĐỊNH FUSION: Dùng tên 「{vit_name.replace('_', ' ').title()}」 từ ViT Gallery "
-                    f"(fusion_score={fusion['fusion_score']:.2f}, reason={fusion['reason']}). "
-                    f"KHÔNG ĐƯỢC dùng tên khác dù nguồn A/B nói gì."
+                    f"\n\nGỢI Ý TỪ ViT: 「{vit_name.replace('_', ' ').title()}」 "
+                    f"(score={fusion['fusion_score']:.2f}). "
+                    f"Chỉ dùng tên này nếu GPT-4o cũng không chắc chắn."
+                )
+            elif fusion["winner"] == "agreement":
+                fusion_info = (
+                    f"\n\n✅ CẢ HAI ĐỒNG Ý: ViT Gallery xác nhận nhân vật từ nguồn A/B. Tin tưởng cao."
                 )
 
         # Both succeeded — use LLM to merge with fusion guidance
@@ -1831,8 +1828,9 @@ SUBJECT_TAG: <tên nhân vật + nguồn, ví dụ "Aiden Pearce (Watch Dogs)">"
             "- KHÔNG BAO GIỜ nhắc đến 'GPT-4o', 'Gemini', 'nguồn A', 'nguồn B', 'AI', 'hệ thống', 'ViT', 'fusion'\n"
             "- KHÔNG nói 'theo phân tích', 'dựa trên thông tin', 'một bên nói... bên kia nói...'\n"
             "- Viết như BẠN tự nhận ra nhân vật — tự tin, trực tiếp\n"
-            "- NẾU có QUYẾT ĐỊNH FUSION ở trên → BẮT BUỘC dùng tên đó, KHÔNG được đổi\n"
-            "- Nếu không có fusion → chọn bên có chi tiết cụ thể hơn\n"
+            "- ƯU TIÊN thông tin từ nguồn A (GPT-4o) vì nó nhìn ảnh trực tiếp\n"
+            "- NẾU có '✅ CẢ HAI ĐỒNG Ý' → nói chắc chắn\n"
+            "- NẾU có 'GỢI Ý TỪ ViT' nhưng nguồn A nói khác → TIN NGUỒN A\n"
             "- Giọng chat tự nhiên, xưng 'mình' gọi 'bạn', ngắn gọn 2-3 câu\n"
             "- CUỐI câu trả lời thêm 2 dòng riêng:\n"
             "SEARCH_QUERY: <query tiếng Anh để tìm nhân vật>\n"
