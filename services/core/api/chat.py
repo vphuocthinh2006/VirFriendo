@@ -624,12 +624,36 @@ async def chat(
     bot_reply = _ensure_assistant_reply(bot_reply)
 
     intent = routed_intent
+
+    # --- EMOTION FUSION: BERT (user) + Groq (bot reply) + heuristic ---
+    from services.ml.emotion_fusion import detect_bot_reply_emotion, fuse_emotions
+
+    # Run Groq bot emotion detection in parallel with old pipeline
+    groq_emotion_task = asyncio.create_task(detect_bot_reply_emotion(bot_reply, request.message))
+
+    # Old pipeline: BERT + heuristic + arbitrator
     emotion_ml, avatar_action, emotion_meta = await _finalize_avatar_with_merge_and_arbitrator(
         user_text_raw=request.message,
         nlp_out=nlp_out,
         agent_emotion=result.get("emotion"),
     )
-    emotion = emotion_ml
+
+    # Get Groq bot emotion result
+    groq_bot_emotion = await groq_emotion_task
+
+    # Fuse all signals
+    bert_emotion = nlp_out.emotion_label if nlp_out else None
+    fused_emotion, fusion_meta = fuse_emotions(
+        bert_emotion=bert_emotion,
+        groq_bot_emotion=groq_bot_emotion,
+        heuristic_emotion=emotion_ml,
+    )
+    emotion = fused_emotion
+    emotion_meta["fusion"] = fusion_meta
+
+    # Update avatar_action based on fused emotion
+    avatar_action = _emotion_to_avatar_from_gate(fused_emotion)
+
     bibliotherapy = result.get("bibliotherapy_suggestion")
 
     # Log ML predictions to S3 for SageMaker Model Monitor
@@ -1130,11 +1154,25 @@ async def _process_ws_message(
     bot_reply = _sanitize_agent_handle_typo(result["reply"], aid)
     bot_reply = _ensure_assistant_reply(bot_reply)
     intent = routed_intent
-    emotion, avatar_action, emotion_meta = await _finalize_avatar_with_merge_and_arbitrator(
+
+    # --- EMOTION FUSION (WS): BERT + Groq bot + heuristic ---
+    from services.ml.emotion_fusion import detect_bot_reply_emotion, fuse_emotions
+
+    groq_emotion_task = asyncio.create_task(detect_bot_reply_emotion(bot_reply, content))
+    emotion_ml, avatar_action, emotion_meta = await _finalize_avatar_with_merge_and_arbitrator(
         user_text_raw=content,
         nlp_out=nlp_out,
         agent_emotion=result.get("emotion"),
     )
+    groq_bot_emotion = await groq_emotion_task
+    bert_emotion = nlp_out.emotion_label if nlp_out else None
+    emotion, fusion_meta = fuse_emotions(
+        bert_emotion=bert_emotion,
+        groq_bot_emotion=groq_bot_emotion,
+        heuristic_emotion=emotion_ml,
+    )
+    emotion_meta["fusion"] = fusion_meta
+    avatar_action = _emotion_to_avatar_from_gate(emotion)
 
     dlg_act_val = gate_dialogue_act(nlp_out) if nlp_out else None
     user_ml_blob: dict[str, Any] = {
