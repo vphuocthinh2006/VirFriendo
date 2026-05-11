@@ -1665,18 +1665,23 @@ SUBJECT_TAG: <tên nhân vật + nguồn, ví dụ "Aiden Pearce (Watch Dogs)">"
         # Both succeeded — use LLM to pick the best/merge
         from services.agent_service.llm.client import generate
         consensus_prompt = (
-            f"Bạn là judge. Hai hệ thống vision AI đã phân tích cùng 1 ảnh.\n\n"
-            f"=== GPT-4o ===\n{gpt4o_result[:800]}\n\n"
-            f"=== Gemini ===\n{gemini_result[:800]}\n\n"
+            f"Bạn là trợ lý chat vui vẻ. Hai nguồn AI đã phân tích cùng 1 ảnh (user KHÔNG biết có 2 nguồn).\n\n"
+            f"=== Nguồn A ===\n{gpt4o_result[:800]}\n\n"
+            f"=== Nguồn B ===\n{gemini_result[:800]}\n\n"
             f"=== ViT Gallery ===\n{gallery_ctx or 'Không có kết quả'}\n\n"
-            "NHIỆM VỤ: Viết 1 câu trả lời DUY NHẤT bằng tiếng Việt, tổng hợp thông tin TỐT NHẤT từ cả 2 nguồn.\n"
-            "- Nếu cả 2 đồng ý về nhân vật → dùng tên đó (chắc chắn)\n"
-            "- Nếu 1 bên nhận ra nhân vật, bên kia không → dùng tên từ bên nhận ra\n"
-            "- Nếu 2 bên nói khác nhau → chọn bên có chi tiết cụ thể hơn (tên anime/game/phim)\n"
-            "- Giữ giọng chat tự nhiên, xưng 'mình' gọi 'bạn'\n"
-            "- CUỐI câu trả lời vẫn thêm SEARCH_QUERY: và SUBJECT_TAG: như format gốc"
+            "NHIỆM VỤ: Viết 1 câu trả lời DUY NHẤT bằng tiếng Việt cho user.\n"
+            "QUY TẮC BẮT BUỘC:\n"
+            "- KHÔNG BAO GIỜ nhắc đến 'GPT-4o', 'Gemini', 'nguồn A', 'nguồn B', 'AI', 'hệ thống'\n"
+            "- KHÔNG nói 'theo phân tích', 'dựa trên thông tin', 'một bên nói... bên kia nói...'\n"
+            "- Viết như BẠN tự nhận ra nhân vật — tự tin, trực tiếp\n"
+            "- Nếu cả 2 đồng ý → nói chắc chắn luôn\n"
+            "- Nếu 2 bên khác nhau → chọn bên có chi tiết cụ thể hơn, nói như đó là câu trả lời duy nhất\n"
+            "- Giọng chat tự nhiên, xưng 'mình' gọi 'bạn', ngắn gọn 2-3 câu\n"
+            "- CUỐI câu trả lời thêm 2 dòng riêng:\n"
+            "SEARCH_QUERY: <query tiếng Anh để tìm nhân vật>\n"
+            "SUBJECT_TAG: <tên nhân vật (nguồn)>"
         )
-        merged = await generate(consensus_prompt, "Viết câu trả lời tổng hợp:")
+        merged = await generate(consensus_prompt, "Viết câu trả lời:")
         if merged and len(merged.strip()) > 40:
             raw_vision = merged.strip()
             logger.info("[VISION] ✅ Consensus merged from both models")

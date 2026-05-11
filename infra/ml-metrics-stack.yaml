@@ -1,0 +1,132 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Pally ML Inference Metrics — Dashboard + IAM (standalone)'
+
+Parameters:
+  ECSTaskRoleName:
+    Type: String
+    Default: virfriendo-ecs-task-role
+    Description: Name of the existing ECS task role to attach CloudWatch policy
+
+Resources:
+  # IAM policy for CloudWatch PutMetricData
+  CloudWatchMetricsPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: pally-cloudwatch-ml-metrics
+      Roles:
+        - !Ref ECSTaskRoleName
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloudwatch:PutMetricData
+            # CloudWatch PutMetricData does not support resource-level restrictions
+            Resource: '*'
+            Condition:
+              StringEquals:
+                cloudwatch:namespace: Pally/MLInference
+
+  # CloudWatch Dashboard
+  MLMonitorDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: Pally-ML-Monitor
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {
+              "type": "metric",
+              "x": 0, "y": 0, "width": 12, "height": 6,
+              "properties": {
+                "title": "Avg Inference Latency by Model",
+                "region": "${AWS::Region}",
+                "metrics": [
+                  ["Pally/MLInference", "InferenceLatencyMs", "ModelName", "bert-intent-emotion", "ModelType", "local", "Status", "success", {"stat": "Average", "label": "BERT (local)"}],
+                  ["...", "vit-gallery-encoder", ".", "local", ".", "success", {"stat": "Average", "label": "ViT (local)"}],
+                  ["...", "groq-llm", ".", "api", ".", "success", {"stat": "Average", "label": "Groq (API)"}],
+                  ["...", "gpt4o-vision", ".", "api", ".", "success", {"stat": "Average", "label": "GPT-4o (API)"}]
+                ],
+                "period": 300,
+                "view": "timeSeries",
+                "stacked": false
+              }
+            },
+            {
+              "type": "metric",
+              "x": 12, "y": 0, "width": 12, "height": 6,
+              "properties": {
+                "title": "P95 Inference Latency by Model",
+                "region": "${AWS::Region}",
+                "metrics": [
+                  ["Pally/MLInference", "InferenceLatencyMs", "ModelName", "bert-intent-emotion", "ModelType", "local", "Status", "success", {"stat": "p95", "label": "BERT (local)"}],
+                  ["...", "vit-gallery-encoder", ".", "local", ".", "success", {"stat": "p95", "label": "ViT (local)"}],
+                  ["...", "groq-llm", ".", "api", ".", "success", {"stat": "p95", "label": "Groq (API)"}],
+                  ["...", "gpt4o-vision", ".", "api", ".", "success", {"stat": "p95", "label": "GPT-4o (API)"}]
+                ],
+                "period": 300,
+                "view": "timeSeries",
+                "stacked": false
+              }
+            },
+            {
+              "type": "metric",
+              "x": 0, "y": 6, "width": 12, "height": 6,
+              "properties": {
+                "title": "Local vs API — Avg Latency",
+                "region": "${AWS::Region}",
+                "metrics": [
+                  ["Pally/MLInference", "InferenceLatencyMs", "ModelType", "local", {"stat": "Average", "label": "Local Models (BERT+ViT)"}],
+                  ["...", "api", {"stat": "Average", "label": "API Models (Groq+GPT-4o)"}]
+                ],
+                "period": 300,
+                "view": "timeSeries",
+                "stacked": false
+              }
+            },
+            {
+              "type": "metric",
+              "x": 12, "y": 6, "width": 12, "height": 6,
+              "properties": {
+                "title": "Inference Count by Model",
+                "region": "${AWS::Region}",
+                "metrics": [
+                  ["Pally/MLInference", "InferenceCount", "ModelName", "bert-intent-emotion", "ModelType", "local", "Status", "success", {"stat": "Sum", "label": "BERT"}],
+                  ["...", "vit-gallery-encoder", ".", "local", ".", "success", {"stat": "Sum", "label": "ViT"}],
+                  ["...", "groq-llm", ".", "api", ".", "success", {"stat": "Sum", "label": "Groq"}],
+                  ["...", "gpt4o-vision", ".", "api", ".", "success", {"stat": "Sum", "label": "GPT-4o"}]
+                ],
+                "period": 300,
+                "view": "timeSeries",
+                "stacked": true
+              }
+            },
+            {
+              "type": "metric",
+              "x": 0, "y": 12, "width": 24, "height": 6,
+              "properties": {
+                "title": "Error Rate by Model (%)",
+                "region": "${AWS::Region}",
+                "metrics": [
+                  [{"expression": "(bert_err / (bert_ok + bert_err)) * 100", "label": "BERT Error %", "id": "bert_pct"}],
+                  [{"expression": "(groq_err / (groq_ok + groq_err)) * 100", "label": "Groq Error %", "id": "groq_pct"}],
+                  [{"expression": "(gpt_err / (gpt_ok + gpt_err)) * 100", "label": "GPT-4o Error %", "id": "gpt_pct"}],
+                  ["Pally/MLInference", "InferenceCount", "ModelName", "bert-intent-emotion", "ModelType", "local", "Status", "success", {"id": "bert_ok", "visible": false, "stat": "Sum"}],
+                  ["...", "bert-intent-emotion", ".", "local", ".", "error", {"id": "bert_err", "visible": false, "stat": "Sum"}],
+                  ["...", "groq-llm", ".", "api", ".", "success", {"id": "groq_ok", "visible": false, "stat": "Sum"}],
+                  ["...", "groq-llm", ".", "api", ".", "error", {"id": "groq_err", "visible": false, "stat": "Sum"}],
+                  ["...", "gpt4o-vision", ".", "api", ".", "success", {"id": "gpt_ok", "visible": false, "stat": "Sum"}],
+                  ["...", "gpt4o-vision", ".", "api", ".", "error", {"id": "gpt_err", "visible": false, "stat": "Sum"}]
+                ],
+                "period": 300,
+                "view": "timeSeries",
+                "stacked": false
+              }
+            }
+          ]
+        }
+
+Outputs:
+  DashboardURL:
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards/dashboard/Pally-ML-Monitor"
+    Description: Direct link to the ML Monitor dashboard
