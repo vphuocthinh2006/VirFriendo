@@ -11,7 +11,7 @@ import functools
 import time
 from typing import Callable, TypeVar
 
-from services.ml.metrics import InferenceStatus, MetricDataPoint, ModelType
+from services.ml.metrics.models import InferenceStatus, MetricDataPoint, ModelType
 
 F = TypeVar("F", bound=Callable)
 
