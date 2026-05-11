@@ -1546,13 +1546,16 @@ async def analyze_media(
                     )
             if tier in ("high", "confident"):
                 gallery_ctx = (
-                    f"Gallery ViT nhận diện: 「{nm}」 (similarity={sim:.2f}, tier={tier}).{margin_note}\n"
-                    "Tin cậy cao — dùng tên này trừ khi vision API nói khác rõ ràng.\n\n"
+                    f"Gallery ViT nhận diện CHẮC CHẮN: 「{nm}」 (similarity={sim:.2f}, tier={tier}).{margin_note}\n"
+                    "Tin cậy RẤT CAO — ViT được train riêng trên nhân vật này. LUÔN dùng tên này.\n"
+                    "KHÔNG được đổi sang tên khác dù vision API nói gì. ViT chính xác hơn vision API về identity.\n\n"
                 )
             elif tier == "medium":
                 gallery_ctx = (
-                    f"Gallery ViT gợi ý: 「{nm}」 (similarity={sim:.2f}, tier={tier}).{margin_note}\n"
-                    "Tin cậy trung bình — cần vision API xác nhận. Nếu vision nói khác, ưu tiên vision.\n\n"
+                    f"Gallery ViT nhận diện: 「{nm}」 (similarity={sim:.2f}, tier={tier}).{margin_note}\n"
+                    "Tin cậy trung bình-cao — ViT được train riêng trên gallery nhân vật nên CHÍNH XÁC hơn vision API về tên nhân vật.\n"
+                    "NẾU vision API nói nhân vật KHÁC nhưng CÙNG BỘ ANIME/GAME → TIN ViT (ví dụ: ViT nói Fern, vision nói Frieren — cả 2 cùng anime nhưng ViT đúng hơn).\n"
+                    "CHỈ bỏ qua ViT nếu vision API nói nhân vật từ BỘ ANIME/GAME HOÀN TOÀN KHÁC.\n\n"
                 )
             else:
                 gallery_ctx = (
