@@ -24,7 +24,7 @@ _ENABLED = os.environ.get("ENABLE_ML_PREDICTION_LOG", "true").strip().lower() in
 _buffer: list[str] = []
 _buffer_lock = threading.Lock()
 _FLUSH_INTERVAL = 60  # seconds
-_FLUSH_SIZE = 5  # records (lowered from 50 to flush faster)
+_FLUSH_SIZE = 1  # flush every single record for reliability
 _last_flush = time.time()
 
 
@@ -127,9 +127,9 @@ def _flush_buffer() -> None:
     try:
         s3 = _s3_client()
         s3.put_object(Bucket=_BUCKET, Key=key, Body=body.encode("utf-8"))
-        logger.debug("Flushed {} prediction records to s3://{}/{}", len(lines), _BUCKET, key)
+        logger.info("Flushed {} prediction records to s3://{}/{}", len(lines), _BUCKET, key)
     except Exception as e:
-        logger.warning("Failed to flush predictions to S3: {}", e)
+        logger.error("Failed to flush predictions to S3: {} — bucket={} key={}", e, _BUCKET, key)
         # Put records back
         with _buffer_lock:
             _buffer.extend(lines)
