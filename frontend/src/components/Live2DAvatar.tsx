@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as PIXI from 'pixi.js'
-import { Live2DModel } from 'pixi-live2d-display/cubism4'
+import { Live2DModel } from 'pixi-live2d-display'
 
 // Make PIXI globally accessible — pixi-live2d-display registers Ticker via window.PIXI
 ;(window as unknown as { PIXI: typeof PIXI }).PIXI = PIXI
@@ -14,22 +14,23 @@ export type Live2DEmotion =
   | 'sleepy'
   | 'blush'
 
-/** Hosted Haru Greeter model (Cubism 4) — official Live2D sample with expressions. */
+/** Shizuku — female anime character with expressions + motions (Cubism 2). */
 const DEFAULT_MODEL_URL =
-  'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display@master/test/assets/haru/haru_greeter_t03.model3.json'
+  'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display@master/test/assets/shizuku/shizuku.model.json'
 
 /**
- * Map our high-level emotion → expression name for Haru model.
- * Haru expressions: F01 (happy), F02 (sad), F03 (angry), F04 (surprised), F05 (relaxed), F06 (shy)
+ * Map emotion → expression name + motion group for Shizuku.
+ * Expressions: f01 (smile), f02 (sad/pout), f03 (surprised), f04 (angry)
+ * Motions: tap_body (happy), shake (sad), flick_head (angry), pinch_out (surprised), pinch_in (sleepy)
  */
-const EMOTION_EXPRESSIONS: Record<Live2DEmotion, string | null> = {
-  idle: null,
-  happy: 'F01',
-  sad: 'F02',
-  angry: 'F03',
-  surprised: 'F04',
-  sleepy: 'F05',
-  blush: 'F06',
+const EMOTION_EXPRESSIONS: Record<Live2DEmotion, { exp: string | null; motion: string | null }> = {
+  idle: { exp: null, motion: null },
+  happy: { exp: 'f01', motion: 'tap_body' },
+  sad: { exp: 'f02', motion: 'shake' },
+  angry: { exp: 'f04', motion: 'flick_head' },
+  surprised: { exp: 'f03', motion: 'pinch_out' },
+  sleepy: { exp: 'f02', motion: 'pinch_in' },
+  blush: { exp: 'f01', motion: 'tap_body' },
 }
 
 interface Props {
@@ -175,19 +176,23 @@ export default function Live2DAvatar({
     }
   }, [modelUrl])
 
-  // Apply emotion changes via expressions (Haru model)
+  // Apply emotion changes — expression + motion (Shizuku)
   useEffect(() => {
     const model = modelRef.current
     if (!loaded || !model) return
-    const exp = EMOTION_EXPRESSIONS[emotion]
+    const mapping = EMOTION_EXPRESSIONS[emotion]
     try {
-      if (exp) {
-        ;(model as unknown as { expression: (name?: string | number) => void }).expression(exp)
-      } else {
-        // idle — reset expression
+      if (mapping.exp) {
+        ;(model as unknown as { expression: (name?: string | number) => void }).expression(mapping.exp)
+      }
+      if (mapping.motion) {
+        ;(model as unknown as { motion: (group: string, index?: number) => void }).motion(mapping.motion)
+      }
+      if (!mapping.exp && !mapping.motion) {
+        // idle — clear expression
         ;(model as unknown as { expression: (name?: string | number) => void }).expression()
       }
-    } catch { /* model may not have this expression — ignore */ }
+    } catch { /* ignore if model doesn't support */ }
   }, [emotion, loaded])
 
   if (errored && fallback) return <>{fallback}</>
