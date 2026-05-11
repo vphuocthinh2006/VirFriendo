@@ -10,8 +10,11 @@ from groq import Groq
 from loguru import logger
 
 from services.core.config import settings
+from services.ml.metrics import ModelType
+from services.ml.metrics.collector import track_inference
 
 
+@track_inference(model_name="groq-llm", model_type=ModelType.API)
 async def arbitrator_pick_emotion(
     *,
     user_snippet: str,

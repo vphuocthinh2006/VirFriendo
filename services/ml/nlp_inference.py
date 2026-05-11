@@ -14,6 +14,8 @@ from transformers import AutoTokenizer
 
 from services.core.config import settings
 from services.ml.label_maps import parse_id_to_label_txt
+from services.ml.metrics import ModelType
+from services.ml.metrics.collector import track_inference
 from services.ml.nlp_models import build_multitask_bert_from_checkpoint
 
 
@@ -115,6 +117,7 @@ class NLPInferenceService:
                 logger.exception("Failed to load NLP model: {}", e)
                 return False
 
+    @track_inference(model_name="bert-intent-emotion", model_type=ModelType.LOCAL)
     def maybe_predict(self, text: str, max_length: int = 64) -> NLPPrediction | None:
         if not self.enabled():
             return None

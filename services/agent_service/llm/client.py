@@ -1,10 +1,14 @@
 # services/agent_service/llm/client.py
 """LLM client: Claude (Anthropic) / OpenAI / Groq. Dùng cho các agent generate reply."""
 import os
+import time
 from typing import Optional, Sequence
 
 from langchain_core.messages import BaseMessage, SystemMessage
 from loguru import logger
+
+from services.ml.metrics import InferenceStatus, MetricDataPoint, ModelType
+from services.ml.metrics.collector import MetricsCollector
 
 _llm = None
 
@@ -112,9 +116,54 @@ def get_active_model_info() -> dict:
     return {"provider": provider, "model": model}
 
 
+def _provider_to_model_name(provider: str) -> str:
+    """Map LLM provider string to metrics model_name."""
+    mapping = {
+        "groq": "groq-llm",
+        "openai": "gpt4o-vision",
+        "anthropic": "anthropic-claude",
+    }
+    return mapping.get(provider, f"{provider}-llm")
+
+
 async def generate(system_prompt: str, user_message: str) -> Optional[str]:
     """
     Gọi LLM với system + user message. Trả về nội dung reply hoặc None nếu lỗi/không cấu hình.
+    """
+    collector = MetricsCollector.instance()
+    if not collector.is_enabled():
+        return await _generate_impl(system_prompt, user_message)
+
+    info = get_active_model_info()
+    model_name = _provider_to_model_name(info["provider"])
+
+    start = time.perf_counter()
+    try:
+        result = await _generate_impl(system_prompt, user_message)
+        elapsed = (time.perf_counter() - start) * 1000
+        collector.record(MetricDataPoint(
+            model_name=model_name,
+            model_type=ModelType.API,
+            status=InferenceStatus.SUCCESS,
+            latency_ms=elapsed,
+            timestamp=time.time(),
+        ))
+        return result
+    except Exception as e:
+        elapsed = (time.perf_counter() - start) * 1000
+        collector.record(MetricDataPoint(
+            model_name=model_name,
+            model_type=ModelType.API,
+            status=InferenceStatus.ERROR,
+            latency_ms=elapsed,
+            timestamp=time.time(),
+        ))
+        raise
+
+
+async def _generate_impl(system_prompt: str, user_message: str) -> Optional[str]:
+    """
+    Internal implementation of generate (without metrics wrapping).
     """
     llm = _get_llm()
     if llm is None:
@@ -135,7 +184,7 @@ async def generate(system_prompt: str, user_message: str) -> Optional[str]:
         return None
     except Exception as e:
         logger.warning("LLM generate failed: {}", e)
-        return None
+        raise
 
 
 # Số tin nhắn tối đa gửi vào LLM (context window) — trùng với core/context.
@@ -151,6 +200,44 @@ async def generate_with_history(
     Gọi LLM với system + toàn bộ đoạn hội thoại gần nhất (để bot nhớ mạch, reply liền như Character.AI).
     messages: list HumanMessage/AIMessage (đã gồm tin mới nhất của user).
     Chỉ lấy last MAX_HISTORY_MESSAGES để tránh tràn context.
+    """
+    collector = MetricsCollector.instance()
+    if not collector.is_enabled():
+        return await _generate_with_history_impl(system_prompt, messages)
+
+    info = get_active_model_info()
+    model_name = _provider_to_model_name(info["provider"])
+
+    start = time.perf_counter()
+    try:
+        result = await _generate_with_history_impl(system_prompt, messages)
+        elapsed = (time.perf_counter() - start) * 1000
+        collector.record(MetricDataPoint(
+            model_name=model_name,
+            model_type=ModelType.API,
+            status=InferenceStatus.SUCCESS,
+            latency_ms=elapsed,
+            timestamp=time.time(),
+        ))
+        return result
+    except Exception as e:
+        elapsed = (time.perf_counter() - start) * 1000
+        collector.record(MetricDataPoint(
+            model_name=model_name,
+            model_type=ModelType.API,
+            status=InferenceStatus.ERROR,
+            latency_ms=elapsed,
+            timestamp=time.time(),
+        ))
+        raise
+
+
+async def _generate_with_history_impl(
+    system_prompt: str,
+    messages: Sequence[BaseMessage],
+) -> Optional[str]:
+    """
+    Internal implementation of generate_with_history (without metrics wrapping).
     """
     llm = _get_llm()
     if llm is None:
@@ -170,4 +257,4 @@ async def generate_with_history(
         return None
     except Exception as e:
         logger.warning("LLM generate_with_history failed: {}", e)
-        return None
+        raise

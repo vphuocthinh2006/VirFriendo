@@ -9,6 +9,8 @@ import torch.nn as nn
 from loguru import logger
 
 from services.core.config import settings
+from services.ml.metrics import ModelType
+from services.ml.metrics.collector import track_inference
 
 
 class _ViTClassifierWrapper(nn.Module):
@@ -70,6 +72,7 @@ def get_vit_encoder() -> _ViTClassifierWrapper | None:
             return None
 
 
+@track_inference(model_name="vit-gallery-encoder", model_type=ModelType.LOCAL)
 @torch.inference_mode()
 def encode_image_pil_normalized(
     pil_image,

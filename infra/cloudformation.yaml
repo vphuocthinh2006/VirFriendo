@@ -91,6 +91,15 @@ Resources:
               - Effect: Allow
                 Action: secretsmanager:GetSecretValue
                 Resource: !Sub arn:aws:secretsmanager:ap-southeast-1:${AWS::AccountId}:secret:virfriendo/prod/database*
+        # CloudWatch PutMetricData does not support resource-level restrictions;
+        # Resource: "*" is required for this action.
+        - PolicyName: pally-cloudwatch-metrics
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: cloudwatch:PutMetricData
+                Resource: "*"
 
   # ----------------------------------------------------------
   # IAM — ECS Execution Role (pull ECR, write logs)
@@ -455,6 +464,128 @@ Resources:
       TreatMissingData: notBreaching
       AlarmActions:
         - !Ref AlertsTopic
+
+  # ----------------------------------------------------------
+  # CloudWatch — ML Inference Dashboard
+  # ----------------------------------------------------------
+  MLInferenceDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: Pally-ML-Monitor
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {
+              "type": "metric",
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 6,
+              "properties": {
+                "title": "Avg Latency by ModelName",
+                "metrics": [
+                  ["Pally/MLInference", "InferenceLatencyMs", "ModelName", "bert-intent-emotion", "ModelType", "local", "Status", "success", {"stat": "Average"}],
+                  ["...", "vit-gallery-encoder", ".", ".", ".", ".", {"stat": "Average"}],
+                  ["...", "groq-llm", ".", "api", ".", ".", {"stat": "Average"}],
+                  ["...", "gpt4o-vision", ".", ".", ".", ".", {"stat": "Average"}],
+                  ["...", "anthropic-claude", ".", ".", ".", ".", {"stat": "Average"}]
+                ],
+                "region": "ap-southeast-1",
+                "period": 10800,
+                "view": "timeSeries",
+                "stacked": false
+              }
+            },
+            {
+              "type": "metric",
+              "x": 12,
+              "y": 0,
+              "width": 12,
+              "height": 6,
+              "properties": {
+                "title": "P95 Latency by ModelName",
+                "metrics": [
+                  ["Pally/MLInference", "InferenceLatencyMs", "ModelName", "bert-intent-emotion", "ModelType", "local", "Status", "success", {"stat": "p95"}],
+                  ["...", "vit-gallery-encoder", ".", ".", ".", ".", {"stat": "p95"}],
+                  ["...", "groq-llm", ".", "api", ".", ".", {"stat": "p95"}],
+                  ["...", "gpt4o-vision", ".", ".", ".", ".", {"stat": "p95"}],
+                  ["...", "anthropic-claude", ".", ".", ".", ".", {"stat": "p95"}]
+                ],
+                "region": "ap-southeast-1",
+                "period": 10800,
+                "view": "timeSeries",
+                "stacked": false
+              }
+            },
+            {
+              "type": "metric",
+              "x": 0,
+              "y": 6,
+              "width": 12,
+              "height": 6,
+              "properties": {
+                "title": "Local vs API Avg Latency",
+                "metrics": [
+                  ["Pally/MLInference", "InferenceLatencyMs", "ModelType", "local", {"stat": "Average"}],
+                  ["...", "api", {"stat": "Average"}]
+                ],
+                "region": "ap-southeast-1",
+                "period": 10800,
+                "view": "timeSeries",
+                "stacked": false
+              }
+            },
+            {
+              "type": "metric",
+              "x": 12,
+              "y": 6,
+              "width": 12,
+              "height": 6,
+              "properties": {
+                "title": "InferenceCount by ModelName",
+                "metrics": [
+                  ["Pally/MLInference", "InferenceCount", "ModelName", "bert-intent-emotion", "ModelType", "local", "Status", "success", {"stat": "Sum"}],
+                  ["...", "vit-gallery-encoder", ".", ".", ".", ".", {"stat": "Sum"}],
+                  ["...", "groq-llm", ".", "api", ".", ".", {"stat": "Sum"}],
+                  ["...", "gpt4o-vision", ".", ".", ".", ".", {"stat": "Sum"}],
+                  ["...", "anthropic-claude", ".", ".", ".", ".", {"stat": "Sum"}]
+                ],
+                "region": "ap-southeast-1",
+                "period": 10800,
+                "view": "timeSeries",
+                "stacked": true
+              }
+            },
+            {
+              "type": "metric",
+              "x": 0,
+              "y": 12,
+              "width": 24,
+              "height": 6,
+              "properties": {
+                "title": "Error Rate by ModelName (%)",
+                "metrics": [
+                  [{"expression": "(bert_err / (bert_err + bert_ok)) * 100", "label": "bert-intent-emotion", "id": "bert_rate"}],
+                  [{"expression": "(vit_err / (vit_err + vit_ok)) * 100", "label": "vit-gallery-encoder", "id": "vit_rate"}],
+                  [{"expression": "(groq_err / (groq_err + groq_ok)) * 100", "label": "groq-llm", "id": "groq_rate"}],
+                  [{"expression": "(gpt_err / (gpt_err + gpt_ok)) * 100", "label": "gpt4o-vision", "id": "gpt_rate"}],
+                  ["Pally/MLInference", "InferenceCount", "ModelName", "bert-intent-emotion", "ModelType", "local", "Status", "error", {"id": "bert_err", "stat": "Sum", "visible": false}],
+                  ["...", "bert-intent-emotion", ".", ".", ".", "success", {"id": "bert_ok", "stat": "Sum", "visible": false}],
+                  ["...", "vit-gallery-encoder", ".", ".", ".", "error", {"id": "vit_err", "stat": "Sum", "visible": false}],
+                  ["...", "vit-gallery-encoder", ".", ".", ".", "success", {"id": "vit_ok", "stat": "Sum", "visible": false}],
+                  ["...", "groq-llm", ".", "api", ".", "error", {"id": "groq_err", "stat": "Sum", "visible": false}],
+                  ["...", "groq-llm", ".", ".", ".", "success", {"id": "groq_ok", "stat": "Sum", "visible": false}],
+                  ["...", "gpt4o-vision", ".", ".", ".", "error", {"id": "gpt_err", "stat": "Sum", "visible": false}],
+                  ["...", "gpt4o-vision", ".", ".", ".", "success", {"id": "gpt_ok", "stat": "Sum", "visible": false}]
+                ],
+                "region": "ap-southeast-1",
+                "period": 10800,
+                "view": "timeSeries",
+                "stacked": false
+              }
+            }
+          ]
+        }
 
 # ============================================================
 # OUTPUTS

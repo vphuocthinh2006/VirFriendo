@@ -70,6 +70,9 @@ class Settings(BaseSettings):
     VIT_MIN_SIMILARITY: float = 0.657
     VIT_MIN_MARGIN_SIM: float = 0.03
 
+    # --- ML Metrics (CloudWatch inference latency tracking) ---
+    ENABLE_ML_METRICS: bool = False
+
     # Optional: external agent-service endpoint (microservice mode)
     AGENT_SERVICE_URL: str | None = None
 
