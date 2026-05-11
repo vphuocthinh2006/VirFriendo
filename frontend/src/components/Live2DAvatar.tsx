@@ -14,22 +14,22 @@ export type Live2DEmotion =
   | 'sleepy'
   | 'blush'
 
-/** Hosted Hiyori Pro model (Cubism 4) — expressive with clear emotions. */
+/** Hosted Haru Greeter model (Cubism 4) — official Live2D sample with expressions. */
 const DEFAULT_MODEL_URL =
-  'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display@master/test/assets/hiyori/hiyori_pro_t10.model3.json'
+  'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display@master/test/assets/haru/haru_greeter_t03.model3.json'
 
 /**
- * Map our high-level emotion → expression index for Hiyori model.
- * Hiyori has numbered expressions (0-based index).
+ * Map our high-level emotion → expression name for Haru model.
+ * Haru expressions: F01 (happy), F02 (sad), F03 (angry), F04 (surprised), F05 (relaxed), F06 (shy)
  */
-const EMOTION_EXPRESSIONS: Record<Live2DEmotion, number | null> = {
+const EMOTION_EXPRESSIONS: Record<Live2DEmotion, string | null> = {
   idle: null,
-  happy: 1,
-  sad: 2,
-  angry: 3,
-  surprised: 4,
-  sleepy: 5,
-  blush: 6,
+  happy: 'F01',
+  sad: 'F02',
+  angry: 'F03',
+  surprised: 'F04',
+  sleepy: 'F05',
+  blush: 'F06',
 }
 
 interface Props {
@@ -175,17 +175,17 @@ export default function Live2DAvatar({
     }
   }, [modelUrl])
 
-  // Apply emotion changes via expressions (Hiyori model)
+  // Apply emotion changes via expressions (Haru model)
   useEffect(() => {
     const model = modelRef.current
     if (!loaded || !model) return
-    const expIndex = EMOTION_EXPRESSIONS[emotion]
+    const exp = EMOTION_EXPRESSIONS[emotion]
     try {
-      if (expIndex !== null) {
-        ;(model as unknown as { expression: (index?: number) => void }).expression(expIndex)
+      if (exp) {
+        ;(model as unknown as { expression: (name?: string | number) => void }).expression(exp)
       } else {
         // idle — reset expression
-        ;(model as unknown as { expression: (index?: number) => void }).expression()
+        ;(model as unknown as { expression: (name?: string | number) => void }).expression()
       }
     } catch { /* model may not have this expression — ignore */ }
   }, [emotion, loaded])
