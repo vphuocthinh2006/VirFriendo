@@ -34,12 +34,12 @@ const SLASH_COMMANDS: { cmd: string; desc: string }[] = [
 function mapToLive2DEmotion(detected: string | null | undefined): Live2DEmotion {
   if (!detected) return 'idle'
   const t = detected.toLowerCase()
-  if (t.includes('happy') || t.includes('joy') || t.includes('excited') || t.includes('cheerful')) return 'happy'
-  if (t.includes('sad') || t.includes('down') || t.includes('crying')) return 'sad'
-  if (t.includes('angry') || t.includes('mad') || t.includes('frustrated')) return 'angry'
-  if (t.includes('surprised') || t.includes('shocked') || t.includes('amazed')) return 'surprised'
-  if (t.includes('sleepy') || t.includes('tired') || t.includes('bored')) return 'sleepy'
-  if (t.includes('blush') || t.includes('shy') || t.includes('embarrass')) return 'blush'
+  if (t.includes('happy') || t.includes('joy') || t.includes('excited') || t.includes('cheerful') || t.includes('love') || t.includes('grateful') || t.includes('amused')) return 'happy'
+  if (t.includes('sad') || t.includes('down') || t.includes('crying') || t.includes('lonely') || t.includes('grief') || t.includes('disappoint')) return 'sad'
+  if (t.includes('angry') || t.includes('mad') || t.includes('frustrated') || t.includes('annoyed') || t.includes('disgust') || t.includes('irritat')) return 'angry'
+  if (t.includes('surprised') || t.includes('shocked') || t.includes('amazed') || t.includes('curious') || t.includes('wonder') || t.includes('interest')) return 'surprised'
+  if (t.includes('sleepy') || t.includes('tired') || t.includes('bored') || t.includes('exhaust')) return 'sleepy'
+  if (t.includes('blush') || t.includes('shy') || t.includes('embarrass') || t.includes('flirt') || t.includes('tease')) return 'blush'
   return 'idle'
 }
 
