@@ -24,7 +24,7 @@ _ENABLED = os.environ.get("ENABLE_ML_PREDICTION_LOG", "true").strip().lower() in
 _buffer: list[str] = []
 _buffer_lock = threading.Lock()
 _FLUSH_INTERVAL = 60  # seconds
-_FLUSH_SIZE = 50  # records
+_FLUSH_SIZE = 5  # records (lowered from 50 to flush faster)
 _last_flush = time.time()
 
 
@@ -101,7 +101,8 @@ def _append_record(line: str) -> None:
     with _buffer_lock:
         _buffer.append(line)
         now = time.time()
-        if len(_buffer) >= _FLUSH_SIZE or (now - _last_flush) >= _FLUSH_INTERVAL:
+        # Flush immediately if buffer has any records and 30s passed, or buffer full
+        if len(_buffer) >= _FLUSH_SIZE or (now - _last_flush) >= 30:
             _flush_buffer()
             _last_flush = now
 
