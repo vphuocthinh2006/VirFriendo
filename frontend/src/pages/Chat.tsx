@@ -558,6 +558,11 @@ export default function Chat() {
   const [musicShuffle, setMusicShuffle] = useState<boolean>(
     () => localStorage.getItem('pally_music_shuffle') === '1',
   )
+
+  // Feedback modal state (dislike popup)
+  const [feedbackModal, setFeedbackModal] = useState<{ msgId: string; convId: string } | null>(null)
+  const [feedbackText, setFeedbackText] = useState('')
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false)
   const [musicVolume, setMusicVolume] = useState<number>(
     () => Number(localStorage.getItem('pally_music_volume') || '40'),
   )
@@ -2057,7 +2062,7 @@ export default function Chat() {
                               type="button"
                               className="vf-chat-feedback-btn"
                               title="Bad reply"
-                              onClick={() => api.submitFeedback(msg.id, conversationId!, 'down').catch(() => {})}
+                              onClick={() => setFeedbackModal({ msgId: msg.id, convId: conversationId! })}
                             >👎</button>
                           </div>
                         )}
@@ -3240,6 +3245,43 @@ export default function Chat() {
                   </div>
                 ))
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Dislike feedback modal */}
+      {feedbackModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => { setFeedbackModal(null); setFeedbackText('') }}>
+          <div className="w-full max-w-sm mx-4 rounded-2xl bg-[#1a1a2e] border border-white/10 p-5 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <h3 className="text-white text-base font-semibold mb-3">What went wrong?</h3>
+            <textarea
+              className="w-full h-24 rounded-xl bg-white/5 border border-white/10 text-white text-sm px-3 py-2 resize-none focus:outline-none focus:border-purple-400/60 placeholder:text-white/30"
+              placeholder="Tell us what was bad about this reply (optional)..."
+              value={feedbackText}
+              onChange={e => setFeedbackText(e.target.value)}
+              autoFocus
+            />
+            <div className="flex gap-2 mt-3">
+              <button
+                type="button"
+                className="flex-1 rounded-xl bg-white/5 border border-white/10 text-white/70 text-sm py-2 hover:bg-white/10 transition-colors"
+                onClick={() => { setFeedbackModal(null); setFeedbackText('') }}
+              >Cancel</button>
+              <button
+                type="button"
+                className="flex-1 rounded-xl bg-red-500/80 text-white text-sm py-2 hover:bg-red-500 transition-colors disabled:opacity-50"
+                disabled={feedbackSubmitting}
+                onClick={async () => {
+                  setFeedbackSubmitting(true)
+                  try {
+                    await api.submitFeedback(feedbackModal.msgId, feedbackModal.convId, 'down', feedbackText.trim() || undefined)
+                  } catch {}
+                  setFeedbackSubmitting(false)
+                  setFeedbackModal(null)
+                  setFeedbackText('')
+                }}
+              >{feedbackSubmitting ? 'Sending...' : 'Submit 👎'}</button>
             </div>
           </div>
         </div>

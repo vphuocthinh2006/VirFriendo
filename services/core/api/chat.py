@@ -1697,17 +1697,22 @@ SUBJECT_TAG: <tên nhân vật + nguồn, ví dụ "Aiden Pearce (Watch Dogs)">"
     for line in raw_vision.splitlines():
         stripped = line.strip()
         up = stripped.upper()
-        if up.startswith("SEARCH_QUERY:"):
+        if up.startswith("SEARCH_QUERY:") or up.startswith("SEARCH_QUERY :"):
             q = stripped.split(":", 1)[1].strip().strip('"').strip("'")
             if q and q.upper() != "NONE":
                 search_query = q
             continue
-        if up.startswith("SUBJECT_TAG:"):
+        if up.startswith("SUBJECT_TAG:") or up.startswith("SUBJECT_TAG :"):
             t = stripped.split(":", 1)[1].strip().strip('"').strip("'")
             if t and t.lower() not in ("none", "ảnh chung"):
                 subject_tag = t
             continue
-        cleaned_lines.append(line)
+        # Also strip inline occurrences (LLM sometimes embeds them mid-text)
+        cleaned = re.sub(r'SEARCH_QUERY\s*:\s*"?[^"\n]+"?', '', stripped, flags=re.IGNORECASE)
+        cleaned = re.sub(r'SUBJECT_TAG\s*:\s*"?[^"\n]+"?', '', cleaned, flags=re.IGNORECASE)
+        cleaned = cleaned.strip()
+        if cleaned:
+            cleaned_lines.append(cleaned)
     vision_reply = "\n".join(cleaned_lines).strip()
 
     logger.info(f"Vision pass done. search_query={search_query!r} subject_tag={subject_tag!r}")
