@@ -1527,6 +1527,7 @@ async def analyze_media(
     gallery_ctx = ""
     if not is_video and getattr(settings, "ENABLE_VIT_GALLERY", False):
         gallery_hints_list, _ = await _run_character_gallery_on_image_bytes(content)
+        logger.info(f"[ViT Gallery] matches={len(gallery_hints_list)}, top={gallery_hints_list[0] if gallery_hints_list else 'none'}")
         if gallery_hints_list:
             top = gallery_hints_list[0]
             nm = top.get("character") or ""
