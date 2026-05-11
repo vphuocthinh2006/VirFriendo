@@ -1563,7 +1563,7 @@ async def analyze_media(
                     "Tin cậy thấp — KHÔNG dùng tên này trừ khi vision API cũng đồng ý. Ưu tiên vision.\n\n"
                 )
 
-    # Get vision analysis - GPT-4o (primary) → Gemini 1.5 Pro (fallback)
+    # Get vision analysis - GPT-4o (primary) → GPT-4o-mini (fallback)
     gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
     openai_key = os.environ.get("OPENAI_API_KEY", "").strip()
 
@@ -1591,7 +1591,8 @@ SEARCH QUERY — CỰC KỲ QUAN TRỌNG:
 
 Trả lời bằng tiếng Việt, tự nhiên, 3-6 câu. KHÔNG bullet points. KHÔNG BAO GIỜ dùng ký tự Trung Quốc/Nhật/Hàn — chỉ tiếng Việt thuần.
 
-CUỐI câu trả lời, BẮT BUỘC thêm 2 dòng:
+CUỐI câu trả lời, BẮT BUỘC thêm 3 dòng:
+CONFIDENCE: <số từ 1-10, 10 = chắc chắn 100%, 1 = đoán mò>
 SEARCH_QUERY: <query tiếng Anh CỤ THỂ để tìm đúng nhân vật — PHẢI có tên nhân vật nếu đoán được>
 SUBJECT_TAG: <tên nhân vật + nguồn, ví dụ "Aiden Pearce (Watch Dogs)">"""
 
@@ -1664,22 +1665,122 @@ SUBJECT_TAG: <tên nhân vật + nguồn, ví dụ "Aiden Pearce (Watch Dogs)">"
     gemini_task = asyncio.create_task(_call_gemini())
     gpt4o_result, gemini_result = await asyncio.gather(gpt4o_task, gemini_task)
 
-    # --- CONSENSUS LOGIC ---
+    # --- FUSION SCORE CONSENSUS LOGIC ---
+    def _parse_vision_confidence(text: str) -> float:
+        """Extract CONFIDENCE: N from vision response. Returns 0-1 scale."""
+        for line in text.splitlines():
+            stripped = line.strip().upper()
+            if stripped.startswith("CONFIDENCE:"):
+                try:
+                    val = float(stripped.split(":", 1)[1].strip().split()[0])
+                    return min(max(val / 10.0, 0.0), 1.0)
+                except (ValueError, IndexError):
+                    pass
+        return 0.5  # default if not found
+
+    def _parse_subject_tag(text: str) -> str:
+        """Extract SUBJECT_TAG value from vision response."""
+        for line in text.splitlines():
+            stripped = line.strip()
+            if stripped.upper().startswith("SUBJECT_TAG:"):
+                return stripped.split(":", 1)[1].strip().strip('"').strip("'")
+        return ""
+
+    def _compute_fusion_decision(
+        vit_sim: float, vit_name: str, vit_tier: str,
+        gpt4o_conf: float, gpt4o_tag: str,
+        mini_conf: float, mini_tag: str,
+    ) -> dict[str, Any]:
+        """Compute fusion score to decide ViT vs Vision API winner.
+
+        Returns dict with 'winner' ('vit' or 'vision'), 'fusion_score', 'reason'.
+        """
+        # Normalize ViT similarity to 0-1 confidence (already is, but clamp)
+        vit_conf = min(max(vit_sim, 0.0), 1.0)
+
+        # Vision API combined confidence (average of both, weighted toward GPT-4o)
+        vision_conf = gpt4o_conf * 0.7 + mini_conf * 0.3
+
+        # Check if ViT and vision agree (same character name)
+        vit_lower = vit_name.lower().replace("_", " ")
+        gpt4o_lower = gpt4o_tag.lower()
+        mini_lower = mini_tag.lower()
+        vit_in_gpt4o = vit_lower in gpt4o_lower or any(w in gpt4o_lower for w in vit_lower.split() if len(w) > 3)
+        vit_in_mini = vit_lower in mini_lower or any(w in mini_lower for w in vit_lower.split() if len(w) > 3)
+
+        # Agreement bonus
+        if vit_in_gpt4o or vit_in_mini:
+            # Both agree → ViT wins easily
+            return {"winner": "vit", "fusion_score": vit_conf + 0.2, "reason": "agreement"}
+
+        # Disagreement → compute fusion
+        # ViT score: similarity * tier_weight
+        tier_weights = {"high": 1.3, "confident": 1.3, "medium": 1.0, "low": 0.5}
+        vit_weighted = vit_conf * tier_weights.get(vit_tier, 0.7)
+
+        # Check if same franchise (e.g. both mention same anime)
+        # Simple heuristic: if vision tags share words with ViT gallery class names
+        same_franchise = False
+        if vit_tier in ("high", "confident", "medium"):
+            # Characters from same anime often get confused (Fern vs Frieren)
+            # ViT is more reliable for distinguishing within same franchise
+            same_franchise = True  # Assume same franchise when ViT has medium+ match
+
+        if same_franchise and vit_weighted >= 0.65:
+            return {"winner": "vit", "fusion_score": vit_weighted, "reason": "same_franchise_vit_reliable"}
+
+        # Pure score comparison
+        if vit_weighted > vision_conf:
+            return {"winner": "vit", "fusion_score": vit_weighted, "reason": "vit_score_higher"}
+        else:
+            return {"winner": "vision", "fusion_score": vision_conf, "reason": "vision_score_higher"}
+
     if gpt4o_result and gemini_result:
-        # Both succeeded — use LLM to pick the best/merge
+        # Parse confidence from both vision responses
+        gpt4o_conf = _parse_vision_confidence(gpt4o_result)
+        mini_conf = _parse_vision_confidence(gemini_result)
+        gpt4o_tag = _parse_subject_tag(gpt4o_result)
+        mini_tag = _parse_subject_tag(gemini_result)
+
+        # Compute fusion decision if ViT has a match
+        fusion_info = ""
+        if gallery_hints_list:
+            top = gallery_hints_list[0]
+            vit_name = top.get("character", "")
+            vit_sim = top.get("similarity", 0)
+            vit_tier = top.get("tier", "")
+            fusion = _compute_fusion_decision(
+                vit_sim, vit_name, vit_tier,
+                gpt4o_conf, gpt4o_tag,
+                mini_conf, mini_tag,
+            )
+            logger.info(
+                f"[FUSION] ViT={vit_name}(sim={vit_sim:.3f},tier={vit_tier}) vs "
+                f"GPT4o={gpt4o_tag}(conf={gpt4o_conf:.1f}) vs Mini={mini_tag}(conf={mini_conf:.1f}) "
+                f"→ winner={fusion['winner']}, score={fusion['fusion_score']:.3f}, reason={fusion['reason']}"
+            )
+            if fusion["winner"] == "vit":
+                fusion_info = (
+                    f"\n\n⚠️ QUYẾT ĐỊNH FUSION: Dùng tên 「{vit_name.replace('_', ' ').title()}」 từ ViT Gallery "
+                    f"(fusion_score={fusion['fusion_score']:.2f}, reason={fusion['reason']}). "
+                    f"KHÔNG ĐƯỢC dùng tên khác dù nguồn A/B nói gì."
+                )
+
+        # Both succeeded — use LLM to merge with fusion guidance
         from services.agent_service.llm.client import generate
         consensus_prompt = (
             f"Bạn là trợ lý chat vui vẻ. Hai nguồn AI đã phân tích cùng 1 ảnh (user KHÔNG biết có 2 nguồn).\n\n"
             f"=== Nguồn A ===\n{gpt4o_result[:800]}\n\n"
             f"=== Nguồn B ===\n{gemini_result[:800]}\n\n"
             f"=== ViT Gallery ===\n{gallery_ctx or 'Không có kết quả'}\n\n"
+            f"{fusion_info}\n\n"
             "NHIỆM VỤ: Viết 1 câu trả lời DUY NHẤT bằng tiếng Việt cho user.\n"
             "QUY TẮC BẮT BUỘC:\n"
-            "- KHÔNG BAO GIỜ nhắc đến 'GPT-4o', 'Gemini', 'nguồn A', 'nguồn B', 'AI', 'hệ thống'\n"
+            "- KHÔNG BAO GIỜ nhắc đến 'GPT-4o', 'Gemini', 'nguồn A', 'nguồn B', 'AI', 'hệ thống', 'ViT', 'fusion'\n"
             "- KHÔNG nói 'theo phân tích', 'dựa trên thông tin', 'một bên nói... bên kia nói...'\n"
             "- Viết như BẠN tự nhận ra nhân vật — tự tin, trực tiếp\n"
-            "- Nếu cả 2 đồng ý → nói chắc chắn luôn\n"
-            "- Nếu 2 bên khác nhau → chọn bên có chi tiết cụ thể hơn, nói như đó là câu trả lời duy nhất\n"
+            "- NẾU có QUYẾT ĐỊNH FUSION ở trên → BẮT BUỘC dùng tên đó, KHÔNG được đổi\n"
+            "- Nếu không có fusion → chọn bên có chi tiết cụ thể hơn\n"
             "- Giọng chat tự nhiên, xưng 'mình' gọi 'bạn', ngắn gọn 2-3 câu\n"
             "- CUỐI câu trả lời thêm 2 dòng riêng:\n"
             "SEARCH_QUERY: <query tiếng Anh để tìm nhân vật>\n"
@@ -1688,7 +1789,7 @@ SUBJECT_TAG: <tên nhân vật + nguồn, ví dụ "Aiden Pearce (Watch Dogs)">"
         merged = await generate(consensus_prompt, "Viết câu trả lời:")
         if merged and len(merged.strip()) > 40:
             raw_vision = merged.strip()
-            logger.info("[VISION] ✅ Consensus merged from both models")
+            logger.info("[VISION] ✅ Consensus merged with fusion scoring")
         else:
             raw_vision = gpt4o_result  # fallback to GPT-4o
     elif gpt4o_result:
@@ -1699,13 +1800,15 @@ SUBJECT_TAG: <tên nhân vật + nguồn, ví dụ "Aiden Pearce (Watch Dogs)">"
     if not raw_vision:
         raise HTTPException(status_code=500, detail="Vision analysis failed: no response from any provider")
 
-    # Extract SEARCH_QUERY + SUBJECT_TAG, strip them from user-facing reply
+    # Extract SEARCH_QUERY + SUBJECT_TAG + CONFIDENCE, strip them from user-facing reply
     search_query: str = ""
     subject_tag: str = ""
     cleaned_lines: list[str] = []
     for line in raw_vision.splitlines():
         stripped = line.strip()
         up = stripped.upper()
+        if up.startswith("CONFIDENCE:") or up.startswith("CONFIDENCE :"):
+            continue  # strip confidence line from user-facing reply
         if up.startswith("SEARCH_QUERY:") or up.startswith("SEARCH_QUERY :"):
             q = stripped.split(":", 1)[1].strip().strip('"').strip("'")
             if q and q.upper() != "NONE":
@@ -1719,6 +1822,7 @@ SUBJECT_TAG: <tên nhân vật + nguồn, ví dụ "Aiden Pearce (Watch Dogs)">"
         # Also strip inline occurrences (LLM sometimes embeds them mid-text)
         cleaned = re.sub(r'SEARCH_QUERY\s*:\s*"?[^"\n]+"?', '', stripped, flags=re.IGNORECASE)
         cleaned = re.sub(r'SUBJECT_TAG\s*:\s*"?[^"\n]+"?', '', cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r'CONFIDENCE\s*:\s*\d+', '', cleaned, flags=re.IGNORECASE)
         cleaned = cleaned.strip()
         if cleaned:
             cleaned_lines.append(cleaned)
