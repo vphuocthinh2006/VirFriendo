@@ -14,22 +14,22 @@ export type Live2DEmotion =
   | 'sleepy'
   | 'blush'
 
-/** Hosted Shizuku sample model — better expressions than Haru. */
+/** Hosted Hiyori Pro model (Cubism 4) — expressive with clear emotions. */
 const DEFAULT_MODEL_URL =
-  'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display@master/test/assets/shizuku/shizuku.model.json'
+  'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display@master/test/assets/hiyori/hiyori_pro_t10.model3.json'
 
 /**
- * Map our high-level emotion → motion group for Shizuku model.
- * Shizuku uses motion groups instead of named expressions.
+ * Map our high-level emotion → expression index for Hiyori model.
+ * Hiyori has numbered expressions (0-based index).
  */
-const EMOTION_EXPRESSIONS: Record<Live2DEmotion, string | null> = {
+const EMOTION_EXPRESSIONS: Record<Live2DEmotion, number | null> = {
   idle: null,
-  happy: 'tap_body',
-  sad: 'shake',
-  angry: 'flick_head',
-  surprised: 'pinch_out',
-  sleepy: 'pinch_in',
-  blush: 'tap_body',
+  happy: 1,
+  sad: 2,
+  angry: 3,
+  surprised: 4,
+  sleepy: 5,
+  blush: 6,
 }
 
 interface Props {
@@ -175,17 +175,19 @@ export default function Live2DAvatar({
     }
   }, [modelUrl])
 
-  // Apply emotion changes via motion groups (Shizuku model)
+  // Apply emotion changes via expressions (Hiyori model)
   useEffect(() => {
     const model = modelRef.current
     if (!loaded || !model) return
-    const motionGroup = EMOTION_EXPRESSIONS[emotion]
+    const expIndex = EMOTION_EXPRESSIONS[emotion]
     try {
-      if (motionGroup) {
-        ;(model as unknown as { motion: (group: string, index?: number) => void }).motion(motionGroup)
+      if (expIndex !== null) {
+        ;(model as unknown as { expression: (index?: number) => void }).expression(expIndex)
+      } else {
+        // idle — reset expression
+        ;(model as unknown as { expression: (index?: number) => void }).expression()
       }
-      // idle = no explicit motion, model returns to default
-    } catch { /* model may not have this motion — ignore */ }
+    } catch { /* model may not have this expression — ignore */ }
   }, [emotion, loaded])
 
   if (errored && fallback) return <>{fallback}</>

@@ -657,9 +657,9 @@ async def chat(
     bibliotherapy = result.get("bibliotherapy_suggestion")
 
     # Log ML predictions to S3 for SageMaker Model Monitor
-    if nlp_out is not None:
-        try:
-            from services.ml.prediction_logger import log_nlp_prediction
+    try:
+        from services.ml.prediction_logger import log_nlp_prediction
+        if nlp_out is not None:
             log_nlp_prediction(
                 user_text=request.message,
                 emotion_label=nlp_out.emotion_label,
@@ -668,12 +668,26 @@ async def chat(
                 emotion_margin=nlp_out.emotion_margin,
                 act_prob_top1=nlp_out.act_prob_top1,
                 act_margin=nlp_out.act_margin,
-                final_avatar_emotion=emotion_ml,
+                final_avatar_emotion=fused_emotion,
                 arbitrator_used=bool(emotion_meta.get("llm_double_check_snippet")),
                 arbitrator_pick=emotion_meta.get("llm_double_check_snippet"),
             )
-        except Exception:
-            pass
+        else:
+            # NLP not available — still log fusion result for monitoring
+            log_nlp_prediction(
+                user_text=request.message,
+                emotion_label="nlp_unavailable",
+                dialogue_act_label="unknown",
+                emotion_prob_top1=0.0,
+                emotion_margin=0.0,
+                act_prob_top1=0.0,
+                act_margin=0.0,
+                final_avatar_emotion=fused_emotion,
+                arbitrator_used=False,
+                arbitrator_pick=None,
+            )
+    except Exception:
+        pass
 
     dlg_act_val = gate_dialogue_act(nlp_out) if nlp_out else None
     user_ml_blob: dict[str, Any] = {
