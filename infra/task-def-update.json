@@ -1,0 +1,73 @@
+{
+  "family": "virfriendo-api",
+  "taskRoleArn": "arn:aws:iam::292773837061:role/virfriendo-ecs-task-role",
+  "executionRoleArn": "arn:aws:iam::292773837061:role/virfriendo-ecs-execution-role",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "2048",
+  "memory": "6144",
+  "containerDefinitions": [
+    {
+      "name": "api",
+      "image": "292773837061.dkr.ecr.ap-southeast-1.amazonaws.com/virfriendo-api:d48a709",
+      "cpu": 0,
+      "essential": true,
+      "portMappings": [
+        {"containerPort": 8000, "hostPort": 8000, "protocol": "tcp", "name": "api-8000-tcp", "appProtocol": "http"}
+      ],
+      "environment": [
+        {"name": "REPLICATE_IMAGE_MODEL", "value": "black-forest-labs/flux-kontext-pro"},
+        {"name": "GALLERY_VECTOR_BACKEND", "value": "numpy"},
+        {"name": "VIT_TIMM_MODEL", "value": "vit_base_patch16_224"},
+        {"name": "GALLERY_CLASS_NAMES_PKL_PATH", "value": "/app/data/models/class_names.pkl"},
+        {"name": "AWS_REGION", "value": "ap-southeast-1"},
+        {"name": "GOOGLE_CLIENT_ID", "value": "458359879363-e69eqpokpn72b5i17b8em9h61b5bpm0c.apps.googleusercontent.com"},
+        {"name": "LLM_MAX_HISTORY", "value": "12"},
+        {"name": "NLP_LABEL_PATH", "value": "/app/data/models/id_to_label.txt"},
+        {"name": "GROQ_MODEL", "value": "llama-3.3-70b-versatile"},
+        {"name": "ML_DEVICE", "value": "cpu"},
+        {"name": "LLM_MAX_TOKENS", "value": "1024"},
+        {"name": "ENABLE_LLM_DOUBLE_CHECK", "value": "true"},
+        {"name": "CORS_ORIGINS", "value": "https://virfriendo.pages.dev,https://virfriendo.win,https://api.virfriendo.win"},
+        {"name": "TAVILY_SEARCH_DEPTH", "value": "basic"},
+        {"name": "GALLERY_EMBEDDINGS_NPY_PATH", "value": "/app/data/models/gallery_embeddings.npy"},
+        {"name": "VIT_NUM_CLASSES", "value": "45"},
+        {"name": "ENABLE_NLP_METADATA", "value": "true"},
+        {"name": "S3_MEDIA_BUCKET", "value": "virfriendo-media-ap-southeast-1"},
+        {"name": "VIT_MODEL_PATH", "value": "/app/data/models/best_vit_model.pth"},
+        {"name": "NLP_BERT_NAME", "value": "bert-base-uncased"},
+        {"name": "NLP_MODEL_PATH", "value": "/app/data/models/intent_emotion_model.pth"},
+        {"name": "ENABLE_WEB_SEARCH", "value": "true"},
+        {"name": "OPENAI_MODEL", "value": "gpt-4o"},
+        {"name": "ENABLE_VIT_GALLERY", "value": "true"},
+        {"name": "ENABLE_ML_METRICS", "value": "true"},
+        {"name": "ENABLE_ML_PREDICTION_LOG", "value": "true"}
+      ],
+      "secrets": [
+        {"name": "DATABASE_URL", "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:292773837061:secret:virfriendo/prod/database-hFoHvY:DATABASE_URL::"},
+        {"name": "SECRET_KEY", "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:292773837061:secret:virfriendo/prod/database-hFoHvY:SECRET_KEY::"},
+        {"name": "OPENAI_API_KEY", "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:292773837061:secret:virfriendo/prod/database-hFoHvY:OPENAI_API_KEY::"},
+        {"name": "GROQ_API_KEY", "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:292773837061:secret:virfriendo/prod/database-hFoHvY:GROQ_API_KEY::"},
+        {"name": "GEMINI_API_KEY", "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:292773837061:secret:virfriendo/prod/database-hFoHvY:GEMINI_API_KEY::"},
+        {"name": "ANTHROPIC_API_KEY", "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:292773837061:secret:virfriendo/prod/database-hFoHvY:ANTHROPIC_API_KEY::"},
+        {"name": "DEEPGRAM_API_KEY", "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:292773837061:secret:virfriendo/prod/database-hFoHvY:DEEPGRAM_API_KEY::"},
+        {"name": "REPLICATE_API_TOKEN", "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:292773837061:secret:virfriendo/prod/database-hFoHvY:REPLICATE_API_TOKEN::"},
+        {"name": "TAVILY_API_KEY", "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:292773837061:secret:virfriendo/prod/database-hFoHvY:TAVILY_API_KEY::"},
+        {"name": "LLM_PROVIDER", "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:292773837061:secret:virfriendo/prod/database-hFoHvY:LLM_PROVIDER::"},
+        {"name": "APP_ENV", "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:292773837061:secret:virfriendo/prod/database-hFoHvY:APP_ENV::"}
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/virfriendo-api",
+          "awslogs-create-group": "true",
+          "awslogs-region": "ap-southeast-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "mountPoints": [],
+      "volumesFrom": [],
+      "systemControls": []
+    }
+  ]
+}
