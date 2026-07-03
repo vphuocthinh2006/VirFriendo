@@ -1241,6 +1241,57 @@ async def _process_ws_message(
     await db.commit()
     await db.refresh(bot_msg)
 
+    # Log ML predictions to S3 (WS path)
+    try:
+        from services.ml.prediction_logger import log_nlp_prediction
+
+        _intent_source = "keyword_fallback"
+        if getattr(intent_classifier, '_model', None) is not None:
+            _intent_source = "bert_model"
+
+        _conv_id_str = str(conversation.id)
+        _msg_id_str = str(user_msg.id)
+
+        if nlp_out is not None:
+            log_nlp_prediction(
+                user_text=content,
+                emotion_label=nlp_out.emotion_label,
+                dialogue_act_label=nlp_out.dialogue_act_label,
+                emotion_prob_top1=nlp_out.emotion_prob_top1,
+                emotion_margin=nlp_out.emotion_margin,
+                act_prob_top1=nlp_out.act_prob_top1,
+                act_margin=nlp_out.act_margin,
+                final_avatar_emotion=emotion,
+                arbitrator_used=bool(emotion_meta.get("llm_double_check_snippet")),
+                arbitrator_pick=emotion_meta.get("llm_double_check_snippet"),
+                conversation_id=_conv_id_str,
+                message_id=_msg_id_str,
+                intent_label=routed_intent,
+                intent_source=_intent_source,
+                intent_model_confidence=nlp_out.emotion_prob_top1,
+                fusion_meta=fusion_meta,
+            )
+        else:
+            log_nlp_prediction(
+                user_text=content,
+                emotion_label="nlp_unavailable",
+                dialogue_act_label="unknown",
+                emotion_prob_top1=0.0,
+                emotion_margin=0.0,
+                act_prob_top1=0.0,
+                act_margin=0.0,
+                final_avatar_emotion=emotion,
+                arbitrator_used=False,
+                arbitrator_pick=None,
+                conversation_id=_conv_id_str,
+                message_id=_msg_id_str,
+                intent_label=routed_intent,
+                intent_source=_intent_source,
+                fusion_meta=fusion_meta,
+            )
+    except Exception:
+        pass
+
     # 6) Stream reply word-by-word (whitespace-only replies yield split() == [] — send whole text)
     await ws.send_json({"type": "stream_start", "conversation_id": str(conversation.id)})
 
