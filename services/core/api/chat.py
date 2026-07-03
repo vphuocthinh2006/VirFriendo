@@ -660,15 +660,11 @@ async def chat(
     try:
         from services.ml.prediction_logger import log_nlp_prediction
 
-        # Determine intent source for analytics
-        _intent_source = "keyword_fallback"  # default
-        if getattr(intent_classifier, '_model', None) is not None:
-            _intent_source = "bert_model"
-
         _conv_id_str = str(conversation.id)
         _msg_id_str = str(user_msg.id)
 
         if nlp_out is not None:
+            # Intent = dialogue act from BERT (Inform/Question/Directive/Commissive)
             log_nlp_prediction(
                 user_text=request.message,
                 emotion_label=nlp_out.emotion_label,
@@ -682,13 +678,12 @@ async def chat(
                 arbitrator_pick=emotion_meta.get("llm_double_check_snippet"),
                 conversation_id=_conv_id_str,
                 message_id=_msg_id_str,
-                intent_label=routed_intent,
-                intent_source=_intent_source,
-                intent_model_confidence=nlp_out.emotion_prob_top1,
+                intent_label=nlp_out.dialogue_act_label,
+                intent_source="bert_multitask",
+                intent_model_confidence=nlp_out.act_prob_top1,
                 fusion_meta=fusion_meta,
             )
         else:
-            # NLP not available — still log fusion result for monitoring
             log_nlp_prediction(
                 user_text=request.message,
                 emotion_label="nlp_unavailable",
@@ -702,8 +697,8 @@ async def chat(
                 arbitrator_pick=None,
                 conversation_id=_conv_id_str,
                 message_id=_msg_id_str,
-                intent_label=routed_intent,
-                intent_source=_intent_source,
+                intent_label="unknown",
+                intent_source="nlp_unavailable",
                 fusion_meta=fusion_meta,
             )
     except Exception:
@@ -1245,14 +1240,11 @@ async def _process_ws_message(
     try:
         from services.ml.prediction_logger import log_nlp_prediction
 
-        _intent_source = "keyword_fallback"
-        if getattr(intent_classifier, '_model', None) is not None:
-            _intent_source = "bert_model"
-
         _conv_id_str = str(conversation.id)
         _msg_id_str = str(user_msg.id)
 
         if nlp_out is not None:
+            # Intent = dialogue act from BERT (Inform/Question/Directive/Commissive)
             log_nlp_prediction(
                 user_text=content,
                 emotion_label=nlp_out.emotion_label,
@@ -1266,9 +1258,9 @@ async def _process_ws_message(
                 arbitrator_pick=emotion_meta.get("llm_double_check_snippet"),
                 conversation_id=_conv_id_str,
                 message_id=_msg_id_str,
-                intent_label=routed_intent,
-                intent_source=_intent_source,
-                intent_model_confidence=nlp_out.emotion_prob_top1,
+                intent_label=nlp_out.dialogue_act_label,
+                intent_source="bert_multitask",
+                intent_model_confidence=nlp_out.act_prob_top1,
                 fusion_meta=fusion_meta,
             )
         else:
@@ -1285,8 +1277,8 @@ async def _process_ws_message(
                 arbitrator_pick=None,
                 conversation_id=_conv_id_str,
                 message_id=_msg_id_str,
-                intent_label=routed_intent,
-                intent_source=_intent_source,
+                intent_label="unknown",
+                intent_source="nlp_unavailable",
                 fusion_meta=fusion_meta,
             )
     except Exception:
